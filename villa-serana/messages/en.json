@@ -1,0 +1,176 @@
+{
+  "nav": {
+    "services": "Services",
+    "gallery": "Gallery",
+    "experiences": "Experiences",
+    "contact": "Contact",
+    "book": "Book Now"
+  },
+  "hero": {
+    "tagline": "An Unrivaled Private Experience",
+    "location": "Los Cabos, México",
+    "cta_whatsapp": "Book via WhatsApp"
+  },
+  "welcome": {
+    "label": "Welcome",
+    "title": "Villa Sera",
+    "subtitle": "Where luxury meets the Sea of Cortés",
+    "description": "Perched on the cliffs of Los Cabos, Villa Sera is a private luxury residence with direct views of the Sea of Cortés and access to a private beach. An experience crafted for the most discerning guests.",
+    "features": {
+      "beach": "Private Beach",
+      "ocean": "Ocean Views",
+      "privacy": "Full Privacy",
+      "staff": "Dedicated Staff"
+    }
+  },
+  "services": {
+    "label": "Add-On Services",
+    "title": "Elevate your stay to the next level",
+    "subtitle": "Optional services available to make your visit even more exceptional. Each one is arranged separately based on your preferences.",
+    "optional_badge": "Optional services · Arranged separately",
+    "cta": "Request via WhatsApp",
+    "items": {
+      "chef": {
+        "title": "Private Chef",
+        "description": "Personalized menus with the freshest local ingredients. Gourmet breakfasts, dinners under the stars and curated wine pairings."
+      },
+      "butler": {
+        "title": "Butler Service",
+        "description": "Discreet and personalized 24-hour service. Every request attended to before you even make it."
+      },
+      "yacht": {
+        "title": "Private Yachts",
+        "description": "Private tours to the Cabo Arch, snorkeling in crystal-clear waters, sport fishing and sunsets from the sea."
+      },
+      "massage": {
+        "title": "Massage & Spa",
+        "description": "Certified therapists in the comfort of the villa. Relaxing massages, facial treatments and wellness rituals."
+      },
+      "activities": {
+        "title": "Activities",
+        "description": "Paddleboard, kayak, ATV, whale watching, golf and guided excursions throughout Los Cabos."
+      },
+      "concierge": {
+        "title": "Concierge",
+        "description": "Reservations at the finest restaurants, luxury transportation, private jets and access to exclusive events."
+      }
+    }
+  },
+  "gallery": {
+    "label": "The Villa",
+    "title": "Discover every space",
+    "subtitle": "Mexican colonial architecture with breathtaking views",
+    "categories": {
+      "all": "All",
+      "exterior": "Exteriors",
+      "interior": "Interiors",
+      "rooms": "Bedrooms",
+      "beach": "Beach"
+    }
+  },
+  "experiences": {
+    "label": "Experiences",
+    "title": "Moments that last forever",
+    "items": {
+      "chef": {
+        "title": "Private Dinner Under the Stars",
+        "description": "Your private chef designs an exclusive menu for the occasion. Villa Sera's terrace, with El Arco in the background and the Sea of Cortés as your backdrop, becomes the most exclusive restaurant in Los Cabos.",
+        "cta": "Request experience"
+      },
+      "yacht": {
+        "title": "Private Yacht Charter",
+        "description": "Set sail from the villa's private beach into the waters of the Sea of Cortés. Snorkeling, sport fishing, whale shark diving and sunsets before the iconic Arch of Cabo San Lucas.",
+        "cta": "Reserve yacht"
+      },
+      "wellness": {
+        "title": "In-Villa Wellness",
+        "description": "Our certified therapists bring the spa to you. Massages on the ocean-view terrace, aromatherapy rituals and sunrise meditation to the sound of the waves.",
+        "cta": "Schedule session"
+      }
+    }
+  },
+  "why": {
+    "label": "Why Villa Sera",
+    "title": "The difference you can feel",
+    "items": {
+      "privacy": {
+        "title": "Total Privacy",
+        "description": "Your villa. Yours alone."
+      },
+      "luxury": {
+        "title": "Authentic Luxury",
+        "description": "Details that matter."
+      },
+      "service": {
+        "title": "24/7 Service",
+        "description": "Dedicated staff always."
+      },
+      "location": {
+        "title": "Unique Location",
+        "description": "Overlooking the Sea of Cortés."
+      }
+    }
+  },
+  "testimonials": {
+    "label": "Testimonials",
+    "title": "What our guests say",
+    "items": [
+      {
+        "quote": "An absolutely magical experience. The villa is stunning, the views are incredible and the staff made us feel like royalty. We will definitely be back.",
+        "author": "Sarah M.",
+        "origin": "New York, USA"
+      },
+      {
+        "quote": "The private chef was the highlight of our trip. Every meal was a work of art. The oceanfront location is simply unmatched anywhere in Los Cabos.",
+        "author": "Carlos & Ana",
+        "origin": "Mexico City"
+      },
+      {
+        "quote": "We celebrated our anniversary here and it was perfect in every way. The sunset yacht tour to the Arch was something we will never forget.",
+        "author": "James & Linda K.",
+        "origin": "Los Angeles, USA"
+      }
+    ]
+  },
+  "contact": {
+    "label": "Reservations",
+    "title": "Reserve your stay",
+    "subtitle": "Contact us directly for availability and personalized rates.",
+    "direct": {
+      "title": "Direct Booking",
+      "subtitle": "No commissions · Best price guaranteed",
+      "whatsapp": "WhatsApp",
+      "email": "Email"
+    },
+    "airbnb": {
+      "title": "Book on Airbnb",
+      "subtitle": "Secure payment · Verified reviews",
+      "cta": "View on Airbnb"
+    },
+    "form": {
+      "name": "Full name",
+      "email": "Email address",
+      "checkin": "Check-in date",
+      "checkout": "Check-out date",
+      "guests": "Number of guests",
+      "services": "Services of interest",
+      "message": "Message (optional)",
+      "submit": "Send inquiry",
+      "services_options": {
+        "chef": "Private Chef",
+        "butler": "Butler",
+        "yacht": "Yacht",
+        "massage": "Massages",
+        "activities": "Activities"
+      }
+    }
+  },
+  "footer": {
+    "tagline": "An unrivaled private experience in Los Cabos",
+    "rights": "All rights reserved",
+    "company": "Sera Holding"
+  },
+  "whatsapp": {
+    "tooltip": "Book now"
+  }
+}

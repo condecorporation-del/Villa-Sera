@@ -1,0 +1,20 @@
+# ─── Next.js app (villa-serana/) ───
+# node_modules, .next, etc. are ignored via villa-serana/.gitignore
+
+# ─── Root-level media (duplicates) ───
+# Fotos canónicas del sitio: villa-serana/public/images/
+# Evita subir dos veces los mismos JPG pesados desde la raíz del repo.
+/*.jpg
+/*.jpeg
+/*.JPG
+/*.JPEG
+
+# ─── OS & editors ───
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+
+# ─── Logs ───
+*.log
