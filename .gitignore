@@ -1,25 +1,32 @@
-# ─── Dependencies & build (monorepo: lockfile en raíz) ───
+# dependencies
 node_modules/
+.pnp
+.pnp.js
+
+# Next.js build output
 .next/
 out/
-.turbo/
 
-# villa-serana/.gitignore sigue ignorando .env* dentro del workspace
+# environment files
+.env
+.env.local
+.env.*.local
 
-# ─── Root-level media (duplicates) ───
-# Fotos canónicas del sitio: villa-serana/public/images/
-# Evita subir dos veces los mismos JPG pesados desde la raíz del repo.
-/*.jpg
-/*.jpeg
-/*.JPG
-/*.JPEG
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 
-# ─── OS & editors ───
+# OS
 .DS_Store
 Thumbs.db
-.idea/
-.vscode/
-*.swp
 
-# ─── Logs ───
-*.log
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
+
+# Vercel
+.vercel
+
+# Turbopack
+.turbo
