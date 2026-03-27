@@ -1,0 +1,12 @@
+{
+  "name": "villa-sera-monorepo",
+  "private": true,
+  "workspaces": [
+    "villa-serana"
+  ],
+  "scripts": {
+    "build": "npm run build --workspace=villa-serana",
+    "dev": "npm run dev --workspace=villa-serana",
+    "lint": "npm run lint --workspace=villa-serana"
+  }
+}

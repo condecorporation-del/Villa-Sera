@@ -1,5 +1,10 @@
-# ─── Next.js app (villa-serana/) ───
-# node_modules, .next, etc. are ignored via villa-serana/.gitignore
+# ─── Dependencies & build (monorepo: lockfile en raíz) ───
+node_modules/
+.next/
+out/
+.turbo/
+
+# villa-serana/.gitignore sigue ignorando .env* dentro del workspace
 
 # ─── Root-level media (duplicates) ───
 # Fotos canónicas del sitio: villa-serana/public/images/
