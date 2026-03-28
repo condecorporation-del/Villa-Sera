@@ -5,4 +5,4 @@ Allow: /
 Disallow: /_next/
 Disallow: /api/
 
-Sitemap: https://villa-sera.vercel.app/sitemap.xml
+Sitemap: https://www.villa-sera.com/sitemap.xml

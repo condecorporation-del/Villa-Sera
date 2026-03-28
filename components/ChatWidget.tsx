@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useLocale } from 'next-intl';
 import { X, ChevronRight, ChevronDown, ExternalLink, Send, Phone, Calendar, ArrowLeft } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -12,7 +12,9 @@ const AIRBNB_URL = 'https://www.airbnb.mx/rooms/1583142544563137626';
 const kb = {
   es: {
     greeting: '¡Hola! Soy el concierge de Villa Sera.\nEstoy aquí para responder cualquier duda sobre la villa, los servicios y Los Cabos.',
+    placeholder: 'Escribe tu pregunta...',
     faqLabel: 'Preguntas frecuentes',
+    fallback: 'Para información personalizada, escríbenos directo por WhatsApp y te respondemos al momento. 👋',
     menu: [
       { label: '📋 Resumen de la villa', value: 'overview' },
       { label: '🛏️ Habitaciones y baños', value: 'rooms' },
@@ -24,6 +26,16 @@ const kb = {
       { label: '💆 Masajes y bienestar', value: 'massage' },
       { label: '🔗 Ver en Airbnb', value: 'airbnb', external: true },
     ],
+    keywords: {
+      overview: ['villa', 'resumen', 'cuántas', 'cuantas', 'recámara', 'recamara', 'habitacion', 'habitación', 'baño', 'bano', 'completo', 'grupo', 'exclusiv', 'privad'],
+      rooms: ['cuarto', 'habitacion', 'habitación', 'recámara', 'recamara', 'baño', 'bano', 'cama', 'dormitori', 'bedroom'],
+      location: ['ubicacion', 'ubicación', 'donde', 'dónde', 'arco', 'arch', 'cabo san lucas', 'distancia', 'lejos', 'centro', 'mar', 'cortés', 'cortes'],
+      beach: ['playa', 'beach', 'nadar', 'nadable', 'mar', 'agua', 'kayak', 'paddleboard', 'privada'],
+      cabos: ['cabos', 'restaurante', 'comer', 'hacer', 'actividad', 'tour', 'golf', 'nightlife', 'noche', 'ballena', 'pesca', 'snorkel', 'buceo'],
+      chef: ['chef', 'cocina', 'comida', 'desayuno', 'cena', 'almuerzo', 'mayordomo', 'butler', 'gastronomia', 'gastronomía', 'menu', 'menú'],
+      yacht: ['yate', 'yacht', 'barco', 'lancha', 'pesca', 'snorkel', 'atardecer', 'mar', 'actividad', 'atv', 'excursion'],
+      massage: ['masaje', 'massage', 'spa', 'bienestar', 'relajacion', 'relajación', 'yoga', 'meditacion', 'facial'],
+    } as Record<string, string[]>,
     answers: {
       overview: 'Villa Sera en números 🏡\n\n• 4 recámaras · 4 baños completos\n• Playa privada nadable — acceso directo desde la villa\n• Vista directa al Arco de Cabo San Lucas y el Mar de Cortés\n• ~5 min al downtown de Cabo San Lucas\n• Propiedad exclusiva: un solo grupo a la vez\n• Servicios opcionales: chef privado, mayordomo, yate, spa',
       rooms: 'Distribución de Villa Sera 🛏️\n\n• 4 recámaras — amplias, luminosas, vistas al mar\n• 4 baños completos — acabados de lujo\n• Diseño pensado para grupos o familias que valoran privacidad y comodidad real\n\nPara fotos detalladas, el listado en Airbnb documenta cada espacio.',
@@ -45,7 +57,9 @@ const kb = {
   },
   en: {
     greeting: 'Hi! I\'m Villa Sera\'s concierge.\nI\'m here to answer any questions about the villa, services and Los Cabos.',
+    placeholder: 'Type your question...',
     faqLabel: 'Frequently asked questions',
+    fallback: 'For personalized information, message us on WhatsApp and we\'ll reply right away. 👋',
     menu: [
       { label: '📋 Villa overview', value: 'overview' },
       { label: '🛏️ Bedrooms & bathrooms', value: 'rooms' },
@@ -57,6 +71,16 @@ const kb = {
       { label: '💆 Massage & wellness', value: 'massage' },
       { label: '🔗 View on Airbnb', value: 'airbnb', external: true },
     ],
+    keywords: {
+      overview: ['villa', 'overview', 'bedroom', 'bathroom', 'rooms', 'how many', 'exclusive', 'private', 'group'],
+      rooms: ['bedroom', 'bathroom', 'room', 'bed', 'suite', 'layout'],
+      location: ['location', 'where', 'arch', 'cabo san lucas', 'distance', 'far', 'downtown', 'sea', 'cortez'],
+      beach: ['beach', 'swim', 'swimmable', 'sea', 'water', 'kayak', 'paddleboard', 'private'],
+      cabos: ['cabos', 'restaurant', 'eat', 'do', 'activity', 'tour', 'golf', 'nightlife', 'whale', 'fishing', 'snorkel', 'dive'],
+      chef: ['chef', 'cook', 'food', 'breakfast', 'dinner', 'lunch', 'butler', 'gastronomy', 'menu', 'meal'],
+      yacht: ['yacht', 'boat', 'fishing', 'snorkel', 'sunset', 'sea', 'activity', 'atv', 'excursion'],
+      massage: ['massage', 'spa', 'wellness', 'relax', 'yoga', 'meditation', 'facial'],
+    } as Record<string, string[]>,
     answers: {
       overview: 'Villa Sera at a glance 🏡\n\n• 4 bedrooms · 4 full bathrooms\n• Private swimmable beach — direct access from the villa\n• Direct view of the Arch of Cabo San Lucas & Sea of Cortez\n• ~5 min to downtown Cabo San Lucas\n• Exclusive property: one group at a time\n• Optional services: private chef, butler, yacht, spa',
       rooms: 'Villa Sera layout 🛏️\n\n• 4 bedrooms — spacious, bright, Sea of Cortez views\n• 4 full bathrooms — luxury finishes\n• Designed for groups or families who value real privacy and comfort\n\nFor room-by-room photos, the Airbnb listing documents every space.',
@@ -78,7 +102,17 @@ const kb = {
   },
 };
 
-type View = 'home' | 'topic';
+type Message = { from: 'bot' | 'user'; text: string };
+
+function findAnswer(input: string, keywords: Record<string, string[]>, answers: Record<string, string>): string | null {
+  const lower = input.toLowerCase();
+  for (const [topic, words] of Object.entries(keywords)) {
+    if (words.some((w) => lower.includes(w))) {
+      return answers[topic] ?? null;
+    }
+  }
+  return null;
+}
 
 export default function ChatWidget() {
   const locale = useLocale() as 'es' | 'en';
@@ -86,16 +120,39 @@ export default function ChatWidget() {
 
   const [open, setOpen] = useState(false);
   const [faqOpen, setFaqOpen] = useState(false);
-  const [view, setView] = useState<View>('home');
-  const [currentTopic, setCurrentTopic] = useState('');
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [input, setInput] = useState('');
   const [bookingOpen, setBookingOpen] = useState(false);
+  const bottomRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (open && messages.length === 0) {
+      setMessages([{ from: 'bot', text: lang.greeting }]);
+    }
+  }, [open]);
+
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
 
   const handleClose = () => {
     setOpen(false);
     setFaqOpen(false);
-    setView('home');
-    setCurrentTopic('');
     setBookingOpen(false);
+  };
+
+  const sendMessage = (text: string) => {
+    if (!text.trim()) return;
+    const userMsg: Message = { from: 'user', text: text.trim() };
+    setMessages((p) => [...p, userMsg]);
+    setInput('');
+    setFaqOpen(false);
+
+    setTimeout(() => {
+      const answer = findAnswer(text, lang.keywords, lang.answers);
+      setMessages((p) => [...p, { from: 'bot', text: answer ?? lang.fallback }]);
+    }, 400);
   };
 
   const openTopic = (value: string) => {
@@ -103,15 +160,16 @@ export default function ChatWidget() {
       window.open(AIRBNB_URL, '_blank', 'noopener,noreferrer');
       return;
     }
-    setCurrentTopic(value);
-    setView('topic');
+    const item = lang.menu.find((m) => m.value === value);
+    const label = item?.label ?? value;
+    const userMsg: Message = { from: 'user', text: label };
+    const botMsg: Message = { from: 'bot', text: lang.answers[value] ?? lang.fallback };
+    setMessages((p) => [...p, userMsg, botMsg]);
     setFaqOpen(false);
   };
 
-  const goHome = () => {
-    setView('home');
-    setCurrentTopic('');
-    setFaqOpen(true);
+  const handleKey = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') sendMessage(input);
   };
 
   return (
@@ -156,11 +214,11 @@ export default function ChatWidget() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 16, scale: 0.96 }}
             transition={{ duration: 0.22 }}
-            className="fixed bottom-24 right-6 z-50 w-[360px] max-w-[calc(100vw-24px)] flex flex-col shadow-2xl overflow-hidden"
-            style={{ borderRadius: '20px', border: '1px solid rgba(201,168,76,0.15)', background: '#0f0f0f' }}
+            className="fixed bottom-24 right-6 z-50 w-[360px] max-w-[calc(100vw-24px)] flex flex-col shadow-2xl"
+            style={{ borderRadius: '20px', border: '1px solid rgba(201,168,76,0.15)', background: '#0f0f0f', maxHeight: '600px' }}
           >
             {/* Header */}
-            <div style={{ background: 'linear-gradient(135deg, #111 0%, #1a1408 100%)' }} className="px-5 py-4 flex items-center gap-3 border-b border-[#C9A84C]/10 shrink-0">
+            <div style={{ background: 'linear-gradient(135deg, #111 0%, #1a1408 100%)', borderRadius: '20px 20px 0 0' }} className="px-5 py-4 flex items-center gap-3 border-b border-[#C9A84C]/10 shrink-0">
               <div className="w-9 h-9 shrink-0 flex items-center justify-center" style={{ borderRadius: '50%', background: 'linear-gradient(135deg, #C9A84C, #8B6914)' }}>
                 <span className="text-[#0D0D0D] text-sm font-medium" style={{ fontFamily: 'var(--font-cormorant)' }}>VS</span>
               </div>
@@ -172,122 +230,114 @@ export default function ChatWidget() {
               </div>
             </div>
 
-            {/* Content */}
-            <div className="flex-1 overflow-y-auto" style={{ maxHeight: '460px' }}>
-              <AnimatePresence mode="wait">
-
-                {/* HOME VIEW */}
-                {view === 'home' && (
-                  <motion.div
-                    key="home"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.15 }}
-                    className="px-4 pt-5 pb-4 space-y-3"
+            {/* Messages */}
+            <div className="flex-1 overflow-y-auto px-4 pt-4 pb-2 space-y-3">
+              {messages.map((msg, i) => (
+                <div key={i} className={`flex ${msg.from === 'user' ? 'justify-end' : 'justify-start'}`}>
+                  <div
+                    className="px-4 py-2.5 text-sm font-sans leading-relaxed whitespace-pre-line max-w-[88%]"
+                    style={{
+                      background: msg.from === 'bot' ? 'rgba(255,255,255,0.06)' : 'linear-gradient(135deg, #C9A84C, #DFC07A)',
+                      color: msg.from === 'bot' ? 'rgba(255,255,255,0.9)' : '#0D0D0D',
+                      borderRadius: msg.from === 'bot' ? '4px 16px 16px 16px' : '16px 4px 16px 16px',
+                    }}
                   >
-                    {/* Greeting bubble */}
-                    <div
-                      className="px-4 py-3 text-sm font-sans text-white/90 leading-relaxed whitespace-pre-line"
-                      style={{ background: 'rgba(255,255,255,0.06)', borderRadius: '4px 16px 16px 16px' }}
-                    >
-                      {lang.greeting}
-                    </div>
+                    {msg.text}
+                  </div>
+                </div>
+              ))}
+              <div ref={bottomRef} />
+            </div>
 
-                    {/* FAQ toggle */}
-                    <button
-                      onClick={() => setFaqOpen((v) => !v)}
-                      className="w-full flex items-center justify-between gap-2 px-4 py-3 text-left transition-all duration-200"
-                      style={{
-                        background: faqOpen ? 'rgba(201,168,76,0.1)' : 'rgba(255,255,255,0.04)',
-                        border: `1px solid ${faqOpen ? 'rgba(201,168,76,0.35)' : 'rgba(255,255,255,0.1)'}`,
-                        borderRadius: '12px',
-                      }}
-                    >
-                      <span className="text-[#C9A84C] text-xs font-sans tracking-[0.12em] uppercase font-medium">
-                        {lang.faqLabel}
-                      </span>
-                      <motion.span animate={{ rotate: faqOpen ? 180 : 0 }} transition={{ duration: 0.2 }}>
-                        <ChevronDown size={14} className="text-[#C9A84C]/70" />
-                      </motion.span>
-                    </button>
+            {/* FAQ toggle */}
+            <div className="px-4 pb-2 shrink-0">
+              <button
+                onClick={() => setFaqOpen((v) => !v)}
+                className="w-full flex items-center justify-between gap-2 px-4 py-2.5 text-left transition-all duration-200"
+                style={{
+                  background: faqOpen ? 'rgba(201,168,76,0.08)' : 'rgba(255,255,255,0.03)',
+                  border: `1px solid ${faqOpen ? 'rgba(201,168,76,0.3)' : 'rgba(255,255,255,0.08)'}`,
+                  borderRadius: '10px',
+                }}
+              >
+                <span className="text-[#C9A84C]/80 text-[10px] font-sans tracking-[0.15em] uppercase">
+                  {lang.faqLabel}
+                </span>
+                <motion.span animate={{ rotate: faqOpen ? 180 : 0 }} transition={{ duration: 0.2 }}>
+                  <ChevronDown size={13} className="text-[#C9A84C]/60" />
+                </motion.span>
+              </button>
 
-                    {/* FAQ list */}
-                    <AnimatePresence>
-                      {faqOpen && (
-                        <motion.div
-                          initial={{ opacity: 0, height: 0 }}
-                          animate={{ opacity: 1, height: 'auto' }}
-                          exit={{ opacity: 0, height: 0 }}
-                          transition={{ duration: 0.25 }}
-                          className="overflow-hidden"
+              <AnimatePresence>
+                {faqOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    exit={{ opacity: 0, height: 0 }}
+                    transition={{ duration: 0.22 }}
+                    className="overflow-hidden"
+                  >
+                    <div className="flex flex-col gap-1 pt-1.5">
+                      {lang.menu.map((item) => (
+                        <button
+                          key={item.value}
+                          onClick={() => openTopic(item.value)}
+                          className="flex items-center justify-between gap-2 text-white/75 hover:text-[#C9A84C] text-[11px] font-sans px-3 py-2 text-left transition-all duration-150 w-full"
+                          style={{
+                            background: 'rgba(255,255,255,0.03)',
+                            border: '1px solid rgba(255,255,255,0.06)',
+                            borderRadius: '8px',
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.borderColor = 'rgba(201,168,76,0.3)';
+                            e.currentTarget.style.background = 'rgba(201,168,76,0.05)';
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.borderColor = 'rgba(255,255,255,0.06)';
+                            e.currentTarget.style.background = 'rgba(255,255,255,0.03)';
+                          }}
                         >
-                          <div className="flex flex-col gap-1.5 pt-1">
-                            {lang.menu.map((item) => (
-                              <button
-                                key={item.value}
-                                onClick={() => openTopic(item.value)}
-                                className="flex items-center justify-between gap-2 text-white/80 hover:text-[#C9A84C] text-[11px] font-sans px-3 py-2.5 text-left transition-all duration-150 w-full group"
-                                style={{
-                                  background: 'rgba(255,255,255,0.03)',
-                                  border: '1px solid rgba(255,255,255,0.07)',
-                                  borderRadius: '9px',
-                                }}
-                                onMouseEnter={(e) => {
-                                  e.currentTarget.style.borderColor = 'rgba(201,168,76,0.35)';
-                                  e.currentTarget.style.background = 'rgba(201,168,76,0.06)';
-                                }}
-                                onMouseLeave={(e) => {
-                                  e.currentTarget.style.borderColor = 'rgba(255,255,255,0.07)';
-                                  e.currentTarget.style.background = 'rgba(255,255,255,0.03)';
-                                }}
-                              >
-                                <span className="leading-snug">{item.label}</span>
-                                {'external' in item && item.external ? (
-                                  <ExternalLink size={11} className="shrink-0 opacity-40" />
-                                ) : (
-                                  <ChevronRight size={11} className="shrink-0 opacity-40" />
-                                )}
-                              </button>
-                            ))}
-                          </div>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                  </motion.div>
-                )}
-
-                {/* TOPIC VIEW */}
-                {view === 'topic' && currentTopic && (
-                  <motion.div
-                    key="topic"
-                    initial={{ opacity: 0, x: 16 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: -16 }}
-                    transition={{ duration: 0.2 }}
-                    className="px-4 pt-4 pb-4 space-y-3"
-                  >
-                    <button
-                      onClick={goHome}
-                      className="flex items-center gap-1.5 text-[#C9A84C]/70 hover:text-[#C9A84C] text-[10px] font-sans tracking-[0.15em] uppercase transition-colors"
-                    >
-                      <ArrowLeft size={11} />
-                      {lang.back}
-                    </button>
-                    <div
-                      className="px-4 py-3.5 text-sm font-sans text-white/90 leading-relaxed whitespace-pre-line"
-                      style={{ background: 'rgba(255,255,255,0.06)', borderRadius: '4px 16px 16px 16px' }}
-                    >
-                      {lang.answers[currentTopic]}
+                          <span>{item.label}</span>
+                          {'external' in item && item.external
+                            ? <ExternalLink size={10} className="shrink-0 opacity-40" />
+                            : <ChevronRight size={10} className="shrink-0 opacity-40" />
+                          }
+                        </button>
+                      ))}
                     </div>
                   </motion.div>
                 )}
-
               </AnimatePresence>
             </div>
 
+            {/* Text input */}
+            <div className="px-4 pb-3 shrink-0">
+              <div
+                className="flex items-center gap-2"
+                style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px' }}
+              >
+                <input
+                  ref={inputRef}
+                  type="text"
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  onKeyDown={handleKey}
+                  placeholder={lang.placeholder}
+                  className="flex-1 bg-transparent text-white/90 text-sm font-sans px-4 py-3 outline-none placeholder:text-white/25"
+                />
+                <button
+                  onClick={() => sendMessage(input)}
+                  disabled={!input.trim()}
+                  className="mr-2 p-1.5 transition-all duration-150 disabled:opacity-20"
+                  style={{ color: '#C9A84C' }}
+                >
+                  <Send size={15} />
+                </button>
+              </div>
+            </div>
+
             {/* Bottom — Book button */}
-            <div style={{ background: '#111', borderTop: '1px solid rgba(201,168,76,0.12)' }} className="px-4 py-3 shrink-0">
+            <div style={{ background: '#111', borderTop: '1px solid rgba(201,168,76,0.12)', borderRadius: '0 0 20px 20px' }} className="px-4 py-3 shrink-0">
               <AnimatePresence mode="wait">
                 {bookingOpen ? (
                   <motion.div
