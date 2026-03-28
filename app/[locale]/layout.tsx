@@ -53,6 +53,10 @@ export async function generateMetadata({
     description: meta.description,
     keywords: meta.keywords,
     robots: { index: true, follow: true, googleBot: { index: true, follow: true } },
+    icons: {
+      icon: '/favicon.png',
+      apple: '/favicon.png',
+    },
     alternates: {
       canonical,
       languages: {

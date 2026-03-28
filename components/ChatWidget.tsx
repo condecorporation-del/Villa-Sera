@@ -2,153 +2,104 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { useLocale } from 'next-intl';
-import { MessageCircle, X, Send, ChevronRight, ExternalLink } from 'lucide-react';
+import { X, ChevronRight, ExternalLink, Send, Phone, Calendar } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const WHATSAPP = '526242175935';
 const EMAIL = 'villasera@seraholding.com';
-const AIRBNB_URL =
-  'https://www.airbnb.mx/rooms/1583142544563137626';
+const AIRBNB_URL = 'https://www.airbnb.mx/rooms/1583142544563137626';
 
-type Message = {
-  from: 'bot' | 'user';
-  text: string;
-  options?: Option[];
-};
+type Message = { from: 'bot' | 'user'; text: string; options?: Option[] };
+type Option = { label: string; value: string };
 
-type Option = {
-  label: string;
-  value: string;
-};
-
-// ─── Knowledge base (concierge-style, property-accurate) ─────────────────────
-const faqs = {
+const kb = {
   es: {
-    greeting:
-      'Hola — soy el asistente de Villa Sera.\n\nActúo como un concierge digital: conozco la propiedad, la zona y cómo organizar tu estadía. Puedo contarte sobre las 4 habitaciones y 4 baños, la playa privada nadable con acceso desde la casa, la vista al Arco de Cabo San Lucas, y por qué la ubicación es de las mejores de Los Cabos.\n\nPara fotos actualizadas, calendario, tarifas y reseñas, el listado completo está en Airbnb.\n\n¿Qué te gustaría explorar?',
+    greeting: '¡Hola! Soy el concierge de Villa Sera. ¿En qué puedo ayudarte?',
     menu: [
       { label: '📋 Resumen de la villa', value: 'overview' },
-      { label: '🛏️ 4 habitaciones · 4 baños', value: 'rooms' },
+      { label: '🛏️ Habitaciones y baños', value: 'rooms' },
       { label: '📍 Ubicación y vista al Arco', value: 'location' },
-      { label: '🏖️ Playa privada nadable', value: 'beach' },
+      { label: '🏖️ Playa privada', value: 'beach' },
+      { label: '🌮 Los Cabos — qué hacer', value: 'cabos' },
       { label: '🍽️ Chef y servicios extra', value: 'chef' },
       { label: '⛵ Yates y actividades', value: 'yacht' },
       { label: '💆 Masajes y bienestar', value: 'massage' },
-      { label: '🔗 Listado completo (Airbnb)', value: 'airbnb' },
-      { label: '📅 Reservar ahora', value: 'book' },
+      { label: '🔗 Ver en Airbnb', value: 'airbnb' },
+      { label: '📅 Reservar', value: 'book' },
     ] as Option[],
     answers: {
-      overview:
-        'Aquí tienes el panorama de Villa Sera 🏡\n\n• Habitaciones: 4 recámaras.\n• Baños: 4 baños completos.\n• Playa: privada, nadable y exclusiva para huéspedes, con acceso directo desde la propiedad.\n• Vista: el icónico Arco de Cabo San Lucas (Land\'s End) forma parte del paisaje.\n• Ubicación: entre las mejores de Los Cabos — aprox. 5 minutos al centro (downtown) de Cabo San Lucas y ~5 minutos a zonas con excelentes restaurantes; cerca de lo esencial sin renunciar a la privacidad.\n\nSi quieres profundizar en distribución, fotos o amenidades, el listado en Airbnb tiene todo el detalle.',
-      rooms:
-        'Distribución confirmada de la villa:\n\n• 4 habitaciones — espacios amplios, luminosidad y vistas al Mar de Cortés en buena parte de la casa.\n• 4 baños — acabados de lujo; pensados para grupos o familias que buscan comodidad real.\n\nPara ver cada recámara con fotos, medidas y distribución exacta, el listado oficial en Airbnb documenta habitación por habitación.',
-      location:
-        'Ubicación: uno de los puntos fuertes de Villa Sera 📍\n\n• Vista al Arco de Cabo San Lucas — ese monumento natural que define el destino; lo tienes como parte del horizonte desde la villa.\n• Proximidad práctica: alrededor de 5 minutos al downtown de Cabo San Lucas y ~5 minutos a áreas con muy buenos restaurantes y servicios. Es decir: cerca de todo lo que necesitas para salir a cenar, comprar o explorar, sin estar en medio del bullicio 24/7.\n• En términos de Los Cabos, es considerada una de las mejores ubicaciones: equilibrio entre exclusividad y acceso.\n\n¿Te ayudo con la playa privada o con reservar?',
-      beach:
-        'La playa en Villa Sera es un diferencial importante 🏖️\n\n• Es playa privada, nadable y exclusiva para quienes se hospedan en la villa — no es una playa pública compartida con masas de turistas.\n• Acceso directo desde la casa hasta la zona de playa privada: bajas desde la propiedad a tu cala.\n• Aguas del Mar de Cortés en un entorno controlado y privado — ideal para nadar y relajarte con discreción.\n\nSi quieres ver fotos aéreas de la cala y el acceso, están en el listado de Airbnb.',
-      chef:
-        'Servicios de gastronomía y staff son extras opcionales — no van incluidos en la tarifa base de la villa, pero sí pueden coordinarse para elevar la estadía 🍳\n\nChef privado con menús personalizados, cenas en la terraza con vista al mar, desayunos gourmet, etc. Todo se cotiza y agenda según fechas y preferencias.\n\nPara combinar con reserva o pedir una propuesta, WhatsApp o email conectan directo con el equipo.',
-      yacht:
-        'Actividades marítimas y en tierra se organizan como experiencias a la carta ⛵\n\nYates privados hacia el Arco, snorkel, pesca deportiva, cruceros al atardecer; también paddleboard, kayak, ATV o avistamiento de ballenas según temporada.\n\nNada de esto está incluido automáticamente en la renta de la villa — se coordinan aparte. Te puedo derivar por WhatsApp para itinerarios y disponibilidad.',
-      massage:
-        'Bienestar in-villa: terapeutas certificados que acuden a Villa Sera 💆\n\nMasajes, tratamientos faciales o rituales relajantes en la privacidad de la villa — servicio extra, con cita previa.\n\nSi quieres agregarlo a tu estancia, lo gestionamos por el canal de contacto directo.',
-      airbnb:
-        'El listado oficial en Airbnb reúne toda la información verificada: fotos de cada espacio, amenidades línea por línea, reglas de la casa, calendario de disponibilidad, tarifas y opiniones de huéspedes.\n\nAbro el enlace en una pestaña nueva…',
+      overview: 'Villa Sera en números 🏡\n\n• 4 recámaras · 4 baños completos\n• Playa privada nadable — acceso directo desde la villa\n• Vista directa al Arco de Cabo San Lucas y el Mar de Cortés\n• ~5 min al downtown de Cabo San Lucas\n• Propiedad exclusiva: un solo grupo a la vez\n• Servicios opcionales: chef privado, mayordomo, yate, spa\n\n¿Qué te gustaría saber con más detalle?',
+      rooms: 'Distribución de Villa Sera 🛏️\n\n• 4 recámaras — amplias, luminosas, vistas al mar en gran parte de la casa\n• 4 baños completos — acabados de lujo\n• Diseño pensado para grupos o familias que valoran privacidad y comodidad real\n\nPara fotos detalladas habitación por habitación, el listado en Airbnb documenta cada espacio.',
+      location: 'Ubicación — uno de los puntos más fuertes 📍\n\n• Vista al Arco de Cabo San Lucas (Land\'s End) desde la villa y la playa\n• ~5 min al centro de Cabo (restaurantes, marina, nightlife)\n• ~5 min a Pedregal y zonas de alta gama\n• Mar de Cortés frente a ti — considerado uno de los mares más biodiversos del mundo\n• Equilibrio perfecto: exclusividad sin aislamiento',
+      beach: 'La playa privada es uno de los diferenciales de Villa Sera 🏖️\n\n• Exclusiva para huéspedes — no es playa pública\n• Nadable: aguas del Mar de Cortés tranquilas\n• Acceso directo desde la propiedad — bajas y estás en tu cala\n• Perfecta para nadar, kayak, paddleboard o simplemente descansar con total privacidad',
+      cabos: 'Los Cabos — todo lo que puedes hacer cerca 🌮\n\n🍽️ GASTRONOMÍA\n• Edith\'s, Flora Farms, Manta, Nick-San — algunos de los mejores restaurantes de México\n• Mercado del Mar para mariscos frescos\n• Tour gastronómico por San José del Cabo\n\n🌊 MAR Y AVENTURA\n• Tour al Arco de Cabo San Lucas (15 min en lancha)\n• Snorkel en El Arco — leones marinos y vida marina increíble\n• Pesca deportiva — marlin, dorado, atún\n• Avistamiento de ballenas (enero–marzo)\n• Buceo en La Paz (2h)\n\n🏌️ GOLF Y LUJO\n• Quivira, Diamante, Cabo del Sol — campos de talla mundial\n• Spa en Esperanza o One&Only Palmilla\n\n🎉 VIDA NOCTURNA\n• Cabo Wabo, Squid Roe, El Squid Roe — zona de clubs\n• Médano Beach — ambiente de día\n\n¿Quieres que te ayude a organizar alguna actividad?',
+      chef: 'Gastronomía en Villa Sera 🍳\n\nEl chef privado es un servicio opcional — no está incluido en la tarifa base, se contrata aparte:\n\n• Menús personalizados con ingredientes locales\n• Desayunos gourmet, comidas y cenas\n• Cenas de gala en la terraza con vista al Mar de Cortés y el Arco\n• Maridajes de vino y cócteles de autor\n• Se adapta a cualquier restricción alimentaria\n\nTambién disponible: mayordomo 24/7 para cualquier solicitud.\n\nCotización por WhatsApp o email.',
+      yacht: 'Experiencias en el mar ⛵\n\n• Yate privado al Arco de Cabo San Lucas\n• Snorkel en El Arco — leones marinos, peces tropicales\n• Pesca deportiva (marlin, dorado, wahoo)\n• Crucero al atardecer con champagne\n• Avistamiento de ballenas (temporada enero–marzo)\n• Paddleboard y kayak desde la playa privada\n• ATV en el desierto de Los Cabos\n\nTodo se organiza a la carta — no está incluido en la renta de la villa. Coordinamos por WhatsApp.',
+      massage: 'Bienestar en la villa 💆\n\nTerapeutas certificados acuden directamente a Villa Sera:\n\n• Masajes sueco, de tejido profundo y relajación\n• Tratamientos faciales\n• Rituales de aromaterapia\n• Sesiones de meditación al amanecer frente al mar\n• Yoga privado en la terraza\n\nServicio extra — con cita previa. Lo coordinamos por el canal de contacto directo.',
+      airbnb: 'El listado oficial en Airbnb tiene fotos de cada espacio, calendario de disponibilidad, tarifas y reseñas verificadas.\n\nAbriendo en nueva pestaña…',
     } as Record<string, string>,
-    bookFlow: {
-      start:
-        'Para reservar o recibir una cotización personalizada, el equipo atiende por WhatsApp o email. ¿Cuál prefieres?',
-      options: [
-        { label: '💬 WhatsApp (recomendado)', value: 'book_whatsapp' },
-        { label: '✉️ Correo electrónico', value: 'book_email' },
-      ] as Option[],
-      whatsapp:
-        'Perfecto. Abriendo WhatsApp con un mensaje preparado para que solo confirmes fechas y número de huéspedes 👋',
-      email:
-        'Abro tu cliente de correo con asunto y cuerpo sugeridos para Villa Sera ✉️',
+    book: {
+      prompt: 'Elige cómo quieres reservar:',
+      whatsappMsg: 'Hola, quiero información o reserva en Villa Sera (4 hab / 4 baños, playa privada, Los Cabos). Fechas: [indicar]. Huéspedes: [número].',
+      emailSubject: 'Reserva / consulta Villa Sera — Los Cabos',
+      emailBody: 'Hola,\n\nMe interesa Villa Sera (4 habitaciones, 4 baños, playa privada nadable, vista al Arco).\n\nFechas deseadas:\nNúmero de huéspedes:\n\nGracias.',
+      openingWA: 'Abriendo WhatsApp con mensaje preparado 👋',
+      openingEmail: 'Abriendo tu cliente de correo ✉️',
     },
-    backMenu: [{ label: '← Volver al menú', value: 'menu' }] as Option[],
-    bookButton: '📅 Reservar / cotizar',
-    afterDetailOptions: (bookLabel: string) =>
-      [
-        { label: '← Otra pregunta', value: 'menu' },
-        { label: bookLabel, value: 'book' },
-        { label: '🔗 Ver Airbnb', value: 'airbnb' },
-      ] as Option[],
+    back: '← Volver',
+    bookBtn: '📅 Reservar',
   },
   en: {
-    greeting:
-      'Hi — I\'m Villa Sera\'s assistant.\n\nI work like a digital concierge: I know the villa, the neighborhood, and how to plan your stay. I can explain the 4 bedrooms and 4 bathrooms, the private swimmable beach with direct access from the house, the view of the Arch of Cabo San Lucas, and why the location ranks among the best in Los Cabos.\n\nFor live photos, calendar, pricing, and guest reviews, the full listing is on Airbnb.\n\nWhat would you like to explore?',
+    greeting: 'Hi! I\'m Villa Sera\'s concierge. How can I help you?',
     menu: [
-      { label: '📋 Property overview', value: 'overview' },
-      { label: '🛏️ 4 bedrooms · 4 bathrooms', value: 'rooms' },
+      { label: '📋 Villa overview', value: 'overview' },
+      { label: '🛏️ Bedrooms & bathrooms', value: 'rooms' },
       { label: '📍 Location & Arch view', value: 'location' },
-      { label: '🏖️ Private swimmable beach', value: 'beach' },
+      { label: '🏖️ Private beach', value: 'beach' },
+      { label: '🌮 Los Cabos — what to do', value: 'cabos' },
       { label: '🍽️ Chef & add-on services', value: 'chef' },
       { label: '⛵ Yachts & activities', value: 'yacht' },
       { label: '💆 Massage & wellness', value: 'massage' },
-      { label: '🔗 Full listing (Airbnb)', value: 'airbnb' },
+      { label: '🔗 View on Airbnb', value: 'airbnb' },
       { label: '📅 Book now', value: 'book' },
     ] as Option[],
     answers: {
-      overview:
-        'Here\'s the snapshot of Villa Sera 🏡\n\n• Bedrooms: 4.\n• Bathrooms: 4 full bathrooms.\n• Beach: private, swimmable, and exclusive to guests, with direct access from the property.\n• View: the iconic Arch of Cabo San Lucas (Land\'s End) is part of the scenery.\n• Location: among the best in Los Cabos — roughly 5 minutes to downtown Cabo San Lucas and ~5 minutes to areas with excellent restaurants; close to what matters while staying private.\n\nFor layout, photos, and every amenity in writing, the Airbnb listing has the full breakdown.',
-      rooms:
-        'Confirmed layout:\n\n• 4 bedrooms — spacious rooms with Sea of Cortés views across much of the villa.\n• 4 bathrooms — high-end finishes; ideal for families or groups who want real comfort.\n\nFor room-by-room photos and specs, the official Airbnb listing documents each space.',
-      location:
-        'Location is a major strength at Villa Sera 📍\n\n• View of the Arch of Cabo San Lucas — that natural landmark that defines the destination; you see it from the villa.\n• Practical proximity: about 5 minutes to downtown Cabo San Lucas and ~5 minutes to great restaurant zones and services. You\'re near everything you need for dining, shopping, or exploring — without being in the middle of the crowd 24/7.\n\nIn Los Cabos terms, it\'s widely considered one of the best locations: privacy plus access.\n\nWant details on the private beach or booking?',
-      beach:
-        'The beach at Villa Sera is a real differentiator 🏖️\n\n• Private, swimmable, and exclusive to villa guests — not a crowded public beach.\n• Direct access from the house down to your private beach area — you walk from the property to the cove.\n• Sea of Cortés water in a private setting — ideal for swimming and relaxing with discretion.\n\nAerial shots of the cove and access are on the Airbnb listing.',
-      chef:
-        'Dining and staffing are optional add-ons — not included in the base villa rate, but easy to arrange 🍳\n\nPrivate chef with custom menus, terrace dinners with ocean views, gourmet breakfasts, etc. Everything is quoted and scheduled around your dates.\n\nWhatsApp or email connects you straight with the team for proposals.',
-      yacht:
-        'On-water and land experiences are arranged à la carte ⛵\n\nPrivate yachts to the Arch, snorkeling, sport fishing, sunset cruises; also paddleboard, kayak, ATV, whale watching (seasonal).\n\nNone of this is bundled into the villa rental by default — coordinated separately. I can point you to WhatsApp for itineraries and availability.',
-      massage:
-        'In-villa wellness: certified therapists come to Villa Sera 💆\n\nMassages, facials, or relaxation rituals in complete privacy — add-on service, booked in advance.\n\nTo add it to your stay, we handle it through direct contact.',
-      airbnb:
-        'The official Airbnb listing has verified details: photos of every space, full amenity list, house rules, availability calendar, pricing, and guest reviews.\n\nOpening it in a new tab…',
+      overview: 'Villa Sera at a glance 🏡\n\n• 4 bedrooms · 4 full bathrooms\n• Private swimmable beach — direct access from the villa\n• Direct view of the Arch of Cabo San Lucas & Sea of Cortez\n• ~5 min to downtown Cabo San Lucas\n• Exclusive property: one group at a time\n• Optional services: private chef, butler, yacht, spa\n\nWhat would you like to know more about?',
+      rooms: 'Villa Sera layout 🛏️\n\n• 4 bedrooms — spacious, bright, Sea of Cortez views throughout\n• 4 full bathrooms — luxury finishes\n• Designed for groups or families who value real privacy and comfort\n\nFor room-by-room photos, the Airbnb listing documents every space in detail.',
+      location: 'Location — one of Villa Sera\'s biggest strengths 📍\n\n• View of the Arch of Cabo San Lucas (Land\'s End) from the villa and the beach\n• ~5 min to downtown Cabo (restaurants, marina, nightlife)\n• ~5 min to Pedregal and upscale areas\n• Sea of Cortez right in front — one of the most biodiverse seas in the world\n• Perfect balance: exclusivity without isolation',
+      beach: 'The private beach is one of Villa Sera\'s key differentiators 🏖️\n\n• Exclusive to villa guests — not a public beach\n• Swimmable: calm Sea of Cortez waters\n• Direct access from the property — walk from the villa to your cove\n• Perfect for swimming, kayaking, paddleboarding, or just relaxing in total privacy',
+      cabos: 'Los Cabos — everything to do nearby 🌮\n\n🍽️ DINING\n• Edith\'s, Flora Farms, Manta, Nick-San — some of the best restaurants in Mexico\n• Mercado del Mar for fresh seafood\n• Culinary tour through San José del Cabo\n\n🌊 OCEAN & ADVENTURE\n• Tour to the Arch of Cabo San Lucas (15 min by boat)\n• Snorkeling at El Arco — sea lions and incredible marine life\n• Sport fishing — marlin, dorado, tuna\n• Whale watching (January–March)\n• Scuba diving in La Paz (2h away)\n\n🏌️ GOLF & LUXURY\n• Quivira, Diamante, Cabo del Sol — world-class courses\n• Spa at Esperanza or One&Only Palmilla\n\n🎉 NIGHTLIFE\n• Cabo Wabo, Squid Roe — party zone\n• Médano Beach — daytime scene\n\nWant help organizing any activity?',
+      chef: 'Dining at Villa Sera 🍳\n\nThe private chef is an optional add-on — not included in the base rate:\n\n• Custom menus with local ingredients\n• Gourmet breakfasts, lunches and dinners\n• Gala dinners on the terrace with Sea of Cortez & Arch views\n• Wine pairings and craft cocktails\n• Any dietary restriction accommodated\n\nAlso available: 24/7 butler for any request.\n\nGet a quote via WhatsApp or email.',
+      yacht: 'Ocean experiences ⛵\n\n• Private yacht to the Arch of Cabo San Lucas\n• Snorkeling at El Arco — sea lions, tropical fish\n• Sport fishing (marlin, dorado, wahoo)\n• Sunset cruise with champagne\n• Whale watching (January–March season)\n• Paddleboard & kayak from the private beach\n• ATV in the Los Cabos desert\n\nAll organized à la carte — not included in the villa rental. We coordinate via WhatsApp.',
+      massage: 'In-villa wellness 💆\n\nCertified therapists come directly to Villa Sera:\n\n• Swedish, deep tissue & relaxation massages\n• Facial treatments\n• Aromatherapy rituals\n• Sunrise meditation by the sea\n• Private yoga on the terrace\n\nAdd-on service — advance booking required. Coordinated through direct contact.',
+      airbnb: 'The official Airbnb listing has photos of every space, availability calendar, rates and verified guest reviews.\n\nOpening in a new tab…',
     } as Record<string, string>,
-    bookFlow: {
-      start:
-        'To book or get a tailored quote, our team replies on WhatsApp or email. Which do you prefer?',
-      options: [
-        { label: '💬 WhatsApp (recommended)', value: 'book_whatsapp' },
-        { label: '✉️ Email', value: 'book_email' },
-      ] as Option[],
-      whatsapp:
-        'Opening WhatsApp with a pre-filled message — just confirm dates and guest count 👋',
-      email:
-        'Opening your email client with a suggested subject and body for Villa Sera ✉️',
+    book: {
+      prompt: 'Choose how you\'d like to book:',
+      whatsappMsg: 'Hello, I\'d like information or a booking at Villa Sera (4 bed / 4 bath, private beach, Los Cabos). Dates: [your dates]. Guests: [number].',
+      emailSubject: 'Villa Sera inquiry / booking — Los Cabos',
+      emailBody: 'Hello,\n\nI\'m interested in Villa Sera (4 bedrooms, 4 bathrooms, private swimmable beach, Arch view).\n\nDesired dates:\nNumber of guests:\n\nThank you.',
+      openingWA: 'Opening WhatsApp with a pre-filled message 👋',
+      openingEmail: 'Opening your email client ✉️',
     },
-    backMenu: [{ label: '← Back to menu', value: 'menu' }] as Option[],
-    bookButton: '📅 Book / get a quote',
-    afterDetailOptions: (bookLabel: string) =>
-      [
-        { label: '← Another question', value: 'menu' },
-        { label: bookLabel, value: 'book' },
-        { label: '🔗 Open Airbnb', value: 'airbnb' },
-      ] as Option[],
+    back: '← Back',
+    bookBtn: '📅 Book now',
   },
 };
 
 export default function ChatWidget() {
   const locale = useLocale() as 'es' | 'en';
-  const lang = faqs[locale] ?? faqs.es;
+  const lang = kb[locale] ?? kb.es;
 
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [initialized, setInitialized] = useState(false);
+  const [bookingOpen, setBookingOpen] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (open && !initialized) {
-      setMessages([
-        {
-          from: 'bot',
-          text: lang.greeting,
-          options: lang.menu,
-        },
-      ]);
+      setMessages([{ from: 'bot', text: lang.greeting, options: lang.menu }]);
       setInitialized(true);
     }
   }, [open, initialized, lang]);
@@ -157,187 +108,142 @@ export default function ChatWidget() {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  const addMessage = (msg: Message) => setMessages((prev) => [...prev, msg]);
+  const add = (msg: Message) => setMessages((p) => [...p, msg]);
 
   const handleOption = (value: string, label: string) => {
-    addMessage({ from: 'user', text: label });
-
+    add({ from: 'user', text: label });
     setTimeout(() => {
       if (value === 'menu') {
-        addMessage({ from: 'bot', text: lang.greeting, options: lang.menu });
+        add({ from: 'bot', text: lang.greeting, options: lang.menu });
         return;
       }
-
       if (value === 'book') {
-        addMessage({
-          from: 'bot',
-          text: lang.bookFlow.start,
-          options: lang.bookFlow.options,
-        });
+        setBookingOpen(true);
         return;
       }
-
       if (value === 'book_whatsapp') {
-        addMessage({ from: 'bot', text: lang.bookFlow.whatsapp });
-        setTimeout(() => {
-          const msg =
-            locale === 'es'
-              ? 'Hola, quiero información o reserva en Villa Sera (4 hab / 4 baños, Los Cabos). Fechas: [indicar]. Huéspedes: [número].'
-              : 'Hello, I\'d like information or a booking at Villa Sera (4 bed / 4 bath, Los Cabos). Dates: [your dates]. Guests: [number].';
-          window.open(`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(msg)}`, '_blank');
-        }, 600);
+        add({ from: 'bot', text: lang.book.openingWA });
+        setTimeout(() => window.open(`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(lang.book.whatsappMsg)}`, '_blank'), 500);
         return;
       }
-
       if (value === 'book_email') {
-        addMessage({ from: 'bot', text: lang.bookFlow.email });
-        setTimeout(() => {
-          const subject =
-            locale === 'es' ? 'Reserva / consulta Villa Sera — Los Cabos' : 'Villa Sera inquiry / booking — Los Cabos';
-          const body =
-            locale === 'es'
-              ? 'Hola,\n\nMe interesa Villa Sera (4 habitaciones, 4 baños, playa privada nadable, vista al Arco).\n\nFechas deseadas:\nNúmero de huéspedes:\n\nGracias.'
-              : 'Hello,\n\nI\'m interested in Villa Sera (4 bedrooms, 4 bathrooms, private swimmable beach, Arch view).\n\nDesired dates:\nNumber of guests:\n\nThank you.';
-          window.open(
-            `mailto:${EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`,
-            '_blank'
-          );
-        }, 600);
+        add({ from: 'bot', text: lang.book.openingEmail });
+        setTimeout(() => window.open(`mailto:${EMAIL}?subject=${encodeURIComponent(lang.book.emailSubject)}&body=${encodeURIComponent(lang.book.emailBody)}`, '_blank'), 500);
         return;
       }
-
       if (value === 'airbnb') {
-        addMessage({
-          from: 'bot',
-          text: lang.answers.airbnb,
-          options: [
-            ...lang.backMenu,
-            { label: lang.bookButton, value: 'book' },
-          ],
-        });
-        setTimeout(() => {
-          window.open(AIRBNB_URL, '_blank', 'noopener,noreferrer');
-        }, 400);
+        add({ from: 'bot', text: lang.answers.airbnb, options: [{ label: lang.back, value: 'menu' }] });
+        setTimeout(() => window.open(AIRBNB_URL, '_blank', 'noopener,noreferrer'), 400);
         return;
       }
-
       if (lang.answers[value]) {
-        addMessage({
+        add({
           from: 'bot',
           text: lang.answers[value],
-          options: lang.afterDetailOptions(lang.bookButton),
+          options: [
+            { label: lang.back, value: 'menu' },
+            { label: lang.bookBtn, value: 'book' },
+          ],
         });
       }
-    }, 350);
+    }, 300);
   };
 
   return (
     <>
+      {/* Floating button */}
       <motion.button
         onClick={() => setOpen((v) => !v)}
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
-        className="fixed bottom-6 right-6 z-50 flex items-center gap-2.5 bg-[#25D366] hover:bg-[#1DA851] text-white px-4 py-3 shadow-xl transition-colors duration-300"
-        style={{ borderRadius: '50px' }}
-        aria-label="Chat"
+        className="fixed bottom-6 right-6 z-50 flex items-center gap-2.5 px-5 py-3.5 shadow-2xl transition-all duration-300"
+        style={{
+          borderRadius: '50px',
+          background: 'linear-gradient(135deg, #1a1a1a 0%, #0D0D0D 100%)',
+          border: '1px solid rgba(201,168,76,0.4)',
+        }}
+        aria-label="Concierge"
       >
         <AnimatePresence mode="wait">
           {open ? (
             <motion.span key="close" initial={{ rotate: -90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: 90, opacity: 0 }} transition={{ duration: 0.2 }}>
-              <X size={20} />
+              <X size={18} className="text-[#C9A84C]" />
             </motion.span>
           ) : (
-            <motion.span key="chat" initial={{ rotate: 90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: -90, opacity: 0 }} transition={{ duration: 0.2 }}>
-              <MessageCircle size={20} fill="white" strokeWidth={0} />
+            <motion.span key="open" initial={{ rotate: 90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: -90, opacity: 0 }} transition={{ duration: 0.2 }}>
+              <span className="text-[#C9A84C] text-base" style={{ fontFamily: 'var(--font-cormorant)' }}>✦</span>
             </motion.span>
           )}
         </AnimatePresence>
-        <span className="text-sm font-sans font-medium tracking-wide hidden sm:inline">
-          {open
-            ? locale === 'es'
-              ? 'Cerrar'
-              : 'Close'
-            : locale === 'es'
-              ? 'Concierge'
-              : 'Concierge'}
+        <span className="text-[#C9A84C] text-xs tracking-[0.2em] uppercase font-sans font-medium hidden sm:inline">
+          Concierge
         </span>
         {!open && (
-          <span
-            className="absolute inset-0 animate-ping bg-[#25D366] opacity-20 pointer-events-none"
-            style={{ borderRadius: '50px' }}
-          />
+          <span className="absolute inset-0 animate-ping opacity-10 pointer-events-none" style={{ borderRadius: '50px', background: '#C9A84C' }} />
         )}
       </motion.button>
 
+      {/* Chat window */}
       <AnimatePresence>
         {open && (
           <motion.div
-            initial={{ opacity: 0, y: 20, scale: 0.95 }}
+            initial={{ opacity: 0, y: 16, scale: 0.96 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 20, scale: 0.95 }}
-            transition={{ duration: 0.25 }}
-            className="fixed bottom-24 right-6 z-50 w-[340px] max-w-[calc(100vw-24px)] flex flex-col shadow-2xl overflow-hidden"
-            style={{ borderRadius: '16px', maxHeight: '560px' }}
+            exit={{ opacity: 0, y: 16, scale: 0.96 }}
+            transition={{ duration: 0.22 }}
+            className="fixed bottom-24 right-6 z-50 w-[360px] max-w-[calc(100vw-24px)] flex flex-col shadow-2xl overflow-hidden"
+            style={{ borderRadius: '20px', maxHeight: '580px', border: '1px solid rgba(201,168,76,0.15)' }}
           >
-            <div className="bg-[#0D0D0D] px-5 py-4 flex items-center gap-3">
-              <div
-                className="w-9 h-9 bg-gradient-to-br from-[#C9A84C] to-[#8B6914] flex items-center justify-center shrink-0"
-                style={{ borderRadius: '50%' }}
-              >
-                <span
-                  className="text-[#0D0D0D] text-lg font-light"
-                  style={{ fontFamily: 'var(--font-cormorant)' }}
-                >
-                  VS
-                </span>
+            {/* Header */}
+            <div style={{ background: 'linear-gradient(135deg, #111 0%, #1a1408 100%)' }} className="px-5 py-4 flex items-center gap-3 border-b border-[#C9A84C]/10">
+              <div className="w-9 h-9 shrink-0 flex items-center justify-center" style={{ borderRadius: '50%', background: 'linear-gradient(135deg, #C9A84C, #8B6914)' }}>
+                <span className="text-[#0D0D0D] text-sm font-medium" style={{ fontFamily: 'var(--font-cormorant)' }}>VS</span>
               </div>
               <div>
-                <p className="text-white text-sm font-sans font-medium">
-                  Villa Sera · Concierge
-                </p>
-                <p className="text-[#25D366] text-[10px] tracking-wide font-sans">
-                  ● {locale === 'es' ? 'Asistente inteligente' : 'Smart assistant'}
+                <p className="text-white text-sm font-sans font-medium tracking-wide">Villa Sera · Concierge</p>
+                <p className="text-[#C9A84C]/70 text-[10px] tracking-[0.2em] uppercase font-sans">
+                  {locale === 'es' ? '● Asistente inteligente' : '● Smart assistant'}
                 </p>
               </div>
             </div>
 
-            <div
-              className="bg-[#F8F4EF] flex-1 overflow-y-auto px-4 py-4 space-y-3"
-              style={{ maxHeight: '380px' }}
-            >
+            {/* Messages */}
+            <div className="bg-[#0f0f0f] flex-1 overflow-y-auto px-4 py-4 space-y-3" style={{ maxHeight: '380px' }}>
               {messages.map((msg, i) => (
-                <div
-                  key={i}
-                  className={`flex flex-col ${msg.from === 'user' ? 'items-end' : 'items-start'}`}
-                >
+                <div key={i} className={`flex flex-col ${msg.from === 'user' ? 'items-end' : 'items-start'}`}>
                   <div
-                    className={`px-4 py-2.5 text-sm font-sans leading-relaxed whitespace-pre-line max-w-[90%] ${
+                    className={`px-4 py-2.5 text-sm font-sans leading-relaxed whitespace-pre-line max-w-[92%] ${
                       msg.from === 'bot'
-                        ? 'bg-white text-[#0D0D0D] shadow-sm'
-                        : 'bg-[#0D0D0D] text-white'
+                        ? 'text-white/90'
+                        : 'text-[#0D0D0D]'
                     }`}
                     style={{
-                      borderRadius:
-                        msg.from === 'bot' ? '4px 16px 16px 16px' : '16px 4px 16px 16px',
+                      background: msg.from === 'bot' ? 'rgba(255,255,255,0.06)' : 'linear-gradient(135deg, #C9A84C, #DFC07A)',
+                      borderRadius: msg.from === 'bot' ? '4px 16px 16px 16px' : '16px 4px 16px 16px',
                     }}
                   >
                     {msg.text}
                   </div>
-
                   {msg.options && msg.from === 'bot' && (
-                    <div className="mt-2 flex flex-col gap-1.5 w-full max-w-[90%]">
+                    <div className="mt-2 flex flex-col gap-1.5 w-full max-w-[92%]">
                       {msg.options.map((opt) => (
                         <button
                           key={opt.value + opt.label}
                           onClick={() => handleOption(opt.value, opt.label)}
-                          className="flex items-center justify-between gap-2 bg-white hover:bg-[#C9A84C] hover:text-[#0D0D0D] border border-[#E5DDD4] hover:border-[#C9A84C] text-[#0D0D0D] text-[11px] font-sans px-3 py-2 text-left transition-all duration-200 w-full shadow-sm"
-                          style={{ borderRadius: '8px' }}
+                          className="flex items-center justify-between gap-2 text-white/80 hover:text-[#C9A84C] text-[11px] font-sans px-3 py-2 text-left transition-all duration-200 w-full"
+                          style={{
+                            background: 'rgba(255,255,255,0.04)',
+                            border: '1px solid rgba(255,255,255,0.08)',
+                            borderRadius: '8px',
+                          }}
+                          onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(201,168,76,0.4)'; (e.currentTarget as HTMLButtonElement).style.background = 'rgba(201,168,76,0.06)'; }}
+                          onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(255,255,255,0.08)'; (e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,255,255,0.04)'; }}
                         >
                           <span className="leading-snug">{opt.label}</span>
                           {opt.value === 'airbnb' ? (
-                            <ExternalLink size={12} className="shrink-0 opacity-50" />
+                            <ExternalLink size={11} className="shrink-0 opacity-40" />
                           ) : (
-                            <ChevronRight size={12} className="shrink-0 opacity-50" />
+                            <ChevronRight size={11} className="shrink-0 opacity-40" />
                           )}
                         </button>
                       ))}
@@ -348,41 +254,67 @@ export default function ChatWidget() {
               <div ref={bottomRef} />
             </div>
 
-            <div className="bg-white border-t border-[#E5DDD4] px-4 py-3 flex gap-2">
-              <a
-                href={`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(
-                  locale === 'es'
-                    ? 'Hola, quiero información sobre Villa Sera (4 hab / 4 baños).'
-                    : 'Hello, I\'d like information about Villa Sera (4 bed / 4 bath).'
-                )}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex-1 flex items-center justify-center gap-1.5 bg-[#25D366] hover:bg-[#1DA851] text-white text-[11px] tracking-wide font-sans py-2.5 transition-colors"
-                style={{ borderRadius: '8px' }}
-              >
-                <MessageCircle size={13} fill="white" strokeWidth={0} />
-                WhatsApp
-              </a>
-              <a
-                href={`mailto:${EMAIL}?subject=${encodeURIComponent(
-                  locale === 'es' ? 'Villa Sera — consulta' : 'Villa Sera — inquiry'
-                )}`}
-                className="flex-1 flex items-center justify-center gap-1.5 bg-[#0D0D0D] hover:bg-[#A0342A] text-white text-[11px] tracking-wide font-sans py-2.5 transition-colors"
-                style={{ borderRadius: '8px' }}
-              >
-                <Send size={12} />
-                Email
-              </a>
-              <a
-                href={AIRBNB_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center justify-center px-2.5 border border-[#E5DDD4] hover:border-[#C9A84C] text-[#0D0D0D] hover:bg-[#F8F4EF] transition-colors"
-                style={{ borderRadius: '8px' }}
-                title="Airbnb"
-              >
-                <ExternalLink size={14} />
-              </a>
+            {/* Bottom bar — Book now only */}
+            <div style={{ background: '#111', borderTop: '1px solid rgba(201,168,76,0.12)' }} className="px-4 py-3">
+              <AnimatePresence mode="wait">
+                {bookingOpen ? (
+                  <motion.div
+                    key="booking"
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 8 }}
+                    className="flex flex-col gap-2"
+                  >
+                    <p className="text-white/50 text-[10px] tracking-[0.15em] uppercase font-sans mb-1">{lang.book.prompt}</p>
+                    <a
+                      href={`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(lang.book.whatsappMsg)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center justify-center gap-2 py-3 text-[#0D0D0D] text-xs font-sans font-semibold tracking-wide transition-opacity hover:opacity-90"
+                      style={{ borderRadius: '10px', background: 'linear-gradient(135deg, #C9A84C, #DFC07A)' }}
+                    >
+                      <Phone size={13} />
+                      WhatsApp
+                    </a>
+                    <a
+                      href={`mailto:${EMAIL}?subject=${encodeURIComponent(lang.book.emailSubject)}&body=${encodeURIComponent(lang.book.emailBody)}`}
+                      className="flex items-center justify-center gap-2 py-3 text-white text-xs font-sans tracking-wide transition-opacity hover:opacity-90"
+                      style={{ borderRadius: '10px', background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.12)' }}
+                    >
+                      <Send size={12} />
+                      Email
+                    </a>
+                    <a
+                      href={AIRBNB_URL}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center justify-center gap-1.5 py-2 text-white/40 hover:text-white/70 text-[10px] font-sans tracking-wide transition-colors"
+                    >
+                      <ExternalLink size={11} />
+                      Airbnb
+                    </a>
+                    <button
+                      onClick={() => setBookingOpen(false)}
+                      className="text-white/30 hover:text-white/60 text-[10px] font-sans tracking-wide transition-colors py-1"
+                    >
+                      {lang.back}
+                    </button>
+                  </motion.div>
+                ) : (
+                  <motion.button
+                    key="bookbtn"
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 8 }}
+                    onClick={() => setBookingOpen(true)}
+                    className="w-full flex items-center justify-center gap-2 py-3 text-[#0D0D0D] text-xs font-sans font-semibold tracking-[0.1em] uppercase transition-opacity hover:opacity-90"
+                    style={{ borderRadius: '10px', background: 'linear-gradient(135deg, #C9A84C, #DFC07A)' }}
+                  >
+                    <Calendar size={13} />
+                    {locale === 'es' ? 'Reservar' : 'Book now'}
+                  </motion.button>
+                )}
+              </AnimatePresence>
             </div>
           </motion.div>
         )}

@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import { Link, usePathname } from '@/i18n/navigation';
+import Image from 'next/image';
 import { Menu, X } from 'lucide-react';
 
 export default function Navbar() {
@@ -19,13 +20,20 @@ export default function Navbar() {
   }, []);
 
   const navLinks = [
-    { href: '/servicios' as const, label: t('services') },
-    { href: '/galeria' as const, label: t('gallery') },
-    { href: '/experiencias' as const, label: t('experiences') },
-    { href: '/contacto' as const, label: t('contact') },
+    { href: '#servicios', label: t('services') },
+    { href: '#galeria', label: t('gallery') },
+    { href: '#experiencias', label: t('experiences') },
+    { href: '#contacto', label: t('contact') },
   ];
 
   const otherLocale = locale === 'es' ? 'en' : 'es';
+
+  const handleAnchor = (href: string) => {
+    setMenuOpen(false);
+    const id = href.replace('#', '');
+    const el = document.getElementById(id);
+    if (el) el.scrollIntoView({ behavior: 'smooth' });
+  };
 
   return (
     <header
@@ -38,28 +46,27 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-6 lg:px-12">
         <div className="flex items-center justify-between h-20">
           {/* Logo */}
-          <Link href="/" className="flex flex-col leading-none group">
-            <span
-              className="text-[#C9A84C] font-heading text-2xl font-light tracking-[0.2em] uppercase"
-              style={{ fontFamily: 'var(--font-cormorant)' }}
-            >
-              Villa Sera
-            </span>
-            <span className="text-white/60 text-[10px] tracking-[0.35em] uppercase font-sans mt-0.5">
-              Los Cabos, México
-            </span>
+          <Link href="/" className="flex items-center">
+            <Image
+              src="/logo.png"
+              alt="Villa Sera"
+              width={120}
+              height={48}
+              className="object-contain h-12 w-auto"
+              priority
+            />
           </Link>
 
           {/* Desktop nav */}
           <nav className="hidden md:flex items-center gap-8">
             {navLinks.map((link) => (
-              <Link
+              <button
                 key={link.href}
-                href={link.href}
-                className="text-white/80 hover:text-[#C9A84C] text-sm tracking-[0.12em] uppercase font-sans font-light transition-colors duration-200"
+                onClick={() => handleAnchor(link.href)}
+                className="text-white/80 hover:text-[#C9A84C] text-sm tracking-[0.12em] uppercase font-sans font-light transition-colors duration-200 bg-transparent border-none cursor-pointer"
               >
                 {link.label}
-              </Link>
+              </button>
             ))}
           </nav>
 
@@ -72,12 +79,12 @@ export default function Navbar() {
             >
               {otherLocale.toUpperCase()}
             </Link>
-            <Link
-              href="/contacto"
-              className="border border-[#C9A84C] text-[#C9A84C] hover:bg-[#C9A84C] hover:text-[#0D0D0D] text-xs tracking-[0.2em] uppercase font-sans px-5 py-2.5 transition-all duration-300"
+            <button
+              onClick={() => handleAnchor('#contacto')}
+              className="border border-[#C9A84C] text-[#C9A84C] hover:bg-[#C9A84C] hover:text-[#0D0D0D] text-xs tracking-[0.2em] uppercase font-sans px-5 py-2.5 transition-all duration-300 cursor-pointer"
             >
               {t('book')}
-            </Link>
+            </button>
           </div>
 
           {/* Mobile menu toggle */}
@@ -105,22 +112,20 @@ export default function Navbar() {
         <div className="md:hidden bg-[#0D0D0D] border-t border-white/10">
           <nav className="max-w-7xl mx-auto px-6 py-6 flex flex-col gap-5">
             {navLinks.map((link) => (
-              <Link
+              <button
                 key={link.href}
-                href={link.href}
-                onClick={() => setMenuOpen(false)}
-                className="text-white/80 hover:text-[#C9A84C] text-base tracking-[0.12em] uppercase font-sans font-light transition-colors"
+                onClick={() => handleAnchor(link.href)}
+                className="text-white/80 hover:text-[#C9A84C] text-base tracking-[0.12em] uppercase font-sans font-light transition-colors text-left bg-transparent border-none cursor-pointer"
               >
                 {link.label}
-              </Link>
+              </button>
             ))}
-            <Link
-              href="/contacto"
-              onClick={() => setMenuOpen(false)}
-              className="mt-2 border border-[#C9A84C] text-[#C9A84C] text-center text-xs tracking-[0.2em] uppercase font-sans px-5 py-3 transition-all"
+            <button
+              onClick={() => handleAnchor('#contacto')}
+              className="mt-2 border border-[#C9A84C] text-[#C9A84C] text-center text-xs tracking-[0.2em] uppercase font-sans px-5 py-3 transition-all cursor-pointer"
             >
               {t('book')}
-            </Link>
+            </button>
           </nav>
         </div>
       )}
