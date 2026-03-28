@@ -44,15 +44,15 @@ export default function Navbar() {
       }`}
     >
       <div className="max-w-7xl mx-auto px-6 lg:px-12">
-        <div className="flex items-center justify-between h-20">
+        <div className="flex items-center justify-between h-28 md:h-40">
           {/* Logo */}
-          <Link href="/" className="flex items-center">
+          <Link href="/" className="flex items-center -ml-3">
             <Image
               src="/logo.png"
               alt="Villa Sera"
-              width={120}
-              height={48}
-              className="object-contain h-12 w-auto"
+              width={480}
+              height={192}
+              className="object-contain h-28 md:h-40 w-auto"
               priority
             />
           </Link>
