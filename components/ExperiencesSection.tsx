@@ -75,6 +75,7 @@ export default function ExperiencesSection() {
                   src={image}
                   alt={alt}
                   fill
+                  quality={75}
                   className="object-cover hover:scale-105 transition-transform duration-700"
                   sizes="(max-width: 1024px) 100vw, 50vw"
                 />

@@ -118,6 +118,7 @@ export default function GallerySection() {
                   src={img.src}
                   alt={img.alt}
                   fill
+                  quality={75}
                   className="object-cover group-hover:scale-105 transition-transform duration-700"
                   sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
                 />
@@ -164,6 +165,7 @@ export default function GallerySection() {
                 src={filtered[lightbox].src}
                 alt={filtered[lightbox].alt}
                 fill
+                quality={85}
                 className="object-contain"
                 sizes="90vw"
               />

@@ -116,6 +116,7 @@ export default function WelcomeSection() {
                 src="/images/CasaSergio126.jpg"
                 alt="Villa Sera fachada"
                 fill
+                quality={75}
                 className="object-cover hover:scale-105 transition-transform duration-700"
                 sizes="(max-width: 1024px) 50vw, 25vw"
               />
@@ -125,6 +126,7 @@ export default function WelcomeSection() {
                 src="/images/livingroom villa serena.jpg"
                 alt="Villa Sera sala principal"
                 fill
+                quality={75}
                 className="object-cover hover:scale-105 transition-transform duration-700"
                 sizes="(max-width: 1024px) 50vw, 25vw"
               />
@@ -134,6 +136,7 @@ export default function WelcomeSection() {
                 src="/images/master room 1.jpg"
                 alt="Villa Sera master suite"
                 fill
+                quality={75}
                 className="object-cover hover:scale-105 transition-transform duration-700"
                 sizes="(max-width: 1024px) 50vw, 25vw"
               />

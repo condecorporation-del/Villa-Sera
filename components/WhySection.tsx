@@ -25,6 +25,7 @@ export default function WhySection() {
         src="/images/CasaSergio139+.jpg"
         alt="Villa Sera aerial Los Cabos"
         fill
+        quality={75}
         className="object-cover"
         sizes="100vw"
       />
