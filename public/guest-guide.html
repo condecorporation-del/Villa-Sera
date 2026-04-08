@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="robots" content="noindex, nofollow" />
-  <title>Villa Sera · Guía de Huéspedes</title>
-  <meta name="description" content="Su guía privada de bienvenida a Villa Sera, Los Cabos." />
+  <title>Villa Sera · Guest Guide</title>
+  <meta id="meta-desc" name="description" content="Your private welcome guide to Villa Sera, Los Cabos." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
@@ -70,10 +70,15 @@
     #nav.hidden { transform: translateY(-100%); }
 
     .nav-logo {
-      font-family: var(--font-serif);
-      font-size: 1.5rem;
-      color: var(--gold);
-      letter-spacing: 0.1em;
+      display: flex;
+      align-items: center;
+      line-height: 0;
+    }
+    .nav-logo img {
+      height: 52px;
+      width: auto;
+      object-fit: contain;
+      max-width: 180px;
     }
 
     .nav-links {
@@ -89,6 +94,33 @@
       transition: color 0.3s;
     }
     .nav-links a:hover { color: var(--gold); }
+
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+    }
+    .lang-switch {
+      display: flex;
+      border: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .lang-switch button {
+      font-family: var(--font-sans);
+      font-size: 0.6rem;
+      letter-spacing: 0.2em;
+      padding: 0.5rem 0.85rem;
+      background: transparent;
+      border: none;
+      color: var(--white-dim);
+      cursor: pointer;
+      transition: color 0.3s, background 0.3s;
+    }
+    .lang-switch button.is-active {
+      background: var(--gold-dim);
+      color: var(--gold);
+    }
+    .lang-switch button:hover:not(.is-active) { color: var(--white); }
 
     .nav-burger {
       display: none;
@@ -360,6 +392,41 @@
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 1.5rem;
+      max-width: 1080px;
+      margin: 0 auto;
+    }
+
+    /* ─── MANTENIMIENTO PROGRAMADO ─── */
+    #mantenimiento { background: var(--bg-2); }
+
+    .mantenimiento-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+    }
+    .mantenimiento-card {
+      background: var(--bg-3);
+      border: 1px solid var(--border);
+      padding: 2rem;
+      transition: var(--transition);
+    }
+    .mantenimiento-card:hover { border-color: var(--gold); }
+    .mantenimiento-day {
+      font-size: 0.65rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 0.75rem;
+    }
+    .mantenimiento-title {
+      font-family: var(--font-serif);
+      font-size: 1.35rem;
+      margin-bottom: 0.75rem;
+    }
+    .mantenimiento-body {
+      font-size: 0.9rem;
+      color: var(--white-dim);
+      line-height: 1.75;
     }
 
     .staff-card {
@@ -420,55 +487,135 @@
     .wa-btn:hover { background: var(--gold); color: var(--bg); }
     .wa-btn-icon { width: 16px; height: 16px; fill: currentColor; }
 
-    /* ─── ESPACIOS (ACCORDION) ─── */
+    /* ─── ESPACIOS (EDITORIAL + PHOTOS) ─── */
     #espacios { background: var(--bg); }
 
-    .accordion-item {
-      border-bottom: 1px solid var(--border);
-    }
-
-    .accordion-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 1.5rem 0;
-      cursor: pointer;
-      gap: 1rem;
-    }
-    .accordion-title {
-      font-family: var(--font-serif);
-      font-size: 1.4rem;
-      color: var(--white);
-      transition: color 0.3s;
-    }
-    .accordion-header:hover .accordion-title { color: var(--gold); }
-
-    .accordion-icon {
-      width: 28px;
-      height: 28px;
+    .espacios-strip {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr 1.4fr;
+      gap: 3px;
+      margin-bottom: 3rem;
       border: 1px solid var(--border);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-      transition: var(--transition);
-      color: var(--gold);
-      font-size: 1rem;
     }
-    .accordion-item.open .accordion-icon { transform: rotate(45deg); border-color: var(--gold); }
-
-    .accordion-body {
-      max-height: 0;
+    .espacios-strip figure {
+      margin: 0;
       overflow: hidden;
-      transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+      aspect-ratio: 4 / 3;
+      max-height: 280px;
     }
-    .accordion-body-inner {
-      padding: 0 0 2rem;
+    .espacios-strip img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.6s ease;
+    }
+    .espacios-strip figure:hover img { transform: scale(1.04); }
+
+    .villa-spaces-list {
+      display: flex;
+      flex-direction: column;
+      gap: 2.5rem;
+    }
+
+    .villa-space-card {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+      border: 1px solid var(--border);
+      background: var(--bg-2);
+      overflow: hidden;
+      transition: border-color 0.35s ease;
+    }
+    .villa-space-card:hover { border-color: rgba(201, 168, 76, 0.45); }
+
+    .villa-space-card:nth-child(even) .villa-space-media { order: 2; }
+    .villa-space-card:nth-child(even) .villa-space-copy { order: 1; }
+
+    .villa-space-media {
+      position: relative;
+      min-height: 280px;
+    }
+    .villa-space-photos {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 3px;
+      height: 100%;
+      min-height: 280px;
+    }
+    .villa-space-photos.single {
+      grid-template-columns: 1fr;
+    }
+    .villa-space-photos.triple a:nth-child(3) {
+      grid-column: 1 / -1;
+    }
+    .villa-space-photos.quint a:nth-child(5) {
+      grid-column: 1 / -1;
+    }
+    .villa-space-photos a {
+      display: block;
+      overflow: hidden;
+      height: 100%;
+      min-height: 140px;
+    }
+    .villa-space-photos img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.55s ease;
+    }
+    .villa-space-photos a:hover img { transform: scale(1.03); }
+
+    .villa-space-copy {
+      padding: 2.25rem 2.5rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .villa-space-num {
+      font-family: var(--font-serif);
+      font-size: 3rem;
+      font-weight: 300;
+      line-height: 1;
+      color: rgba(201, 168, 76, 0.35);
+      margin-bottom: 0.75rem;
+    }
+    .villa-space-title {
+      font-family: var(--font-serif);
+      font-size: clamp(1.35rem, 2.5vw, 1.75rem);
+      color: var(--white);
+      margin-bottom: 1rem;
+      letter-spacing: 0.02em;
+    }
+    .villa-space-rule {
+      width: 40px;
+      height: 1px;
+      background: var(--gold);
+      margin-bottom: 1.25rem;
+    }
+    .villa-space-text {
       font-size: 0.9rem;
       color: var(--white-dim);
-      line-height: 1.8;
-      max-width: 680px;
+      line-height: 1.85;
+      max-width: 36rem;
+    }
+
+    @media (max-width: 900px) {
+      .espacios-strip {
+        grid-template-columns: 1fr 1fr 1fr;
+        max-height: none;
+      }
+      .espacios-strip figure { aspect-ratio: 1 / 1; max-height: 160px; }
+      .villa-space-card,
+      .villa-space-card:nth-child(even) {
+        grid-template-columns: 1fr;
+      }
+      .villa-space-card:nth-child(even) .villa-space-media,
+      .villa-space-card:nth-child(even) .villa-space-copy { order: unset; }
+      .villa-space-media { min-height: 220px; }
+      .villa-space-photos { min-height: 220px; }
+      .villa-space-copy { padding: 1.75rem 1.5rem; }
     }
 
     /* ─── SERVICIOS ─── */
@@ -588,6 +735,67 @@
     }
     .recom-meta a { color: var(--gold); }
 
+    /* ─── RESTAURANTS: categories + photo cards ─── */
+    .recom-card.has-photo { padding: 0; }
+    .rest-section { margin-bottom: 2.5rem; }
+    .rest-section-header {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      margin-bottom: 1.25rem;
+      padding-bottom: 0.65rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .rest-section-icon { font-size: 1rem; line-height: 1; }
+    .rest-section-label {
+      font-family: var(--font-sans);
+      font-size: 0.65rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--gold);
+    }
+    .recom-card-img-wrap {
+      overflow: hidden;
+      position: relative;
+      height: 150px;
+    }
+    .recom-card-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.55s ease;
+    }
+    .recom-card:hover .recom-card-img { transform: scale(1.05); }
+    .recom-top-badge {
+      position: absolute;
+      top: 0.5rem;
+      right: 0.5rem;
+      font-size: 0.55rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      background: rgba(10, 10, 10, 0.88);
+      color: var(--gold);
+      border: 1px solid rgba(201, 168, 76, 0.4);
+      padding: 0.2rem 0.5rem;
+    }
+    .recom-stars {
+      color: var(--gold);
+      font-size: 0.72rem;
+      margin-bottom: 0.3rem;
+    }
+    .recom-card-body { padding: 1.25rem 1.5rem; }
+    .recom-maps-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      font-size: 0.68rem;
+      color: var(--gold);
+      margin-top: 0.5rem;
+      letter-spacing: 0.04em;
+    }
+    .recom-maps-link:hover { text-decoration: underline; }
+
     .emergency-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
@@ -652,10 +860,13 @@
       text-align: center;
     }
     .footer-logo {
-      font-family: var(--font-serif);
-      font-size: 3rem;
-      color: var(--gold);
       margin-bottom: 1rem;
+    }
+    .footer-logo img {
+      height: 64px;
+      width: auto;
+      margin: 0 auto;
+      object-fit: contain;
     }
     .footer-name {
       font-family: var(--font-serif);
@@ -702,6 +913,36 @@
     }
     .footer-links a:hover { color: var(--gold); }
 
+    .footer-social {
+      margin-bottom: 2rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border);
+      max-width: 420px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .footer-social-title {
+      font-size: 0.65rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--white-dimmer);
+      margin-bottom: 1rem;
+    }
+    .footer-social-links {
+      display: flex;
+      justify-content: center;
+      gap: 1.25rem 2rem;
+      flex-wrap: wrap;
+    }
+    .footer-social-links a {
+      font-size: 0.75rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--white-dim);
+      transition: color 0.3s;
+    }
+    .footer-social-links a:hover { color: var(--gold); }
+
     .footer-private {
       font-size: 0.7rem;
       color: var(--white-dimmer);
@@ -740,8 +981,23 @@
       .servicios-grid { grid-template-columns: repeat(2, 1fr); }
     }
 
+    @media (max-width: 1024px) and (min-width: 769px) {
+      .staff-grid {
+        grid-template-columns: repeat(2, 1fr);
+        max-width: 720px;
+      }
+      .staff-grid .staff-card:nth-child(3) {
+        grid-column: 1 / -1;
+        max-width: 360px;
+        width: 100%;
+        justify-self: center;
+      }
+    }
+
     @media (max-width: 768px) {
       .nav-links { display: none; }
+      .nav-right { gap: 0.75rem; }
+      .lang-switch button { padding: 0.45rem 0.65rem; font-size: 0.55rem; }
       .nav-burger { display: flex; }
 
       section { padding: 4rem 1.25rem; }
@@ -750,6 +1006,7 @@
       .esencial-grid { grid-template-columns: repeat(2, 1fr); }
       .staff-grid {
         grid-template-columns: 1fr;
+        max-width: none;
         display: flex;
         overflow-x: auto;
         scroll-snap-type: x mandatory;
@@ -757,6 +1014,7 @@
         -webkit-overflow-scrolling: touch;
       }
       .staff-card { min-width: 280px; scroll-snap-align: start; }
+      .mantenimiento-grid { grid-template-columns: 1fr; }
       .servicios-grid { grid-template-columns: 1fr; }
       .recom-grid { grid-template-columns: 1fr; }
       .emergency-grid { grid-template-columns: 1fr; }
@@ -782,30 +1040,42 @@
 
   <!-- NAV -->
   <nav id="nav">
-    <a href="#hero" class="nav-logo">VS</a>
-    <ul class="nav-links">
-      <li><a href="#bienvenida">Bienvenida</a></li>
-      <li><a href="#esencial">Esencial</a></li>
-      <li><a href="#staff">Staff</a></li>
-      <li><a href="#espacios">La Villa</a></li>
-      <li><a href="#servicios">Servicios</a></li>
-      <li><a href="#recomendaciones">Guía Local</a></li>
-      <li><a href="#reglas">Reglas</a></li>
-    </ul>
-    <button class="nav-burger" onclick="toggleMenu()" aria-label="Menú">
+    <a href="#hero" class="nav-logo"><img src="/logo.png" alt="Villa Sera" /></a>
+    <div class="nav-right">
+      <ul class="nav-links">
+        <li><a href="#bienvenida" data-i18n="nav_bienvenida">Welcome</a></li>
+        <li><a href="#esencial" data-i18n="nav_esencial">Essentials</a></li>
+        <li><a href="#mantenimiento" data-i18n="nav_mantenimiento">Scheduled visits</a></li>
+        <li><a href="#staff" data-i18n="nav_staff">Your team</a></li>
+        <li><a href="#espacios" data-i18n="nav_villa">The villa</a></li>
+        <li><a href="#servicios" data-i18n="nav_servicios">Add-ons</a></li>
+        <li><a href="#recomendaciones" data-i18n="nav_guia">Local guide</a></li>
+        <li><a href="#reglas" data-i18n="nav_reglas">House rules</a></li>
+      </ul>
+      <div class="lang-switch" role="group" aria-label="Language">
+        <button type="button" data-lang="en" aria-pressed="true">EN</button>
+        <button type="button" data-lang="es" aria-pressed="false">ES</button>
+      </div>
+    </div>
+    <button class="nav-burger" onclick="toggleMenu()" data-i18n-attr="aria-label:nav_menu_aria" aria-label="Menu">
       <span></span><span></span><span></span>
     </button>
   </nav>
 
   <div class="mobile-menu" id="mobile-menu">
+    <div class="lang-switch" role="group" aria-label="Language" style="margin-bottom:1.5rem;justify-content:center;">
+      <button type="button" data-lang="en" aria-pressed="true">EN</button>
+      <button type="button" data-lang="es" aria-pressed="false">ES</button>
+    </div>
     <ul>
-      <li><a href="#bienvenida" onclick="closeMenu()">Bienvenida</a></li>
-      <li><a href="#esencial" onclick="closeMenu()">Info Esencial</a></li>
-      <li><a href="#staff" onclick="closeMenu()">Su Staff</a></li>
-      <li><a href="#espacios" onclick="closeMenu()">La Villa</a></li>
-      <li><a href="#servicios" onclick="closeMenu()">Servicios</a></li>
-      <li><a href="#recomendaciones" onclick="closeMenu()">Guía Local</a></li>
-      <li><a href="#reglas" onclick="closeMenu()">Reglas</a></li>
+      <li><a href="#bienvenida" onclick="closeMenu()" data-i18n="nav_bienvenida">Welcome</a></li>
+      <li><a href="#esencial" onclick="closeMenu()" data-i18n="nav_esencial">Essentials</a></li>
+      <li><a href="#mantenimiento" onclick="closeMenu()" data-i18n="nav_mantenimiento">Scheduled visits</a></li>
+      <li><a href="#staff" onclick="closeMenu()" data-i18n="nav_staff">Your team</a></li>
+      <li><a href="#espacios" onclick="closeMenu()" data-i18n="nav_villa">The villa</a></li>
+      <li><a href="#servicios" onclick="closeMenu()" data-i18n="nav_servicios">Add-ons</a></li>
+      <li><a href="#recomendaciones" onclick="closeMenu()" data-i18n="nav_guia">Local guide</a></li>
+      <li><a href="#reglas" onclick="closeMenu()" data-i18n="nav_reglas">House rules</a></li>
     </ul>
   </div>
 
@@ -814,9 +1084,9 @@
     <div class="hero-bg" id="hero-bg"></div>
     <div class="hero-overlay"></div>
     <div class="hero-content">
-      <p class="hero-eyebrow">Bienvenidos a</p>
+      <p class="hero-eyebrow" data-i18n="hero_eyebrow">Welcome to</p>
       <h1 class="hero-title">Villa Sera</h1>
-      <p class="hero-subtitle">Su guía privada de huéspedes &nbsp;·&nbsp; Los Cabos, México</p>
+      <p class="hero-subtitle" data-i18n="hero_subtitle">Your private guest guide · Los Cabos, Mexico</p>
     </div>
     <div class="scroll-indicator">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
@@ -829,41 +1099,41 @@
   <section id="bienvenida">
     <div class="container">
       <div class="fade-in">
-        <p class="section-eyebrow">Mensaje personal</p>
-        <h2 class="section-title">Una bienvenida de parte de Alexis</h2>
+        <p class="section-eyebrow" data-i18n="welcome_eyebrow">Personal note</p>
+        <h2 class="section-title" data-i18n="welcome_title">A welcome from Marlon Alexis Herrera</h2>
         <div class="gold-divider"></div>
       </div>
       <div class="bienvenida-grid">
         <div class="fade-in">
-          <p class="welcome-text">
-            "Es un honor recibirlos en Villa Sera. Esta es su casa durante su estancia — cada espacio, cada servicio y cada atardecer está aquí para que los disfruten al máximo. No duden en contactarnos para cualquier cosa. Estamos aquí para hacer de esta experiencia algo que nunca olvidarán."
+          <p class="welcome-text" data-i18n="welcome_quote">
+            "It is an honor to host you at Villa Sera. This is your home for your stay — every space, every service, and every sunset is here for you to enjoy."
           </p>
           <br />
-          <p style="font-size:0.85rem; color:var(--white-dim);">
-            Nuestro equipo está disponible las 24 horas para cualquier necesidad — desde una recomendación de restaurante hasta coordinar una excursión privada al Arco.
+          <p style="font-size:0.85rem; color:var(--white-dim);" data-i18n="welcome_note">
+            Our team is available 24/7 — from restaurant recommendations to coordinating a private Arch tour.
           </p>
         </div>
         <div class="fade-in" style="transition-delay:0.15s">
           <div class="info-card">
-            <p class="info-card-title">Información de su estadía</p>
+            <p class="info-card-title" data-i18n="welcome_card_title">Your stay at a glance</p>
             <div class="info-row">
-              <span class="info-row-label">Check-in</span>
+              <span class="info-row-label" data-i18n="welcome_checkin">Check-in</span>
               <span class="info-row-value">3:00 PM</span>
             </div>
             <div class="info-row">
-              <span class="info-row-label">Check-out</span>
+              <span class="info-row-label" data-i18n="welcome_checkout">Check-out</span>
               <span class="info-row-value">12:00 PM</span>
             </div>
             <div class="info-row">
-              <span class="info-row-label">Early/Late</span>
-              <span class="info-row-value">Consultar con staff</span>
+              <span class="info-row-label" data-i18n="welcome_early_label">Early / late</span>
+              <span class="info-row-value" data-i18n="welcome_early_val">Ask the team</span>
             </div>
             <div class="info-row">
-              <span class="info-row-label">Capacidad máx.</span>
-              <span class="info-row-value">10 huéspedes</span>
+              <span class="info-row-label" data-i18n="welcome_capacity_label">Max. occupancy</span>
+              <span class="info-row-value" data-i18n="welcome_capacity_val">8 guests</span>
             </div>
             <a href="tel:+526242175935" class="emergency-btn">
-              📞 &nbsp; Contacto de Emergencia: +52 624 217 5935
+              📞 &nbsp; <span data-i18n="welcome_emergency">Emergency contact: +52 624 217 5935</span>
             </a>
           </div>
         </div>
@@ -875,41 +1145,67 @@
   <section id="esencial">
     <div class="container">
       <div class="fade-in">
-        <p class="section-eyebrow">Lo que necesita saber</p>
-        <h2 class="section-title">Información Esencial</h2>
+        <p class="section-eyebrow" data-i18n="esencial_eyebrow">Good to know</p>
+        <h2 class="section-title" data-i18n="esencial_title">Essential information</h2>
         <div class="gold-divider"></div>
       </div>
       <div class="esencial-grid fade-in" style="transition-delay:0.1s">
         <div class="esencial-card">
           <div class="esencial-icon">📶</div>
           <div class="esencial-card-title">WiFi</div>
-          <p class="wifi-network">Red: VillaSera_Guest</p>
-          <p class="wifi-pass">SeaCortez2024</p>
+          <p class="wifi-network" data-i18n="card_wifi_net">Network: VillaSera_Guest</p>
+          <p class="wifi-pass">VillaSera2025</p>
         </div>
         <div class="esencial-card">
           <div class="esencial-icon">❄️</div>
-          <div class="esencial-card-title">Aire Acondicionado</div>
-          <p class="esencial-card-body">Termostatos en cada habitación. Temperatura recomendada: 22°C. Por favor apagar al salir del cuarto.</p>
+          <div class="esencial-card-title" data-i18n="card_ac_t">Air conditioning</div>
+          <p class="esencial-card-body" data-i18n="card_ac_b">Thermostats in each room. Recommended temperature: 22°C. Please switch off when leaving the room.</p>
         </div>
         <div class="esencial-card">
           <div class="esencial-icon">📺</div>
-          <div class="esencial-card-title">Entretenimiento</div>
-          <p class="esencial-card-body">Smart TV en sala y habitaciones con Netflix y Apple TV. Bocinas Sonos en terraza — pida al butler que las configure.</p>
+          <div class="esencial-card-title" data-i18n="card_tv_t">Entertainment</div>
+          <p class="esencial-card-body" data-i18n="card_tv_b">Smart TVs in the living room and bedrooms with Netflix and Apple TV. Sonos on the terrace — ask the Villa Sera team to help you connect.</p>
         </div>
         <div class="esencial-card">
           <div class="esencial-icon">🚗</div>
-          <div class="esencial-card-title">Estacionamiento</div>
-          <p class="esencial-card-body">Espacio privado para 3 vehículos frente a la villa. El portón se abre con control remoto en recepción.</p>
+          <div class="esencial-card-title" data-i18n="card_park_t">Parking</div>
+          <p class="esencial-card-body" data-i18n="card_park_b">Private space for 2 vehicles in front of the villa. The gate opens with the remote at reception.</p>
         </div>
         <div class="esencial-card">
           <div class="esencial-icon">⚡</div>
-          <div class="esencial-card-title">Electricidad</div>
-          <p class="esencial-card-body">La villa cuenta con generador automático. En caso de corte de luz, el sistema se activa en menos de 30 segundos.</p>
+          <div class="esencial-card-title" data-i18n="card_power_t">Power</div>
+          <p class="esencial-card-body" data-i18n="card_power_b">The villa has an automatic backup generator. If power drops, the system kicks in within 30 seconds.</p>
         </div>
         <div class="esencial-card">
           <div class="esencial-icon">♻️</div>
-          <div class="esencial-card-title">Basura</div>
-          <p class="esencial-card-body">Recolección diaria por el staff. Separamos orgánico y reciclable. Gracias por ayudarnos a cuidar Los Cabos.</p>
+          <div class="esencial-card-title" data-i18n="card_trash_t">Trash</div>
+          <p class="esencial-card-body" data-i18n="card_trash_b">Pickup on Mondays, Wednesdays, and Fridays. We separate organic and recycling — thank you for helping us care for Los Cabos.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MANTENIMIENTO PROGRAMADO -->
+  <section id="mantenimiento">
+    <div class="container">
+      <div class="fade-in">
+        <p class="section-eyebrow" data-i18n="maint_eyebrow">Property access</p>
+        <h2 class="section-title" data-i18n="maint_title">Scheduled maintenance</h2>
+        <div class="gold-divider"></div>
+        <p style="color:var(--white-dim); font-size:0.9rem; margin-bottom:2.5rem;" data-i18n="maint_intro">
+          For your comfort and security, we will notify you in advance whenever authorized staff need to be on the property.
+        </p>
+      </div>
+      <div class="mantenimiento-grid fade-in" style="transition-delay:0.1s">
+        <div class="mantenimiento-card">
+          <p class="mantenimiento-day" data-i18n="maint_tue_day">Tuesday</p>
+          <h3 class="mantenimiento-title" data-i18n="maint_tue_t">Landscaping</h3>
+          <p class="mantenimiento-body" data-i18n-html="maint_tue_b"></p>
+        </div>
+        <div class="mantenimiento-card">
+          <p class="mantenimiento-day" data-i18n="maint_fri_day">Friday</p>
+          <h3 class="mantenimiento-title" data-i18n="maint_fri_t">Pool & hot tub service</h3>
+          <p class="mantenimiento-body" data-i18n="maint_fri_b">On Fridays, pool and hot tub maintenance ensures water quality and equipment are in top condition.</p>
         </div>
       </div>
     </div>
@@ -919,40 +1215,46 @@
   <section id="staff">
     <div class="container">
       <div class="fade-in">
-        <p class="section-eyebrow">Su equipo personal</p>
-        <h2 class="section-title">Su Equipo Dedicado</h2>
+        <p class="section-eyebrow" data-i18n="staff_eyebrow">Your hosts</p>
+        <h2 class="section-title" data-i18n="staff_title">Your dedicated team</h2>
         <div class="gold-divider"></div>
-        <p style="color:var(--white-dim); font-size:0.9rem; margin-bottom:2.5rem;">Estamos aquí para hacer su estancia perfecta, las 24 horas.</p>
+        <p style="color:var(--white-dim); font-size:0.9rem; margin-bottom:2.5rem;" data-i18n="staff_intro">We are here to make your stay perfect — 24 hours a day.</p>
       </div>
       <div class="staff-grid fade-in" style="transition-delay:0.1s">
         <div class="staff-card">
-          <div class="staff-avatar">VS</div>
-          <div class="staff-name">Equipo Villa Sera</div>
-          <div class="staff-role">Concierge & Reservaciones</div>
-          <div class="staff-desc">Para reservaciones, preguntas generales y coordinación de servicios adicionales.</div>
-          <a href="https://wa.me/526242175935" target="_blank" class="wa-btn">
+          <div class="staff-avatar">MA</div>
+          <div class="staff-name" data-i18n="staff_vs_name">Marlon Alexis Herrera</div>
+          <div class="staff-role" data-i18n="staff_vs_role">House manager</div>
+          <div class="staff-desc" data-i18n="staff_vs_desc">Your on-site house manager and main contact around the clock: reservations, general questions, and coordinating add-on services.</div>
+          <a href="https://wa.me/526242175935?text=Hello%2C%20I%27m%20a%20Villa%20Sera%20guest%20and%20need%20assistance." target="_blank" rel="noopener noreferrer" class="wa-btn"
+            data-wa-en="https://wa.me/526242175935?text=Hello%2C%20I%27m%20a%20Villa%20Sera%20guest%20and%20need%20assistance."
+            data-wa-es="https://wa.me/526242175935?text=Hola%2C%20soy%20hu%C3%A9sped%20de%20Villa%20Sera%20y%20necesito%20asistencia.">
             <svg class="wa-btn-icon" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-            WhatsApp
+            <span data-i18n="wa_btn">WhatsApp</span>
           </a>
         </div>
         <div class="staff-card">
           <div class="staff-avatar">CH</div>
-          <div class="staff-name">Chef Privado</div>
-          <div class="staff-role">Chef de Cuisine</div>
-          <div class="staff-desc">Disponible para desayunos, comidas y cenas privadas. Comparta sus preferencias y restricciones alimenticias con anticipación.</div>
-          <a href="https://wa.me/526242175935" target="_blank" class="wa-btn">
+          <div class="staff-name" data-i18n="staff_ch_name">Private chef</div>
+          <div class="staff-role" data-i18n="staff_ch_role">Chef de cuisine</div>
+          <div class="staff-desc" data-i18n="staff_ch_desc">Available for breakfast, lunch, and private dinners. Please share dietary preferences and restrictions in advance.</div>
+          <a href="https://wa.me/526242175935?text=Hello%2C%20I%27d%20like%20to%20request%20the%20private%20chef%20service." target="_blank" rel="noopener noreferrer" class="wa-btn"
+            data-wa-en="https://wa.me/526242175935?text=Hello%2C%20I%27d%20like%20to%20request%20the%20private%20chef%20service."
+            data-wa-es="https://wa.me/526242175935?text=Hola%2C%20me%20gustar%C3%ADa%20solicitar%20el%20servicio%20de%20chef%20privado.">
             <svg class="wa-btn-icon" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-            WhatsApp
+            <span data-i18n="wa_btn">WhatsApp</span>
           </a>
         </div>
         <div class="staff-card">
-          <div class="staff-avatar">BT</div>
-          <div class="staff-name">Butler</div>
-          <div class="staff-role">Servicio 24/7</div>
-          <div class="staff-desc">Su punto de contacto para cualquier necesidad durante su estancia. Discreto, atento y siempre disponible.</div>
-          <a href="https://wa.me/526242175935" target="_blank" class="wa-btn">
+          <div class="staff-avatar">CV</div>
+          <div class="staff-name" data-i18n="staff_hk_name">Cecilia Velazques</div>
+          <div class="staff-role" data-i18n="staff_hk_role">Housekeeper</div>
+          <div class="staff-desc" data-i18n="staff_hk_desc">Keeps Villa Sera immaculate during your stay — daily tidying, linens, and details. Share preferred times or special requests.</div>
+          <a href="https://wa.me/526242175935?text=Hello%2C%20I%27m%20a%20Villa%20Sera%20guest%20and%20would%20like%20to%20reach%20the%20housekeeping%20team." target="_blank" rel="noopener noreferrer" class="wa-btn"
+            data-wa-en="https://wa.me/526242175935?text=Hello%2C%20I%27m%20a%20Villa%20Sera%20guest%20and%20would%20like%20to%20reach%20the%20housekeeping%20team."
+            data-wa-es="https://wa.me/526242175935?text=Hola%2C%20soy%20hu%C3%A9sped%20de%20Villa%20Sera%20y%20quiero%20contactar%20al%20equipo%20de%20limpieza.">
             <svg class="wa-btn-icon" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-            WhatsApp
+            <span data-i18n="wa_btn">WhatsApp</span>
           </a>
         </div>
       </div>
@@ -963,65 +1265,171 @@
   <section id="espacios">
     <div class="container">
       <div class="fade-in">
-        <p class="section-eyebrow">Tour privado</p>
-        <h2 class="section-title">Conozca Su Villa</h2>
+        <p class="section-eyebrow" data-i18n="esp_eyebrow">Private tour</p>
+        <h2 class="section-title" data-i18n="esp_title">Explore your villa</h2>
         <div class="gold-divider"></div>
+        <p class="villa-space-text" style="margin-bottom:2rem;max-width:40rem;" data-i18n="esp_intro">A curated visual tour of the residence — terraces, ocean, and interior living.</p>
       </div>
-      <div class="fade-in" style="transition-delay:0.1s">
-        <div class="accordion-item">
-          <div class="accordion-header" onclick="toggleAccordion(this)">
-            <span class="accordion-title">Terraza Principal & Alberca</span>
-            <span class="accordion-icon">+</span>
+
+      <div class="espacios-strip fade-in" style="transition-delay:0.05s">
+        <figure>
+          <img src="https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto/f_auto/v1775608196/CasaSergio179_orre1k.jpg" alt="" loading="lazy" decoding="async" width="800" height="600" data-i18n="photo_alt" />
+        </figure>
+        <figure>
+          <img src="https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto/f_auto/v1775608194/CasaSergio10_czywqv.jpg" alt="" loading="lazy" decoding="async" width="800" height="600" data-i18n="photo_alt" />
+        </figure>
+        <figure>
+          <img src="https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto/f_auto/v1775608192/CasaSergio238_jg6mpa.jpg" alt="" loading="lazy" decoding="async" width="800" height="600" data-i18n="photo_alt" />
+        </figure>
+      </div>
+
+      <div class="villa-spaces-list fade-in" style="transition-delay:0.1s">
+        <article class="villa-space-card">
+          <div class="villa-space-media">
+            <div class="villa-space-photos">
+              <a href="https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto/f_auto/v1775608194/CasaSergio10_czywqv.jpg" target="_blank" rel="noopener noreferrer">
+                <img src="https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto/f_auto/v1775608194/CasaSergio10_czywqv.jpg" alt="" loading="lazy" decoding="async" width="800" height="600" data-i18n="photo_alt" />
+              </a>
+              <a href="https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto/f_auto/v1775608197/CasaSergio184-2_aug1tr.jpg" target="_blank" rel="noopener noreferrer">
+                <img src="https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto/f_auto/v1775608197/CasaSergio184-2_aug1tr.jpg" alt="" loading="lazy" decoding="async" width="800" height="600" data-i18n="photo_alt" />
+              </a>
+            </div>
           </div>
-          <div class="accordion-body">
-            <div class="accordion-body-inner">Su terraza privada con vista directa al Mar de Cortés y El Arco de Cabo San Lucas. La alberca está disponible las 24 horas. Temperatura del agua: 28°C. Camastros y toallas siempre listos.</div>
+          <div class="villa-space-copy">
+            <span class="villa-space-num">01</span>
+            <h3 class="villa-space-title" data-i18n="acc1_t">Pool, hot tub & main terrace</h3>
+            <div class="villa-space-rule"></div>
+            <p class="villa-space-text" data-i18n="acc1_b">The main terrace faces the Sea of Cortez and the Arch.</p>
           </div>
-        </div>
-        <div class="accordion-item">
-          <div class="accordion-header" onclick="toggleAccordion(this)">
-            <span class="accordion-title">Playa Privada</span>
-            <span class="accordion-icon">+</span>
+        </article>
+
+        <article class="villa-space-card">
+          <div class="villa-space-media">
+            <div class="villa-space-photos triple">
+              <a href="https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto/f_auto/v1775609851/CasaSergio182_lazs9m.jpg" target="_blank" rel="noopener noreferrer">
+                <img src="https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto/f_auto/v1775609851/CasaSergio182_lazs9m.jpg" alt="" loading="lazy" decoding="async" width="800" height="600" data-i18n="photo_alt" />
+              </a>
+              <a href="https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto/f_auto/v1775609850/CasaSergio121_vcbafb.jpg" target="_blank" rel="noopener noreferrer">
+                <img src="https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto/f_auto/v1775609850/CasaSergio121_vcbafb.jpg" alt="" loading="lazy" decoding="async" width="800" height="600" data-i18n="photo_alt" />
+              </a>
+              <a href="https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto/f_auto/v1775609853/CasaSergio180_uaxxt7.jpg" target="_blank" rel="noopener noreferrer">
+                <img src="https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto/f_auto/v1775609853/CasaSergio180_uaxxt7.jpg" alt="" loading="lazy" decoding="async" width="800" height="600" data-i18n="photo_alt" />
+              </a>
+            </div>
           </div>
-          <div class="accordion-body">
-            <div class="accordion-body-inner">Acceso exclusivo por la escalinata de piedra al lado derecho de la villa. La playa es completamente privada y nadable. Equipos de snorkel, kayaks y paddleboards disponibles — solicite al butler. Horarios de marea en recepción.</div>
+          <div class="villa-space-copy">
+            <span class="villa-space-num">02</span>
+            <h3 class="villa-space-title" data-i18n="acc2_t">Private beach</h3>
+            <div class="villa-space-rule"></div>
+            <p class="villa-space-text" data-i18n="acc2_b">Exclusive access via the stone staircase on the right side of the villa.</p>
           </div>
-        </div>
-        <div class="accordion-item">
-          <div class="accordion-header" onclick="toggleAccordion(this)">
-            <span class="accordion-title">Comedor Exterior</span>
-            <span class="accordion-icon">+</span>
+        </article>
+
+        <article class="villa-space-card">
+          <div class="villa-space-media">
+            <div class="villa-space-photos triple">
+              <a href="https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto/f_auto/v1775608192/CasaSergio238_jg6mpa.jpg" target="_blank" rel="noopener noreferrer">
+                <img src="https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto/f_auto/v1775608192/CasaSergio238_jg6mpa.jpg" alt="" loading="lazy" decoding="async" width="800" height="600" data-i18n="photo_alt" />
+              </a>
+              <a href="https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto/f_auto/v1775608196/CasaSergio179_orre1k.jpg" target="_blank" rel="noopener noreferrer">
+                <img src="https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto/f_auto/v1775608196/CasaSergio179_orre1k.jpg" alt="" loading="lazy" decoding="async" width="800" height="600" data-i18n="photo_alt" />
+              </a>
+              <a href="https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto/f_auto/v1775610420/CasaSergio213_nxl7do.jpg" target="_blank" rel="noopener noreferrer">
+                <img src="https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto/f_auto/v1775610420/CasaSergio213_nxl7do.jpg" alt="" loading="lazy" decoding="async" width="800" height="600" data-i18n="photo_alt" />
+              </a>
+            </div>
           </div>
-          <div class="accordion-body">
-            <div class="accordion-body-inner">Bajo los arcos coloniales con vista al mar. Capacidad para 10 personas. Ideal para cenas al atardecer con chef privado. Reserve con mínimo 4 horas de anticipación.</div>
+          <div class="villa-space-copy">
+            <span class="villa-space-num">03</span>
+            <h3 class="villa-space-title" data-i18n="acc3_t">Outdoor dining</h3>
+            <div class="villa-space-rule"></div>
+            <p class="villa-space-text" data-i18n="acc3_b">Under the colonial arches with ocean views. Seats up to 8.</p>
           </div>
-        </div>
-        <div class="accordion-item">
-          <div class="accordion-header" onclick="toggleAccordion(this)">
-            <span class="accordion-title">Sala Principal</span>
-            <span class="accordion-icon">+</span>
+        </article>
+
+        <article class="villa-space-card">
+          <div class="villa-space-media">
+            <div class="villa-space-photos">
+              <a href="https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto/f_auto/v1775608196/CasaSergio194_xcwtwf.jpg" target="_blank" rel="noopener noreferrer">
+                <img src="https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto/f_auto/v1775608196/CasaSergio194_xcwtwf.jpg" alt="" loading="lazy" decoding="async" width="800" height="600" data-i18n="photo_alt" />
+              </a>
+              <a href="https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto/f_auto/v1775608195/CasaSergio166_ysvalx.jpg" target="_blank" rel="noopener noreferrer">
+                <img src="https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto/f_auto/v1775608195/CasaSergio166_ysvalx.jpg" alt="" loading="lazy" decoding="async" width="800" height="600" data-i18n="photo_alt" />
+              </a>
+              <a href="https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto/f_auto/v1775608193/CasaSergio107_fiiith.jpg" target="_blank" rel="noopener noreferrer">
+                <img src="https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto/f_auto/v1775608193/CasaSergio107_fiiith.jpg" alt="" loading="lazy" decoding="async" width="800" height="600" data-i18n="photo_alt" />
+              </a>
+              <a href="https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto/f_auto/v1775608193/CasaSergio161_rtzji2.jpg" target="_blank" rel="noopener noreferrer">
+                <img src="https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto/f_auto/v1775608193/CasaSergio161_rtzji2.jpg" alt="" loading="lazy" decoding="async" width="800" height="600" data-i18n="photo_alt" />
+              </a>
+            </div>
           </div>
-          <div class="accordion-body">
-            <div class="accordion-body-inner">Sala de estar de doble altura con bar completo. Minibar reabastecido diariamente. Los licores del bar tienen costo adicional — pregunte al butler por la lista de precios.</div>
+          <div class="villa-space-copy">
+            <span class="villa-space-num">04</span>
+            <h3 class="villa-space-title" data-i18n="acc4_t">Main living room</h3>
+            <div class="villa-space-rule"></div>
+            <p class="villa-space-text" data-i18n="acc4_b">Double-height lounge with a full bar. Minibar restocked daily.</p>
           </div>
-        </div>
-        <div class="accordion-item">
-          <div class="accordion-header" onclick="toggleAccordion(this)">
-            <span class="accordion-title">Habitaciones (4 Suites)</span>
-            <span class="accordion-icon">+</span>
+        </article>
+
+        <article class="villa-space-card">
+          <div class="villa-space-media">
+            <div class="villa-space-photos">
+              <a href="https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto/f_auto/v1775608195/CasaSergio160_fhgop8.jpg" target="_blank" rel="noopener noreferrer">
+                <img src="https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto/f_auto/v1775608195/CasaSergio160_fhgop8.jpg" alt="" loading="lazy" decoding="async" width="800" height="600" data-i18n="photo_alt" />
+              </a>
+              <a href="https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto/f_auto/v1775610821/CasaSergio222_jkgjqi.jpg" target="_blank" rel="noopener noreferrer">
+                <img src="https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto/f_auto/v1775610821/CasaSergio222_jkgjqi.jpg" alt="" loading="lazy" decoding="async" width="800" height="600" data-i18n="photo_alt" />
+              </a>
+              <a href="https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto/f_auto/v1775608192/CasaSergio156_ah4try.jpg" target="_blank" rel="noopener noreferrer">
+                <img src="https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto/f_auto/v1775608192/CasaSergio156_ah4try.jpg" alt="" loading="lazy" decoding="async" width="800" height="600" data-i18n="photo_alt" />
+              </a>
+              <a href="https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto/f_auto/v1775608189/CasaSergio49_s5gvlh.jpg" target="_blank" rel="noopener noreferrer">
+                <img src="https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto/f_auto/v1775608189/CasaSergio49_s5gvlh.jpg" alt="" loading="lazy" decoding="async" width="800" height="600" data-i18n="photo_alt" />
+              </a>
+              <a href="https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto/f_auto/v1775610756/CasaSergio31_tv1b17.jpg" target="_blank" rel="noopener noreferrer">
+                <img src="https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto/f_auto/v1775610756/CasaSergio31_tv1b17.jpg" alt="" loading="lazy" decoding="async" width="800" height="600" data-i18n="photo_alt" />
+              </a>
+              <a href="https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto/f_auto/v1775608190/CasaSergio75_uj8eaf.jpg" target="_blank" rel="noopener noreferrer">
+                <img src="https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto/f_auto/v1775608190/CasaSergio75_uj8eaf.jpg" alt="" loading="lazy" decoding="async" width="800" height="600" data-i18n="photo_alt" />
+              </a>
+            </div>
           </div>
-          <div class="accordion-body">
-            <div class="accordion-body-inner">4 suites privadas, todas con AC individual, ropa de cama premium (400 hilos), amenidades de lujo y acceso a terraza. Servicio de cama incluido cada noche.</div>
+          <div class="villa-space-copy">
+            <span class="villa-space-num">05</span>
+            <h3 class="villa-space-title" data-i18n="acc5_t">Bedrooms (4 suites)</h3>
+            <div class="villa-space-rule"></div>
+            <p class="villa-space-text" data-i18n="acc5_b">Four private suites with individual AC and terrace access.</p>
           </div>
-        </div>
-        <div class="accordion-item">
-          <div class="accordion-header" onclick="toggleAccordion(this)">
-            <span class="accordion-title">Baños & Spa (4 baños)</span>
-            <span class="accordion-icon">+</span>
+        </article>
+
+        <article class="villa-space-card">
+          <div class="villa-space-media">
+            <div class="villa-space-photos quint">
+              <a href="https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto/f_auto/v1775610757/CasaSergio153_fmuwv0.jpg" target="_blank" rel="noopener noreferrer">
+                <img src="https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto/f_auto/v1775610757/CasaSergio153_fmuwv0.jpg" alt="" loading="lazy" decoding="async" width="800" height="600" data-i18n="photo_alt" />
+              </a>
+              <a href="https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto/f_auto/v1775610757/CasaSergio152_jzalzs.jpg" target="_blank" rel="noopener noreferrer">
+                <img src="https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto/f_auto/v1775610757/CasaSergio152_jzalzs.jpg" alt="" loading="lazy" decoding="async" width="800" height="600" data-i18n="photo_alt" />
+              </a>
+              <a href="https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto/f_auto/v1775610757/CasaSergio154_phdoc3.jpg" target="_blank" rel="noopener noreferrer">
+                <img src="https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto/f_auto/v1775610757/CasaSergio154_phdoc3.jpg" alt="" loading="lazy" decoding="async" width="800" height="600" data-i18n="photo_alt" />
+              </a>
+              <a href="https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto/f_auto/v1775610756/CasaSergio74_lkx0vi.jpg" target="_blank" rel="noopener noreferrer">
+                <img src="https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto/f_auto/v1775610756/CasaSergio74_lkx0vi.jpg" alt="" loading="lazy" decoding="async" width="800" height="600" data-i18n="photo_alt" />
+              </a>
+              <a href="https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto/f_auto/v1775611026/CasaSergio45_w8cccf.jpg" target="_blank" rel="noopener noreferrer">
+                <img src="https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto/f_auto/v1775611026/CasaSergio45_w8cccf.jpg" alt="" loading="lazy" decoding="async" width="800" height="600" data-i18n="photo_alt" />
+              </a>
+            </div>
           </div>
-          <div class="accordion-body">
-            <div class="accordion-body-inner">Tinas de mármol en suite master. Productos de baño de lujo reabastecidos diariamente. Servicio de spa y masajes en villa disponible — solicitar con 24hrs de anticipación.</div>
+          <div class="villa-space-copy">
+            <span class="villa-space-num">06</span>
+            <h3 class="villa-space-title" data-i18n="acc6_t">Bathrooms (4)</h3>
+            <div class="villa-space-rule"></div>
+            <p class="villa-space-text" data-i18n="acc6_b">Marble soaking tubs in the master. No spa on site; massages on request.</p>
           </div>
-        </div>
+        </article>
       </div>
     </div>
   </section>
@@ -1030,47 +1438,59 @@
   <section id="servicios">
     <div class="container">
       <div class="fade-in">
-        <p class="section-eyebrow">Servicios opcionales · Se coordinan por separado</p>
-        <h2 class="section-title">Eleve Su Experiencia</h2>
+        <p class="section-eyebrow" data-i18n="serv_eyebrow">Optional services · Booked separately</p>
+        <h2 class="section-title" data-i18n="serv_title">Elevate your stay</h2>
         <div class="gold-divider"></div>
-        <p style="color:var(--white-dim); font-size:0.85rem; margin-bottom:2.5rem;">Servicios adicionales disponibles a solicitud. Precios al consultar con el concierge.</p>
+        <p style="color:var(--white-dim); font-size:0.85rem; margin-bottom:2.5rem;" data-i18n="serv_intro">Add-on services on request. Pricing upon inquiry with concierge.</p>
       </div>
       <div class="servicios-grid fade-in" style="transition-delay:0.1s">
         <div class="servicio-card">
           <div class="servicio-icon">👨‍🍳</div>
-          <div class="servicio-title">Chef Privado</div>
-          <div class="servicio-desc">Menús personalizados con ingredientes frescos locales. Desayunos, comidas, cenas y maridajes de vino. Comunique sus preferencias con anticipación.</div>
-          <a href="https://wa.me/526242175935?text=Hola%2C%20me%20gustar%C3%ADa%20solicitar%20el%20servicio%20de%20Chef%20Privado." target="_blank" class="wa-btn-gold">Solicitar por WhatsApp →</a>
+          <div class="servicio-title" data-i18n="s1_t">Private chef</div>
+          <div class="servicio-desc" data-i18n="s1_b">Custom menus with fresh local ingredients.</div>
+          <a href="https://wa.me/526242175935?text=Hello%2C%20I%27d%20like%20to%20request%20the%20private%20chef%20service." target="_blank" rel="noopener noreferrer" class="wa-btn-gold"
+            data-wa-en="https://wa.me/526242175935?text=Hello%2C%20I%27d%20like%20to%20request%20the%20private%20chef%20service."
+            data-wa-es="https://wa.me/526242175935?text=Hola%2C%20me%20gustar%C3%ADa%20solicitar%20el%20servicio%20de%20chef%20privado."><span data-i18n="wa_cta">Request via WhatsApp →</span></a>
         </div>
         <div class="servicio-card">
           <div class="servicio-icon">⛵</div>
-          <div class="servicio-title">Yate Privado</div>
-          <div class="servicio-desc">Tours privados al Arco, snorkel en aguas cristalinas, pesca deportiva y atardeceres desde el mar. Salida desde nuestra playa privada.</div>
-          <a href="https://wa.me/526242175935?text=Hola%2C%20me%20gustar%C3%ADa%20solicitar%20el%20servicio%20de%20Yate%20Privado." target="_blank" class="wa-btn-gold">Solicitar por WhatsApp →</a>
+          <div class="servicio-title" data-i18n="s2_t">Private yacht</div>
+          <div class="servicio-desc" data-i18n="s2_b">Arch tours, snorkeling, sport fishing, sunsets from the sea.</div>
+          <a href="https://wa.me/526242175935?text=Hello%2C%20I%27d%20like%20to%20request%20a%20private%20yacht." target="_blank" rel="noopener noreferrer" class="wa-btn-gold"
+            data-wa-en="https://wa.me/526242175935?text=Hello%2C%20I%27d%20like%20to%20request%20a%20private%20yacht."
+            data-wa-es="https://wa.me/526242175935?text=Hola%2C%20me%20gustar%C3%ADa%20solicitar%20yate%20privado."><span data-i18n="wa_cta">Request via WhatsApp →</span></a>
         </div>
         <div class="servicio-card">
           <div class="servicio-icon">💆</div>
-          <div class="servicio-title">Masajes & Spa</div>
-          <div class="servicio-desc">Terapeutas certificados en la comodidad de la villa. Masajes en terraza con vista al mar, tratamientos faciales y rituales de bienestar.</div>
-          <a href="https://wa.me/526242175935?text=Hola%2C%20me%20gustar%C3%ADa%20solicitar%20el%20servicio%20de%20Masajes." target="_blank" class="wa-btn-gold">Solicitar por WhatsApp →</a>
+          <div class="servicio-title" data-i18n="s3_t">Massage & wellness</div>
+          <div class="servicio-desc" data-i18n="s3_b">Certified therapists at the villa — by appointment.</div>
+          <a href="https://wa.me/526242175935?text=Hello%2C%20I%27d%20like%20to%20book%20a%20massage." target="_blank" rel="noopener noreferrer" class="wa-btn-gold"
+            data-wa-en="https://wa.me/526242175935?text=Hello%2C%20I%27d%20like%20to%20book%20a%20massage."
+            data-wa-es="https://wa.me/526242175935?text=Hola%2C%20me%20gustar%C3%ADa%20reservar%20un%20masaje."><span data-i18n="wa_cta">Request via WhatsApp →</span></a>
         </div>
         <div class="servicio-card">
           <div class="servicio-icon">🏄</div>
-          <div class="servicio-title">Actividades</div>
-          <div class="servicio-desc">Paddleboard, kayak, snorkel, avistamiento de ballenas (temporada), golf, ATV y excursiones guiadas por Los Cabos.</div>
-          <a href="https://wa.me/526242175935?text=Hola%2C%20me%20gustar%C3%ADa%20conocer%20las%20actividades%20disponibles." target="_blank" class="wa-btn-gold">Solicitar por WhatsApp →</a>
+          <div class="servicio-title" data-i18n="s4_t">Activities</div>
+          <div class="servicio-desc" data-i18n="s4_b">Paddleboard, kayak, snorkeling, whales (season), golf, ATVs.</div>
+          <a href="https://wa.me/526242175935?text=Hello%2C%20I%27d%20like%20information%20on%20activities." target="_blank" rel="noopener noreferrer" class="wa-btn-gold"
+            data-wa-en="https://wa.me/526242175935?text=Hello%2C%20I%27d%20like%20information%20on%20activities."
+            data-wa-es="https://wa.me/526242175935?text=Hola%2C%20me%20gustar%C3%ADa%20informaci%C3%B3n%20sobre%20actividades."><span data-i18n="wa_cta">Request via WhatsApp →</span></a>
         </div>
         <div class="servicio-card">
           <div class="servicio-icon">🚁</div>
-          <div class="servicio-title">Transporte de Lujo</div>
-          <div class="servicio-desc">Traslados en SUV privado, helicóptero al aeropuerto, jets privados y acceso a eventos exclusivos.</div>
-          <a href="https://wa.me/526242175935?text=Hola%2C%20me%20gustar%C3%ADa%20solicitar%20transporte%20privado." target="_blank" class="wa-btn-gold">Solicitar por WhatsApp →</a>
+          <div class="servicio-title" data-i18n="s5_t">Luxury transport</div>
+          <div class="servicio-desc" data-i18n="s5_b">Private SUVs, helicopter, jets, exclusive events.</div>
+          <a href="https://wa.me/526242175935?text=Hello%2C%20I%27d%20like%20private%20transport." target="_blank" rel="noopener noreferrer" class="wa-btn-gold"
+            data-wa-en="https://wa.me/526242175935?text=Hello%2C%20I%27d%20like%20private%20transport."
+            data-wa-es="https://wa.me/526242175935?text=Hola%2C%20me%20gustar%C3%ADa%20transporte%20privado."><span data-i18n="wa_cta">Request via WhatsApp →</span></a>
         </div>
         <div class="servicio-card">
           <div class="servicio-icon">🎉</div>
-          <div class="servicio-title">Eventos Privados</div>
-          <div class="servicio-desc">Bodas, cumpleaños, propuestas, celebraciones corporativas. Coordinación completa de decoración, catering y entretenimiento.</div>
-          <a href="https://wa.me/526242175935?text=Hola%2C%20me%20gustar%C3%ADa%20cotizar%20un%20evento%20privado." target="_blank" class="wa-btn-gold">Solicitar por WhatsApp →</a>
+          <div class="servicio-title" data-i18n="s6_t">Private events</div>
+          <div class="servicio-desc" data-i18n="s6_b">Weddings, birthdays, proposals, corporate gatherings.</div>
+          <a href="https://wa.me/526242175935?text=Hello%2C%20I%27d%20like%20a%20quote%20for%20a%20private%20event." target="_blank" rel="noopener noreferrer" class="wa-btn-gold"
+            data-wa-en="https://wa.me/526242175935?text=Hello%2C%20I%27d%20like%20a%20quote%20for%20a%20private%20event."
+            data-wa-es="https://wa.me/526242175935?text=Hola%2C%20me%20gustar%C3%ADa%20cotizar%20un%20evento%20privado."><span data-i18n="wa_cta">Request via WhatsApp →</span></a>
         </div>
       </div>
     </div>
@@ -1080,73 +1500,207 @@
   <section id="recomendaciones">
     <div class="container">
       <div class="fade-in">
-        <p class="section-eyebrow">Selección personal</p>
-        <h2 class="section-title">Los Favoritos de Alexis</h2>
+        <p class="section-eyebrow" data-i18n="rec_eyebrow">Curated picks</p>
+        <h2 class="section-title" data-i18n="rec_title">Recommendations</h2>
         <div class="gold-divider"></div>
-        <p style="color:var(--white-dim); font-size:0.9rem; margin-bottom:2rem;">Lugares seleccionados personalmente para hacer su visita a Los Cabos inolvidable.</p>
+        <p style="color:var(--white-dim); font-size:0.9rem; margin-bottom:2rem;" data-i18n="rec_intro">Hand-picked places to make your Los Cabos visit unforgettable.</p>
       </div>
       <div class="tabs fade-in" style="transition-delay:0.1s">
-        <button class="tab-btn active" onclick="switchTab('restaurantes', this)">Restaurantes</button>
-        <button class="tab-btn" onclick="switchTab('excursiones', this)">Excursiones</button>
-        <button class="tab-btn" onclick="switchTab('emergencias', this)">Emergencias</button>
+        <button type="button" class="tab-btn active" onclick="switchTab('restaurantes', this)" data-i18n="tab_rest">Restaurants</button>
+        <button type="button" class="tab-btn" onclick="switchTab('emergencias', this)" data-i18n="tab_em">Emergencies</button>
       </div>
 
       <div id="tab-restaurantes" class="tab-panel active fade-in">
-        <div class="recom-grid">
-          <div class="recom-card">
-            <div class="recom-name">Manta</div>
-            <div class="recom-type">Mariscos de autor</div>
-            <div class="recom-desc">El restaurante más aclamado de Los Cabos. Reserva con semanas de anticipación.</div>
-            <div class="recom-meta">🚗 15 min en auto &nbsp;·&nbsp; Pida al concierge que haga la reserva</div>
-          </div>
-          <div class="recom-card">
-            <div class="recom-name">Acre</div>
-            <div class="recom-type">Granja a la mesa</div>
-            <div class="recom-desc">Jardín tropical exuberante, coctelería artesanal y cocina de temporada. Ambiente único.</div>
-            <div class="recom-meta">🚗 20 min en auto</div>
-          </div>
-          <div class="recom-card">
-            <div class="recom-name">Sunset Monalisa</div>
-            <div class="recom-type">Italiano con vista al Arco</div>
-            <div class="recom-desc">Atardeceres legendarios sobre El Arco. Perfecto para cenas románticas.</div>
-            <div class="recom-meta">🚗 10 min en auto</div>
-          </div>
-          <div class="recom-card">
-            <div class="recom-name">Flora's Field Kitchen</div>
-            <div class="recom-type">Farm to table</div>
-            <div class="recom-desc">Brunch dominical imperdible en hacienda colonial. Ambiente auténtico mexicano.</div>
-            <div class="recom-meta">🚗 25 min en auto</div>
-          </div>
-        </div>
-      </div>
 
-      <div id="tab-excursiones" class="tab-panel fade-in">
-        <div class="recom-grid">
-          <div class="recom-card">
-            <div class="recom-name">El Arco de Cabo San Lucas</div>
-            <div class="recom-type">Icono de Los Cabos</div>
-            <div class="recom-desc">La postal más icónica de Los Cabos. Tour en lancha desde el marina, 45 minutos.</div>
-            <div class="recom-meta">📍 Coordinar con concierge</div>
+        <!-- ── SEAFOOD ── -->
+        <div class="rest-section">
+          <div class="rest-section-header">
+            <span class="rest-section-icon">🐟</span>
+            <span class="rest-section-label" data-i18n="cat_seafood">Seafood</span>
           </div>
-          <div class="recom-card">
-            <div class="recom-name">Avistamiento de Ballenas</div>
-            <div class="recom-type">Experiencia única · Temporada</div>
-            <div class="recom-desc">Temporada: Diciembre a Abril. Ballenas jorobadas en su hábitat natural desde yate privado.</div>
-            <div class="recom-meta">🐋 Solo en temporada (Dic–Abr)</div>
-          </div>
-          <div class="recom-card">
-            <div class="recom-name">Snorkel en Pelican Rock</div>
-            <div class="recom-type">Vida marina · Acceso directo</div>
-            <div class="recom-desc">La mejor mancha de snorkel de Los Cabos. Acceso directo desde nuestra playa privada o en lancha.</div>
-            <div class="recom-meta">🤿 Equipo disponible en la villa</div>
-          </div>
-          <div class="recom-card">
-            <div class="recom-name">Todos Santos</div>
-            <div class="recom-type">Pueblo Mágico</div>
-            <div class="recom-desc">Arte, gastronomía, Hotel California y playas del Pacífico.</div>
-            <div class="recom-meta">🚗 1 hora en auto</div>
+          <div class="recom-grid">
+            <div class="recom-card has-photo">
+              <div class="recom-card-img-wrap">
+                <img class="recom-card-img" src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=600&q=80&fit=crop" alt="Manta restaurant" loading="lazy" onerror="this.parentNode.style.background='linear-gradient(135deg,#0a2540,#163a5f)';this.remove()" />
+                <span class="recom-top-badge" data-i18n="badge_tripadvisor">TripAdvisor #1</span>
+              </div>
+              <div class="recom-card-body">
+                <div class="recom-stars">★★★★★</div>
+                <div class="recom-name">Manta</div>
+                <div class="recom-type" data-i18n="r_manta_type">Signature seafood</div>
+                <div class="recom-desc" data-i18n="r_manta_d">Los Cabos' most acclaimed restaurant. Book weeks ahead.</div>
+                <div class="recom-meta" data-i18n="r_manta_m">🚗 15 min · Ask concierge to reserve</div>
+                <a href="https://www.google.com/maps/search/Manta+The+Cape+Cabo+San+Lucas" target="_blank" rel="noopener noreferrer" class="recom-maps-link" data-i18n="see_on_maps">See on Google Maps →</a>
+              </div>
+            </div>
+            <div class="recom-card has-photo">
+              <div class="recom-card-img-wrap">
+                <img class="recom-card-img" src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=600&q=80&fit=crop" alt="El Farallon" loading="lazy" onerror="this.parentNode.style.background='linear-gradient(135deg,#0a2540,#163a5f)';this.remove()" />
+                <span class="recom-top-badge" data-i18n="badge_luxury">Luxury Pick</span>
+              </div>
+              <div class="recom-card-body">
+                <div class="recom-stars">★★★★★</div>
+                <div class="recom-name">El Farallon</div>
+                <div class="recom-type" data-i18n="r_farallon_type">Luxury cliffside seafood</div>
+                <div class="recom-desc" data-i18n="r_farallon_d">Choose your fish from a live tank; chefs prepare it tableside above the Pacific.</div>
+                <div class="recom-meta" data-i18n="r_farallon_m">🚗 20 min · Waldorf Astoria Pedregal</div>
+                <a href="https://www.google.com/maps/search/El+Farallon+Waldorf+Astoria+Los+Cabos" target="_blank" rel="noopener noreferrer" class="recom-maps-link" data-i18n="see_on_maps">See on Google Maps →</a>
+              </div>
+            </div>
+            <div class="recom-card has-photo">
+              <div class="recom-card-img-wrap">
+                <img class="recom-card-img" src="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=600&q=80&fit=crop" alt="Sunset Monalisa" loading="lazy" onerror="this.parentNode.style.background='linear-gradient(135deg,#0a2540,#163a5f)';this.remove()" />
+              </div>
+              <div class="recom-card-body">
+                <div class="recom-stars">★★★★☆</div>
+                <div class="recom-name">Sunset Monalisa</div>
+                <div class="recom-type" data-i18n="r_sunset_type">Italian · Arch views</div>
+                <div class="recom-desc" data-i18n="r_sunset_d">Legendary sunsets over the Arch. Ideal for romantic dinners.</div>
+                <div class="recom-meta" data-i18n="r_sunset_m">🚗 10 min</div>
+                <a href="https://www.google.com/maps/search/Sunset+Monalisa+Cabo+San+Lucas" target="_blank" rel="noopener noreferrer" class="recom-maps-link" data-i18n="see_on_maps">See on Google Maps →</a>
+              </div>
+            </div>
           </div>
         </div>
+
+        <!-- ── STEAKHOUSE ── -->
+        <div class="rest-section">
+          <div class="rest-section-header">
+            <span class="rest-section-icon">🥩</span>
+            <span class="rest-section-label" data-i18n="cat_steak">Steakhouse</span>
+          </div>
+          <div class="recom-grid">
+            <div class="recom-card has-photo">
+              <div class="recom-card-img-wrap">
+                <img class="recom-card-img" src="https://images.unsplash.com/photo-1544025162-d76694265947?w=600&q=80&fit=crop" alt="Edith's restaurant" loading="lazy" onerror="this.parentNode.style.background='linear-gradient(135deg,#2a0a0a,#4a1a0a)';this.remove()" />
+                <span class="recom-top-badge" data-i18n="badge_local">Local Icon</span>
+              </div>
+              <div class="recom-card-body">
+                <div class="recom-stars">★★★★☆</div>
+                <div class="recom-name">Edith's</div>
+                <div class="recom-type" data-i18n="r_ediths_type">Cabo classic · Grilled meats</div>
+                <div class="recom-desc" data-i18n="r_ediths_d">A Cabo institution since 1988. Mesquite-grilled meats, freshly baked tortillas, live music under the stars.</div>
+                <div class="recom-meta" data-i18n="r_ediths_m">🚗 15 min</div>
+                <a href="https://www.google.com/maps/search/Edith%27s+Restaurant+Cabo+San+Lucas" target="_blank" rel="noopener noreferrer" class="recom-maps-link" data-i18n="see_on_maps">See on Google Maps →</a>
+              </div>
+            </div>
+            <div class="recom-card has-photo">
+              <div class="recom-card-img-wrap">
+                <img class="recom-card-img" src="https://images.unsplash.com/photo-1558030006-450675393462?w=600&q=80&fit=crop" alt="Bourbon Street steakhouse" loading="lazy" onerror="this.parentNode.style.background='linear-gradient(135deg,#2a0a0a,#4a1a0a)';this.remove()" />
+              </div>
+              <div class="recom-card-body">
+                <div class="recom-stars">★★★★☆</div>
+                <div class="recom-name">Bourbon Street</div>
+                <div class="recom-type" data-i18n="r_bourbon_type">American steakhouse</div>
+                <div class="recom-desc" data-i18n="r_bourbon_d">Classic cuts, full bar, and a lively atmosphere in the heart of the marina district.</div>
+                <div class="recom-meta" data-i18n="r_bourbon_m">🚗 20 min</div>
+                <a href="https://www.google.com/maps/search/Bourbon+Street+Cabo+San+Lucas" target="_blank" rel="noopener noreferrer" class="recom-maps-link" data-i18n="see_on_maps">See on Google Maps →</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── MEXICAN FOOD ── -->
+        <div class="rest-section">
+          <div class="rest-section-header">
+            <span class="rest-section-icon">🌮</span>
+            <span class="rest-section-label" data-i18n="cat_mexican">Mexican food</span>
+          </div>
+          <div class="recom-grid">
+            <div class="recom-card has-photo">
+              <div class="recom-card-img-wrap">
+                <img class="recom-card-img" src="https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=600&q=80&fit=crop" alt="Mi Casa restaurant" loading="lazy" onerror="this.parentNode.style.background='linear-gradient(135deg,#1a2a0a,#2a400a)';this.remove()" />
+                <span class="recom-top-badge" data-i18n="badge_tripadvisor">TripAdvisor #1</span>
+              </div>
+              <div class="recom-card-body">
+                <div class="recom-stars">★★★★★</div>
+                <div class="recom-name">Mi Casa</div>
+                <div class="recom-type" data-i18n="r_micasa_type">Traditional Mexican · Award-winning</div>
+                <div class="recom-desc" data-i18n="r_micasa_d">Most beloved Mexican restaurant in Los Cabos. Colonial hacienda, live music, extraordinary mole.</div>
+                <div class="recom-meta" data-i18n="r_micasa_m">🚗 15 min · Reserve through concierge</div>
+                <a href="https://www.google.com/maps/search/Mi+Casa+Restaurant+Cabo+San+Lucas" target="_blank" rel="noopener noreferrer" class="recom-maps-link" data-i18n="see_on_maps">See on Google Maps →</a>
+              </div>
+            </div>
+            <div class="recom-card has-photo">
+              <div class="recom-card-img-wrap">
+                <img class="recom-card-img" src="https://images.unsplash.com/photo-1611523658822-385aa008324c?w=600&q=80&fit=crop" alt="Los Tres Gallos" loading="lazy" onerror="this.parentNode.style.background='linear-gradient(135deg,#1a2a0a,#2a400a)';this.remove()" />
+              </div>
+              <div class="recom-card-body">
+                <div class="recom-stars">★★★★★</div>
+                <div class="recom-name">Los Tres Gallos</div>
+                <div class="recom-type" data-i18n="r_gallos_type">Traditional Mexican · Hacienda style</div>
+                <div class="recom-desc" data-i18n="r_gallos_d">Award-winning mole negro, hand-pressed tortillas, and mezcal by the glass in a charming pueblo setting.</div>
+                <div class="recom-meta" data-i18n="r_gallos_m">🚗 15 min</div>
+                <a href="https://www.google.com/maps/search/Los+Tres+Gallos+Cabo+San+Lucas" target="_blank" rel="noopener noreferrer" class="recom-maps-link" data-i18n="see_on_maps">See on Google Maps →</a>
+              </div>
+            </div>
+            <div class="recom-card has-photo">
+              <div class="recom-card-img-wrap">
+                <img class="recom-card-img" src="https://images.unsplash.com/photo-1511690656952-34342bb7c2f2?w=600&q=80&fit=crop" alt="Acre" loading="lazy" onerror="this.parentNode.style.background='linear-gradient(135deg,#1a2a0a,#2a400a)';this.remove()" />
+              </div>
+              <div class="recom-card-body">
+                <div class="recom-stars">★★★★☆</div>
+                <div class="recom-name">Acre</div>
+                <div class="recom-type" data-i18n="r_acre_type">Farm to table</div>
+                <div class="recom-desc" data-i18n="r_acre_d">Lush tropical garden, craft cocktails, seasonal cuisine.</div>
+                <div class="recom-meta" data-i18n="r_acre_m">🚗 20 min</div>
+                <a href="https://www.google.com/maps/search/Acre+San+Jose+del+Cabo" target="_blank" rel="noopener noreferrer" class="recom-maps-link" data-i18n="see_on_maps">See on Google Maps →</a>
+              </div>
+            </div>
+            <div class="recom-card has-photo">
+              <div class="recom-card-img-wrap">
+                <img class="recom-card-img" src="https://images.unsplash.com/photo-1533621834623-720a8e6dc448?w=600&q=80&fit=crop" alt="Flora's Field Kitchen" loading="lazy" onerror="this.parentNode.style.background='linear-gradient(135deg,#1a2a0a,#2a400a)';this.remove()" />
+              </div>
+              <div class="recom-card-body">
+                <div class="recom-stars">★★★★☆</div>
+                <div class="recom-name">Flora's Field Kitchen</div>
+                <div class="recom-type" data-i18n="r_flora_type">Farm to table</div>
+                <div class="recom-desc" data-i18n="r_flora_d">Sunday brunch at a colonial hacienda. Authentic Mexican charm.</div>
+                <div class="recom-meta" data-i18n="r_flora_m">🚗 25 min</div>
+                <a href="https://www.google.com/maps/search/Flora%27s+Field+Kitchen+San+Jose+del+Cabo" target="_blank" rel="noopener noreferrer" class="recom-maps-link" data-i18n="see_on_maps">See on Google Maps →</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── JAPANESE FOOD ── -->
+        <div class="rest-section">
+          <div class="rest-section-header">
+            <span class="rest-section-icon">🍣</span>
+            <span class="rest-section-label" data-i18n="cat_japanese">Japanese food</span>
+          </div>
+          <div class="recom-grid">
+            <div class="recom-card has-photo">
+              <div class="recom-card-img-wrap">
+                <img class="recom-card-img" src="https://images.unsplash.com/photo-1617196034183-421b4040ed20?w=600&q=80&fit=crop" alt="Nick-San" loading="lazy" onerror="this.parentNode.style.background='linear-gradient(135deg,#0a0a2a,#0a1a3a)';this.remove()" />
+                <span class="recom-top-badge" data-i18n="badge_celeb">Celebrity Spot</span>
+              </div>
+              <div class="recom-card-body">
+                <div class="recom-stars">★★★★★</div>
+                <div class="recom-name">Nick-San</div>
+                <div class="recom-type" data-i18n="r_nicksan_type">Best Japanese in Mexico · Celebrity spot</div>
+                <div class="recom-desc" data-i18n="r_nicksan_d">Chef Ángel Carbajal trained under Nobu Matsuhisa. Iconic sashimi, creative rolls, unforgettable omakase.</div>
+                <div class="recom-meta" data-i18n="r_nicksan_m">🚗 10 min · Downtown &amp; Marina locations</div>
+                <a href="https://www.google.com/maps/search/Nick-San+Cabo+San+Lucas" target="_blank" rel="noopener noreferrer" class="recom-maps-link" data-i18n="see_on_maps">See on Google Maps →</a>
+              </div>
+            </div>
+            <div class="recom-card has-photo">
+              <div class="recom-card-img-wrap">
+                <img class="recom-card-img" src="https://images.unsplash.com/photo-1559410545-0bdcd187e0a6?w=600&q=80&fit=crop" alt="Nobu" loading="lazy" onerror="this.parentNode.style.background='linear-gradient(135deg,#0a0a2a,#0a1a3a)';this.remove()" />
+                <span class="recom-top-badge" data-i18n="badge_world">World-famous</span>
+              </div>
+              <div class="recom-card-body">
+                <div class="recom-stars">★★★★★</div>
+                <div class="recom-name">Nobu</div>
+                <div class="recom-type" data-i18n="r_nobu_type">Japanese-Peruvian fusion</div>
+                <div class="recom-desc" data-i18n="r_nobu_d">Chef Nobu Matsuhisa's legendary restaurant at One&amp;Only Palmilla. Black cod miso on the Sea of Cortez.</div>
+                <div class="recom-meta" data-i18n="r_nobu_m">🚗 25 min · Advance reservation essential</div>
+                <a href="https://www.google.com/maps/search/Nobu+One+and+Only+Palmilla+Los+Cabos" target="_blank" rel="noopener noreferrer" class="recom-maps-link" data-i18n="see_on_maps">See on Google Maps →</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
       </div>
 
       <div id="tab-emergencias" class="tab-panel fade-in">
@@ -1154,22 +1708,22 @@
           <div class="emergency-card">
             <div class="emergency-name">Hospital H+ Los Cabos</div>
             <a href="tel:+526241049300" class="emergency-phone">+52 624 104 9300</a>
-            <div class="emergency-note">Hospital privado recomendado</div>
+            <div class="emergency-note" data-i18n="em_h_note">Recommended private hospital</div>
           </div>
           <div class="emergency-card">
             <div class="emergency-name">Farmacia San Lucas</div>
             <a href="tel:+526241431919" class="emergency-phone">+52 624 143 1919</a>
-            <div class="emergency-note">24 horas · Entrega a domicilio</div>
+            <div class="emergency-note" data-i18n="em_f_note">24/7 · Delivery available</div>
           </div>
           <div class="emergency-card">
-            <div class="emergency-name">Policía / Emergencias</div>
+            <div class="emergency-name" data-i18n="em_police_name">Police / Emergencies</div>
             <a href="tel:911" class="emergency-phone">911</a>
-            <div class="emergency-note">Emergencias generales</div>
+            <div class="emergency-note" data-i18n="em_p_note">General emergencies</div>
           </div>
           <div class="emergency-card">
             <div class="emergency-name">Cruz Roja Los Cabos</div>
             <a href="tel:+526241433300" class="emergency-phone">+52 624 143 3300</a>
-            <div class="emergency-note">Ambulancia</div>
+            <div class="emergency-note" data-i18n="em_c_note">Ambulance</div>
           </div>
         </div>
       </div>
@@ -1180,44 +1734,59 @@
   <section id="reglas">
     <div class="container">
       <div class="fade-in">
-        <p class="section-eyebrow">Con su colaboración</p>
-        <h2 class="section-title">Para Cuidar Su Hogar Temporal</h2>
+        <p class="section-eyebrow" data-i18n="reg_eyebrow">With your help</p>
+        <h2 class="section-title" data-i18n="reg_title">Caring for your temporary home</h2>
         <div class="gold-divider"></div>
       </div>
       <ul class="reglas-list fade-in" style="transition-delay:0.1s">
-        <li class="regla-item"><span class="regla-sym">✦</span><span class="regla-text">No se permite fumar dentro de la villa. Área de fumadores en terraza exterior.</span></li>
-        <li class="regla-item"><span class="regla-sym">✦</span><span class="regla-text">No se permiten mascotas sin autorización previa.</span></li>
-        <li class="regla-item"><span class="regla-sym">✦</span><span class="regla-text">Capacidad máxima: 10 huéspedes. Visitas externas coordinar con el concierge.</span></li>
-        <li class="regla-item"><span class="regla-sym">✦</span><span class="regla-text">Eventos o reuniones grandes requieren autorización previa y pueden tener cargo adicional.</span></li>
-        <li class="regla-item"><span class="regla-sym">✦</span><span class="regla-text">La playa privada es exclusiva para huéspedes de Villa Sera.</span></li>
-        <li class="regla-item"><span class="regla-sym">✦</span><span class="regla-text">Por favor reportar cualquier daño al butler inmediatamente — comprendemos que los accidentes ocurren.</span></li>
-        <li class="regla-item"><span class="regla-sym">✦</span><span class="regla-text">Silencio a partir de las 11:00 PM en áreas exteriores, por cortesía con los vecinos.</span></li>
-        <li class="regla-item"><span class="regla-sym">✦</span><span class="regla-text">Check-out: 12:00 PM. Late check-out disponible sujeto a disponibilidad — consultar con 24hrs de anticipación.</span></li>
+        <li class="regla-item"><span class="regla-sym">✦</span><span class="regla-text" data-i18n="rule1">No smoking inside the villa.</span></li>
+        <li class="regla-item"><span class="regla-sym">✦</span><span class="regla-text" data-i18n="rule2">No pets without prior approval.</span></li>
+        <li class="regla-item"><span class="regla-sym">✦</span><span class="regla-text" data-i18n="rule3">Maximum 8 guests.</span></li>
+        <li class="regla-item"><span class="regla-sym">✦</span><span class="regla-text" data-i18n="rule4">Large events require prior approval.</span></li>
+        <li class="regla-item"><span class="regla-sym">✦</span><span class="regla-text" data-i18n="rule5">The private beach is for Villa Sera guests only.</span></li>
+        <li class="regla-item"><span class="regla-sym">✦</span><span class="regla-text" data-i18n="rule6">Please report any damage to the Villa Sera team right away.</span></li>
+        <li class="regla-item"><span class="regla-sym">✦</span><span class="regla-text" data-i18n="rule7">Quiet outdoors from 11:00 PM.</span></li>
+        <li class="regla-item"><span class="regla-sym">✦</span><span class="regla-text" data-i18n="rule8">Check-out: 12:00 PM.</span></li>
       </ul>
     </div>
   </section>
 
   <!-- FOOTER -->
   <footer id="footer">
-    <div class="footer-logo">VS</div>
+    <div class="footer-logo"><img src="/logo.png" alt="Villa Sera" width="200" height="64" /></div>
     <div class="footer-name">Villa Sera · Los Cabos, México</div>
-    <div class="footer-holding">Una propiedad de Sera Holding</div>
-    <a href="https://wa.me/526242175935?text=Hola%2C%20soy%20hu%C3%A9sped%20de%20Villa%20Sera%20y%20necesito%20asistencia." target="_blank" class="footer-wa">
+    <div class="footer-holding" data-i18n="footer_holding">A Sera Holding property</div>
+    <a href="https://wa.me/526242175935?text=Hello%2C%20I%27m%20a%20Villa%20Sera%20guest%20and%20need%20assistance." target="_blank" rel="noopener noreferrer" class="footer-wa"
+      data-wa-en="https://wa.me/526242175935?text=Hello%2C%20I%27m%20a%20Villa%20Sera%20guest%20and%20need%20assistance."
+      data-wa-es="https://wa.me/526242175935?text=Hola%2C%20soy%20hu%C3%A9sped%20de%20Villa%20Sera%20y%20necesito%20asistencia.">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-      ¿Necesita algo? Escríbanos →
+      <span data-i18n="footer_wa">Need anything? Message us →</span>
     </a>
     <div class="footer-links">
       <a href="/">villa-sera.com</a>
       <a href="mailto:villasera@seraholding.com">villasera@seraholding.com</a>
     </div>
-    <p class="footer-private">Esta página es privada y exclusiva para huéspedes de Villa Sera.</p>
+    <div class="footer-social">
+      <p class="footer-social-title" data-i18n="footer_social_title">Social</p>
+      <div class="footer-social-links">
+        <a href="https://www.google.com/maps/search/?api=1&amp;query=Villa+Sera+Los+Cabos" target="_blank" rel="noopener noreferrer" data-i18n="footer_google">Google · Villa Sera Los Cabos</a>
+        <a href="https://www.instagram.com/villasera/" target="_blank" rel="noopener noreferrer">Instagram</a>
+        <a href="https://www.tiktok.com/@villaseraloscabos" target="_blank" rel="noopener noreferrer">TikTok</a>
+      </div>
+    </div>
+    <p class="footer-private" data-i18n="footer_private">This page is private and for Villa Sera guests only.</p>
   </footer>
 
   <!-- FLOATING WA -->
-  <a href="https://wa.me/526242175935?text=Hola%2C%20soy%20hu%C3%A9sped%20de%20Villa%20Sera%20y%20necesito%20asistencia." target="_blank" class="floating-wa" aria-label="WhatsApp">
+  <a href="https://wa.me/526242175935?text=Hello%2C%20I%27m%20a%20Villa%20Sera%20guest%20and%20need%20assistance." target="_blank" rel="noopener noreferrer" class="floating-wa"
+    data-i18n-attr="aria-label:floating_wa_aria"
+    aria-label="WhatsApp"
+    data-wa-en="https://wa.me/526242175935?text=Hello%2C%20I%27m%20a%20Villa%20Sera%20guest%20and%20need%20assistance."
+    data-wa-es="https://wa.me/526242175935?text=Hola%2C%20soy%20hu%C3%A9sped%20de%20Villa%20Sera%20y%20necesito%20asistencia.">
     <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
   </a>
 
+  <script src="/guest-guide-i18n.js"></script>
   <script>
     // ─── NAV HIDE/SHOW ON SCROLL ───
     let lastY = 0;
