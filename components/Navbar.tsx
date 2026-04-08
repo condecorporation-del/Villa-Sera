@@ -1,17 +1,16 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
-import { Link, usePathname } from '@/i18n/navigation';
 import Image from 'next/image';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, Globe } from 'lucide-react';
 
 export default function Navbar() {
   const t = useTranslations('nav');
-  const locale = useLocale();
-  const pathname = usePathname();
+  const currentLocale = useLocale();
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [isPending, setIsPending] = useState(false);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
@@ -26,14 +25,25 @@ export default function Navbar() {
     { href: '#contacto', label: t('contact') },
   ];
 
-  const otherLocale = locale === 'es' ? 'en' : 'es';
-
   const handleAnchor = (href: string) => {
     setMenuOpen(false);
     const id = href.replace('#', '');
     const el = document.getElementById(id);
     if (el) el.scrollIntoView({ behavior: 'smooth' });
   };
+
+  // Cookie-based locale switcher
+  const switchLocale = useCallback(async (newLocale: string) => {
+    if (newLocale === currentLocale || isPending) return;
+    
+    setIsPending(true);
+    
+    // Set cookie
+    document.cookie = `user-locale=${newLocale}; path=/; max-age=31536000; SameSite=Lax`;
+    
+    // Reload to apply new locale
+    window.location.reload();
+  }, [currentLocale, isPending]);
 
   return (
     <header
@@ -46,7 +56,7 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-6 lg:px-12">
         <div className="flex items-center justify-between h-28 md:h-40">
           {/* Logo */}
-          <Link href="/" className="flex items-center -ml-3">
+          <a href="/" className="flex items-center -ml-3">
             <Image
               src="/logo.png"
               alt="Villa Sera"
@@ -55,7 +65,7 @@ export default function Navbar() {
               className="object-contain h-28 md:h-40 w-auto"
               priority
             />
-          </Link>
+          </a>
 
           {/* Desktop nav */}
           <nav className="hidden md:flex items-center gap-8">
@@ -72,13 +82,38 @@ export default function Navbar() {
 
           {/* Right side: lang switcher + CTA */}
           <div className="hidden md:flex items-center gap-5">
-            <Link
-              href={pathname}
-              locale={otherLocale}
-              className="text-white/60 hover:text-white text-xs tracking-[0.2em] uppercase font-sans transition-colors"
-            >
-              {otherLocale.toUpperCase()}
-            </Link>
+            {/* Professional Language Toggle */}
+            <div className="flex items-center bg-white/5 rounded-full p-1 border border-white/10">
+              <button
+                onClick={() => switchLocale('en')}
+                disabled={isPending}
+                className={`px-4 py-2 rounded-full text-xs font-sans font-medium transition-all duration-200 ${
+                  currentLocale === 'en'
+                    ? 'bg-[#C9A84C] text-[#0D0D0D]'
+                    : 'text-white/60 hover:text-white'
+                } ${isPending ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+              >
+                <span className="flex items-center gap-2">
+                  <span className="text-base">🇺🇸</span>
+                  <span>English</span>
+                </span>
+              </button>
+              <button
+                onClick={() => switchLocale('es')}
+                disabled={isPending}
+                className={`px-4 py-2 rounded-full text-xs font-sans font-medium transition-all duration-200 ${
+                  currentLocale === 'es'
+                    ? 'bg-[#C9A84C] text-[#0D0D0D]'
+                    : 'text-white/60 hover:text-white'
+                } ${isPending ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+              >
+                <span className="flex items-center gap-2">
+                  <span className="text-base">🇲🇽</span>
+                  <span>Español</span>
+                </span>
+              </button>
+            </div>
+
             <button
               onClick={() => handleAnchor('#contacto')}
               className="border border-[#C9A84C] text-[#C9A84C] hover:bg-[#C9A84C] hover:text-[#0D0D0D] text-xs tracking-[0.2em] uppercase font-sans px-5 py-2.5 transition-all duration-300 cursor-pointer"
@@ -89,13 +124,16 @@ export default function Navbar() {
 
           {/* Mobile menu toggle */}
           <div className="flex md:hidden items-center gap-4">
-            <Link
-              href={pathname}
-              locale={otherLocale}
-              className="text-white/60 text-xs tracking-widest uppercase"
+            {/* Mobile Language Toggle */}
+            <button
+              onClick={() => switchLocale(currentLocale === 'es' ? 'en' : 'es')}
+              disabled={isPending}
+              className="flex items-center gap-1.5 text-white/60 hover:text-white text-xs font-sans font-medium transition-colors"
             >
-              {otherLocale.toUpperCase()}
-            </Link>
+              <Globe size={16} />
+              <span>{currentLocale === 'es' ? '🇲🇽 ES' : '🇺🇸 EN'}</span>
+            </button>
+
             <button
               onClick={() => setMenuOpen(!menuOpen)}
               className="text-white p-1"
@@ -111,6 +149,34 @@ export default function Navbar() {
       {menuOpen && (
         <div className="md:hidden bg-[#0D0D0D] border-t border-white/10">
           <nav className="max-w-7xl mx-auto px-6 py-6 flex flex-col gap-5">
+            {/* Mobile Language Switcher in Menu */}
+            <div className="flex items-center justify-center gap-4 pb-4 border-b border-white/10">
+              <button
+                onClick={() => switchLocale('en')}
+                disabled={isPending}
+                className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-sans font-medium transition-all ${
+                  currentLocale === 'en'
+                    ? 'bg-[#C9A84C] text-[#0D0D0D]'
+                    : 'text-white/60 border border-white/20'
+                } ${isPending ? 'opacity-50' : ''}`}
+              >
+                <span className="text-lg">🇺🇸</span>
+                <span>English</span>
+              </button>
+              <button
+                onClick={() => switchLocale('es')}
+                disabled={isPending}
+                className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-sans font-medium transition-all ${
+                  currentLocale === 'es'
+                    ? 'bg-[#C9A84C] text-[#0D0D0D]'
+                    : 'text-white/60 border border-white/20'
+                } ${isPending ? 'opacity-50' : ''}`}
+              >
+                <span className="text-lg">🇲🇽</span>
+                <span>Español</span>
+              </button>
+            </div>
+
             {navLinks.map((link) => (
               <button
                 key={link.href}

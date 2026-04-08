@@ -1,5 +1,10 @@
-import { redirect } from 'next/navigation';
+import HomePage from './[locale]/page';
+import { LocaleLayout } from './locale-layout';
 
 export default function RootPage() {
-  redirect('/es');
+  return (
+    <LocaleLayout>
+      <HomePage />
+    </LocaleLayout>
+  );
 }

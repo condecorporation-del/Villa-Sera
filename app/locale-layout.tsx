@@ -2,11 +2,8 @@ import type { Metadata } from 'next';
 import { Cormorant_Garamond, Inter } from 'next/font/google';
 import { NextIntlClientProvider } from 'next-intl';
 import { cookies } from 'next/headers';
-import { notFound } from 'next/navigation';
-import { hasLocale } from 'next-intl';
-import { routing } from '@/i18n/routing';
 import { Analytics } from '@vercel/analytics/next';
-import '../globals.css';
+import './globals.css';
 
 const cormorant = Cormorant_Garamond({
   variable: '--font-cormorant',
@@ -41,22 +38,11 @@ const META = {
   },
 } as const;
 
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ locale: string }>;
-}): Promise<Metadata> {
-  const { locale } = await params;
-  
-  // For backwards compatibility with old URL-based routing
-  // Validate the locale from URL
-  if (!hasLocale(routing.locales, locale)) {
-    notFound();
-  }
-  
-  const lang = locale === 'en' ? 'en' : 'es';
+export async function generateMetadata(): Promise<Metadata> {
+  // Default to English for root page
+  const lang = 'en';
   const meta = META[lang];
-  const canonical = `${BASE_URL}/${lang}`;
+  const canonical = `${BASE_URL}/`;
 
   return {
     metadataBase: new URL(BASE_URL),
@@ -85,8 +71,8 @@ export async function generateMetadata({
         { url: `${BASE_URL}/images/CasaSergio233.jpg`, width: 1200, height: 800, alt: 'Villa Sera — Playa privada y vista al Arco, Los Cabos' },
         { url: `${BASE_URL}/images/CasaSergio126.jpg`, width: 1200, height: 800, alt: 'Villa Sera — Vista al Mar de Cortés, Los Cabos' },
       ],
-      locale: lang === 'es' ? 'es_MX' : 'en_US',
-      alternateLocale: lang === 'es' ? 'en_US' : 'es_MX',
+      locale: 'en_US',
+      alternateLocale: 'es_MX',
       type: 'website',
     },
     twitter: {
@@ -235,33 +221,19 @@ const jsonLd = {
   ],
 };
 
-export default async function LocaleLayout({
+export async function LocaleLayout({
   children,
-  params,
 }: {
   children: React.ReactNode;
-  params: Promise<{ locale: string }>;
 }) {
-  const { locale } = await params;
-
-  // Validate locale from URL
-  if (!hasLocale(routing.locales, locale)) {
-    notFound();
-  }
-
-  // Check cookie - if cookie locale differs from URL, prioritize cookie
+  // Get locale from cookie
   const cookieStore = await cookies();
-  const cookieLocale = cookieStore.get('user-locale')?.value;
+  const locale = cookieStore.get('user-locale')?.value || 'en';
   
-  // Use cookie locale if it exists and is valid
-  const finalLocale = (cookieLocale && hasLocale(routing.locales, cookieLocale)) 
-    ? cookieLocale 
-    : locale;
-
-  const messages = (await import(`@/messages/${finalLocale}.json`)).default;
+  const messages = (await import(`@/messages/${locale}.json`)).default;
 
   return (
-    <html lang={finalLocale} className={`${cormorant.variable} ${inter.variable}`}>
+    <html lang={locale} className={`${cormorant.variable} ${inter.variable}`}>
       <head>
         <script
           type="application/ld+json"
@@ -269,7 +241,7 @@ export default async function LocaleLayout({
         />
       </head>
       <body>
-        <NextIntlClientProvider locale={finalLocale} messages={messages}>
+        <NextIntlClientProvider locale={locale} messages={messages}>
           {children}
         </NextIntlClientProvider>
         <Analytics />
