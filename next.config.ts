@@ -8,15 +8,6 @@ const nextConfig: NextConfig = {
     formats: ['image/webp'],
     qualities: [75, 90],
   },
-  async redirects() {
-    return [
-      {
-        source: '/guest-guide.html',
-        destination: '/g',
-        permanent: true,
-      },
-    ];
-  },
 };
 
 export default withNextIntl(nextConfig);
