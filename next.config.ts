@@ -8,6 +8,12 @@ const nextConfig: NextConfig = {
     formats: ['image/webp'],
     qualities: [75, 90],
   },
+  async rewrites() {
+    return [
+      { source: '/guest-guide', destination: '/guest-guide/index.html' },
+      { source: '/guest-guide/', destination: '/guest-guide/index.html' },
+    ];
+  },
 };
 
 export default withNextIntl(nextConfig);
