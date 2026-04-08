@@ -8,11 +8,9 @@ const nextConfig: NextConfig = {
     formats: ['image/webp'],
     qualities: [75, 90],
   },
-  async rewrites() {
-    return [
-      { source: '/guest-guide', destination: '/guest-guide/index.html' },
-      { source: '/guest-guide/', destination: '/guest-guide/index.html' },
-    ];
+  // Ensure Vercel serverless bundle includes the HTML read by app/guest-guide/route.ts
+  outputFileTracingIncludes: {
+    '/guest-guide': ['./public/guest-guide/index.html'],
   },
 };
 
