@@ -9,6 +9,7 @@
       meta_title: 'Villa Sera · Guest Guide',
       meta_description: 'Your private welcome guide to Villa Sera, Los Cabos.',
       nav_menu_aria: 'Menu',
+      nav_menu_btn: 'Menu',
       nav_bienvenida: 'Welcome',
       nav_esencial: 'Essentials',
       nav_mantenimiento: 'Scheduled visits',
@@ -38,16 +39,16 @@
       card_wifi_net: 'Network: VillaSera_Guest',
       card_ac_t: 'Air conditioning',
       card_ac_b:
-        'Thermostats in each room. Recommended temperature: 22°C. Please switch off when leaving the room.',
+        'The villa has <strong>two control displays</strong>. The display <strong>at the bar</strong> controls air conditioning for the <strong>living room, kitchen, bar, entrance</strong>, and other shared areas. The second display is in the <strong>master bedroom</strong>. You can adjust temperature <strong>from each display or from your phone</strong>. Recommended: 22°C. Please switch off when leaving.',
       card_tv_t: 'Entertainment',
       card_tv_b:
         'Smart TVs in the living room and bedrooms with Netflix and Apple TV. Sonos on the terrace — ask the Villa Sera team to help you connect.',
       card_park_t: 'Parking',
       card_park_b:
         'Private space for 2 vehicles in front of the villa. The gate opens with the remote at reception.',
-      card_power_t: 'Power',
-      card_power_b:
-        'The villa has an automatic backup generator. If power drops, the system kicks in within 30 seconds.',
+      card_housekeeping_t: 'Housekeeping',
+      card_housekeeping_b:
+        'During your stay, the villa is cleaned only when you request the service. Cleaning is $60 USD per service. Please request at least 24 hours in advance.',
       card_trash_t: 'Trash',
       card_trash_b:
         'Pickup on Mondays, Wednesdays, and Fridays. We separate organic and recycling — thank you for helping us care for Los Cabos.',
@@ -129,7 +130,27 @@
       rec_intro: 'Hand-picked places to make your Los Cabos visit unforgettable.',
       tab_rest: 'Restaurants',
       tab_ex: 'Excursions',
+      tab_things: 'Things to do',
       tab_em: 'Emergencies',
+      cabo_intro:
+        'The destination of <em>Los Cabos</em> is named for its <strong>two municipal districts</strong> (<em>delegaciones</em>): <strong>Cabo San Lucas</strong> and <strong>San José del Cabo</strong>. That pairing—two towns at the tip of Baja—is what people mean when they say Los Cabos.',
+      cabo_sl_title: 'Cabo San Lucas',
+      cabo_sl_body:
+        '<strong>Friday plaza</strong> — weekly gathering with food, crafts, and music around <strong>Plaza Amelia Wilkes</strong> (confirm the day and time with concierge).<br><br><strong>Museo de Cabo San Lucas</strong> — at Plaza Amelia Wilkes; exhibits on the natural and human history of the cape.<br><br><strong>El Arco &amp; the marina</strong> — water taxis and tours from the marina to Land’s End, Lover’s Beach, and the Pacific.',
+      cabo_sj_title: 'San José del Cabo',
+      cabo_sj_body:
+        '<strong>Thursday Art Walk</strong> — peak season: galleries open late in the historic district, street art, wine, and live music.<br><br><strong>Chocolate downtown</strong> — visit a San José chocolate atelier for tastings and the story of cacao—known to Indigenous peoples of Mesoamerica for millennia—and how it reached Baja California long before today’s resort towns.',
+      cabo_highlights_title: 'More ideas',
+      cabo_hi_arco:
+        '<strong>El Arco by sea</strong> — allow about 2–3 hours round trip from the marina; concierge can book private or shared boats.',
+      cabo_hi_plaza:
+        '<strong>Plaza Amelia Wilkes</strong> — Cabo San Lucas’s civic heart: kiosk, gardens, and the museum—easy to combine with a marina stroll.',
+      cabo_hi_whale:
+        '<strong>Whale watching</strong> — roughly December–April; private outings through the Villa Sera team.',
+      cabo_hi_snorkel:
+        '<strong>Snorkeling</strong> — Pelican Rock or Chileno Bay; gear and boats coordinated from the villa.',
+      cabo_hi_ts:
+        '<strong>Todos Santos</strong> — Pueblo Mágico day trip: art, food, and Pacific beaches—about an hour by car.',
       r_manta_type: 'Signature seafood',
       r_manta_d: "Los Cabos' most acclaimed restaurant. Book weeks ahead.",
       r_manta_m: '🚗 15 min · Ask concierge to reserve',
@@ -139,6 +160,7 @@
       r_sunset_type: 'Italian · Arch views',
       r_sunset_d: 'Legendary sunsets over the Arch. Ideal for romantic dinners.',
       r_sunset_m: '🚗 10 min',
+      r_flora_name: "Flora's Farm",
       r_flora_type: 'Farm to table',
       r_flora_d: 'Sunday brunch at a colonial hacienda. Authentic Mexican charm.',
       r_flora_m: '🚗 25 min',
@@ -161,6 +183,15 @@
       r_bourbon_type: 'American steakhouse',
       r_bourbon_d: 'Classic cuts, full bar, and a lively atmosphere in the heart of the marina district.',
       r_bourbon_m: '🚗 20 min',
+      r_peregrino_type: 'Fine dining · Wood-fire grill',
+      r_peregrino_d: "Exceptional cuts cooked over open fire in an intimate setting. One of Los Cabos' best-kept secrets.",
+      r_peregrino_m: '🚗 20 min',
+      r_chambao_type: 'Mediterranean · Beachfront',
+      r_chambao_d: 'Barefoot-luxury dining steps from the sand. Premium meats, fresh seafood, and signature cocktails at sunset.',
+      r_chambao_m: '🚗 15 min · Medano Beach',
+      r_rosanegra_type: 'Latin cuisine · Lively atmosphere',
+      r_rosanegra_d: "Mexico City's iconic restaurant, now in Los Cabos. Bold Latin flavors, DJ nights, and a scene made for celebration.",
+      r_rosanegra_m: '🚗 15 min · Marina district',
       r_micasa_type: 'Traditional Mexican · Award-winning',
       r_micasa_d: 'Most beloved Mexican restaurant in Los Cabos. Colonial hacienda, live music, extraordinary mole.',
       r_micasa_m: '🚗 15 min · Reserve through concierge',
@@ -216,6 +247,7 @@
       meta_title: 'Villa Sera · Guía de huéspedes',
       meta_description: 'Su guía privada de bienvenida a Villa Sera, Los Cabos.',
       nav_menu_aria: 'Menú',
+      nav_menu_btn: 'Menú',
       nav_bienvenida: 'Bienvenida',
       nav_esencial: 'Esencial',
       nav_mantenimiento: 'Mantenimiento',
@@ -245,16 +277,16 @@
       card_wifi_net: 'Red: VillaSera_Guest',
       card_ac_t: 'Aire acondicionado',
       card_ac_b:
-        'Termostatos en cada habitación. Temperatura recomendada: 22°C. Por favor apagar al salir del cuarto.',
+        'La casa tiene <strong>dos displays de control</strong>. El display <strong>en el bar</strong> controla el aire de la <strong>sala, cocina, bar, entrada</strong> y demás zonas comunes. El segundo está en la <strong>habitación principal (master)</strong>. Puede configurar la temperatura <strong>desde cada display o desde su celular</strong>. Temperatura recomendada: 22°C. Apague al salir.',
       card_tv_t: 'Entretenimiento',
       card_tv_b:
         'Smart TV en sala y habitaciones con Netflix y Apple TV. Bocinas Sonos en terraza — pida al equipo de Villa Sera que las configure.',
       card_park_t: 'Estacionamiento',
       card_park_b:
         'Espacio privado para 2 vehículos frente a la villa. El portón se abre con control remoto en recepción.',
-      card_power_t: 'Electricidad',
-      card_power_b:
-        'La villa cuenta con generador automático. En caso de corte de luz, el sistema se activa en menos de 30 segundos.',
+      card_housekeeping_t: 'Limpieza',
+      card_housekeeping_b:
+        'Durante su estancia la casa solo se limpia cuando usted solicita el servicio. El servicio de limpieza tiene un costo de 60 USD. Debe solicitarse con 24 horas de anticipación.',
       card_trash_t: 'Basura',
       card_trash_b:
         'Recolección los días lunes, miércoles y viernes. Separamos orgánico y reciclable. Gracias por ayudarnos a cuidar Los Cabos.',
@@ -336,7 +368,27 @@
       rec_intro: 'Lugares seleccionados para una visita inolvidable a Los Cabos.',
       tab_rest: 'Restaurantes',
       tab_ex: 'Excursiones',
+      tab_things: 'Cosas que hacer',
       tab_em: 'Emergencias',
+      cabo_intro:
+        'El destino de <em>Los Cabos</em> toma su nombre de sus <strong>dos delegaciones municipales</strong>: <strong>Cabo San Lucas</strong> y <strong>San José del Cabo</strong>. Ese binomio—dos ciudades en el extremo de Baja—es lo que la gente llama Los Cabos.',
+      cabo_sl_title: 'Cabo San Lucas',
+      cabo_sl_body:
+        '<strong>Viernes de plaza</strong> — convivencia semanal con comida, artesanías y música en torno a la <strong>Plaza Amelia Wilkes</strong> (confirme día y hora con el concierge).<br><br><strong>Museo de Cabo San Lucas</strong> — en la Plaza Amelia Wilkes; historia natural y humana del cabo.<br><br><strong>El Arco y la marina</strong> — taxis acuáticos y tours desde la marina hasta el fin de la península, Playa del Amor y el Pacífico.',
+      cabo_sj_title: 'San José del Cabo',
+      cabo_sj_body:
+        '<strong>Art Walk (jueves)</strong> — en temporada alta, galerías abiertas tarde en el centro histórico, arte en la calle, vino y música en vivo.<br><br><strong>Chocolate en el centro</strong> — visite un taller de chocolate artesanal en San José: degustaciones y la historia del cacao, conocido por los pueblos originarios de Mesoamérica durante milenios, y cómo llegó a Baja California mucho antes de los resorts de hoy.',
+      cabo_highlights_title: 'Más ideas',
+      cabo_hi_arco:
+        '<strong>El Arco en lancha</strong> — calcule unas 2–3 horas ida y vuelta desde la marina; el concierge reserva lancha privada o compartida.',
+      cabo_hi_plaza:
+        '<strong>Plaza Amelia Wilkes</strong> — corazón cívico de Cabo San Lucas: quiosco, jardines y museo; combina bien con un paseo por la marina.',
+      cabo_hi_whale:
+        '<strong>Ballenas</strong> — aproximadamente diciembre–abril; salidas privadas con el equipo de Villa Sera.',
+      cabo_hi_snorkel:
+        '<strong>Snorkel</strong> — Pelican Rock o Bahía Chileno; equipo y embarcaciones desde la villa.',
+      cabo_hi_ts:
+        '<strong>Todos Santos</strong> — escapada a Pueblo Mágico: arte, gastronomía y playas del Pacífico—a una hora en auto.',
       r_manta_type: 'Mariscos de autor',
       r_manta_d: 'El restaurante más aclamado de Los Cabos. Reserva con semanas de anticipación.',
       r_manta_m: '🚗 15 min · Pida al concierge que reserve',
@@ -346,6 +398,7 @@
       r_sunset_type: 'Italiano con vista al Arco',
       r_sunset_d: 'Atardeceres legendarios sobre el Arco. Cenas románticas.',
       r_sunset_m: '🚗 10 min',
+      r_flora_name: "Flora's Farm",
       r_flora_type: 'Farm to table',
       r_flora_d: 'Brunch dominical en hacienda colonial. México auténtico.',
       r_flora_m: '🚗 25 min',
@@ -368,6 +421,15 @@
       r_bourbon_type: 'Steakhouse americano',
       r_bourbon_d: 'Cortes clásicos, bar completo y ambiente vibrante en la zona del marina.',
       r_bourbon_m: '🚗 20 min',
+      r_peregrino_type: 'Fine dining · Parrilla de leña',
+      r_peregrino_d: 'Cortes excepcionales cocinados a fuego abierto en un ambiente íntimo. Uno de los mejores secretos de Los Cabos.',
+      r_peregrino_m: '🚗 20 min',
+      r_chambao_type: 'Mediterráneo · Frente a la playa',
+      r_chambao_d: 'Lujo desenfadado a pasos de la arena. Carnes premium, mariscos frescos y cócteles al atardecer.',
+      r_chambao_m: '🚗 15 min · Playa Médano',
+      r_rosanegra_type: 'Cocina latina · Ambiente vibrante',
+      r_rosanegra_d: 'El icónico restaurante de Ciudad de México, ahora en Los Cabos. Sabores latinos, noches con DJ y ambiente de celebración.',
+      r_rosanegra_m: '🚗 15 min · Zona marina',
       r_micasa_type: 'Mexicano tradicional · Premiado',
       r_micasa_d: 'El restaurante mexicano más querido de Los Cabos. Hacienda colonial, música en vivo, mole extraordinario.',
       r_micasa_m: '🚗 15 min · Reservar con el concierge',

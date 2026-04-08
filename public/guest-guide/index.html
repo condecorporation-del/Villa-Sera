@@ -6,9 +6,11 @@
   <meta name="robots" content="noindex, nofollow" />
   <title>Villa Sera · Guest Guide</title>
   <meta id="meta-desc" name="description" content="Your private welcome guide to Villa Sera, Los Cabos." />
+  <link rel="icon" href="/favicon.png" type="image/png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Inter:wght@300;400;500;600&display=swap" />
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Inter:wght@300;400;500;600&display=swap" /></noscript>
   <style>
     :root {
       --bg: #0a0a0a;
@@ -57,11 +59,13 @@
       position: fixed;
       top: 0; left: 0; right: 0;
       z-index: 1000;
-      height: var(--nav-h);
+      min-height: var(--nav-h);
+      box-sizing: border-box;
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      padding: 0 2rem;
+      justify-content: flex-start;
+      gap: 1rem;
+      padding: 0 clamp(1rem, 3vw, 2.5rem);
       background: rgba(10, 10, 10, 0.85);
       backdrop-filter: blur(16px);
       border-bottom: 1px solid var(--border);
@@ -73,6 +77,7 @@
       display: flex;
       align-items: center;
       line-height: 0;
+      flex: 0 0 auto;
     }
     .nav-logo img {
       height: 52px;
@@ -81,24 +86,122 @@
       max-width: 180px;
     }
 
-    .nav-links {
+    /* Desktop: dropdown menu (professional) */
+    .nav-desktop-menu {
+      flex: 1 1 auto;
+      min-width: 0;
       display: flex;
-      gap: 2rem;
-      list-style: none;
+      justify-content: center;
+      align-items: center;
     }
+    .nav-desktop-menu-inner {
+      position: relative;
+    }
+    .nav-menu-trigger {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.55rem;
+      font-family: var(--font-sans);
+      font-size: clamp(0.6rem, 0.5vw + 0.45rem, 0.68rem);
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--white);
+      background: transparent;
+      border: 1px solid rgba(201, 168, 76, 0.4);
+      padding: 0.62rem 1.4rem;
+      cursor: pointer;
+      transition: border-color 0.3s, background 0.3s, color 0.3s;
+    }
+    .nav-menu-trigger:hover,
+    .nav-menu-trigger[aria-expanded="true"] {
+      border-color: var(--gold);
+      color: var(--gold);
+      background: rgba(201, 168, 76, 0.07);
+    }
+    .nav-menu-trigger:focus-visible {
+      outline: 1px solid var(--gold);
+      outline-offset: 3px;
+    }
+    .nav-menu-trigger .nav-chevron {
+      flex-shrink: 0;
+      transition: transform 0.25s ease;
+      opacity: 0.85;
+    }
+    .nav-menu-trigger[aria-expanded="true"] .nav-chevron {
+      transform: rotate(180deg);
+    }
+    .nav-dropdown-panel {
+      position: absolute;
+      top: calc(100% + 0.6rem);
+      left: 50%;
+      transform: translateX(-50%) translateY(-6px);
+      min-width: min(320px, calc(100vw - 2rem));
+      max-width: 380px;
+      padding: 0.35rem 0;
+      background: rgba(12, 12, 12, 0.98);
+      border: 1px solid var(--border);
+      box-shadow: 0 28px 56px rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transition: opacity 0.28s ease, transform 0.28s ease, visibility 0.28s;
+      z-index: 1001;
+    }
+    .nav-dropdown-panel.is-open {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+      transform: translateX(-50%) translateY(0);
+    }
+    .nav-dropdown-panel::before {
+      content: '';
+      position: absolute;
+      bottom: 100%;
+      left: 0;
+      right: 0;
+      height: 0.6rem;
+    }
+    .nav-links {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0;
+    }
+    .nav-links li {
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    .nav-links li:last-child { border-bottom: none; }
     .nav-links a {
-      font-size: 0.7rem;
-      letter-spacing: 0.2em;
+      display: block;
+      padding: 0.82rem 1.45rem;
+      font-size: 0.72rem;
+      letter-spacing: 0.16em;
       text-transform: uppercase;
       color: var(--white-dim);
-      transition: color 0.3s;
+      transition: color 0.25s, background 0.25s;
     }
-    .nav-links a:hover { color: var(--gold); }
+    .nav-links a:hover {
+      color: var(--gold);
+      background: rgba(201, 168, 76, 0.06);
+    }
+    .nav-dropdown-panel .nav-local-guide a {
+      color: var(--gold);
+      font-weight: 500;
+    }
+    .nav-dropdown-panel .nav-local-guide a:hover {
+      background: rgba(201, 168, 76, 0.12);
+    }
 
-    .nav-right {
+    .nav-actions {
       display: flex;
       align-items: center;
-      gap: 1.5rem;
+      gap: 0.75rem;
+      flex: 0 0 auto;
     }
     .lang-switch {
       display: flex;
@@ -158,6 +261,24 @@
       letter-spacing: 0.2em;
       text-transform: uppercase;
       color: var(--white-dim);
+    }
+    .mobile-menu .nav-local-guide {
+      margin-top: 0.5rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border);
+    }
+    .mobile-menu .nav-local-guide a {
+      color: var(--gold);
+      font-size: 0.9rem;
+      font-weight: 500;
+      letter-spacing: 0.25em;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .mobile-menu .nav-local-guide a::before {
+      content: '✦';
+      font-size: 0.6rem;
     }
 
     /* ─── HERO ─── */
@@ -372,6 +493,10 @@
       font-size: 0.85rem;
       color: var(--white-dim);
       line-height: 1.7;
+    }
+    .esencial-card-body strong {
+      color: var(--white);
+      font-weight: 600;
     }
     .wifi-network {
       font-size: 0.75rem;
@@ -767,6 +892,18 @@
       transition: transform 0.55s ease;
     }
     .recom-card:hover .recom-card-img { transform: scale(1.05); }
+    .recom-card-img-wrap .recom-card-video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+      display: block;
+      transition: transform 0.55s ease;
+    }
+    .recom-card:hover .recom-card-video { transform: scale(1.05); }
+    @media (prefers-reduced-motion: reduce) {
+      .recom-card-img-wrap .recom-card-video { transform: none !important; }
+    }
     .recom-top-badge {
       position: absolute;
       top: 0.5rem;
@@ -821,6 +958,63 @@
     .emergency-note {
       font-size: 0.75rem;
       color: var(--white-dim);
+    }
+
+    /* ─── LOS CABOS: things to do tab ─── */
+    .cabo-intro {
+      color: var(--white-dim);
+      font-size: 0.9rem;
+      line-height: 1.65;
+      margin-bottom: 2rem;
+      max-width: 52rem;
+    }
+    .cabo-area-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+      margin-bottom: 2.5rem;
+    }
+    .cabo-area-card {
+      background: var(--bg-2);
+      border: 1px solid var(--border);
+      padding: 1.35rem 1.5rem;
+      transition: var(--transition);
+    }
+    .cabo-area-card:hover { border-color: rgba(201, 168, 76, 0.45); }
+    .cabo-area-card h3 {
+      font-family: var(--font-serif);
+      font-size: 1.05rem;
+      color: var(--gold);
+      margin: 0 0 0.65rem;
+      letter-spacing: 0.03em;
+    }
+    .cabo-area-card p {
+      margin: 0;
+      font-size: 0.82rem;
+      color: var(--white-dim);
+      line-height: 1.6;
+    }
+    .cabo-highlights-title {
+      font-size: 0.7rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin: 0 0 1rem;
+    }
+    .cabo-highlights-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+    }
+    .cabo-highlights-list li {
+      font-size: 0.85rem;
+      color: var(--white-dim);
+      padding-left: 1.1rem;
+      border-left: 2px solid rgba(201, 168, 76, 0.35);
+      line-height: 1.5;
     }
 
     /* ─── REGLAS ─── */
@@ -995,8 +1189,9 @@
     }
 
     @media (max-width: 768px) {
-      .nav-links { display: none; }
-      .nav-right { gap: 0.75rem; }
+      #nav { justify-content: space-between; }
+      .nav-desktop-menu { display: none; }
+      .nav-actions { gap: 0.75rem; }
       .lang-switch button { padding: 0.45rem 0.65rem; font-size: 0.55rem; }
       .nav-burger { display: flex; }
 
@@ -1018,6 +1213,7 @@
       .servicios-grid { grid-template-columns: 1fr; }
       .recom-grid { grid-template-columns: 1fr; }
       .emergency-grid { grid-template-columns: 1fr; }
+      .cabo-area-grid { grid-template-columns: 1fr; }
       .tabs { overflow-x: auto; }
       .tab-btn { white-space: nowrap; }
     }
@@ -1040,26 +1236,36 @@
 
   <!-- NAV -->
   <nav id="nav">
-    <a href="#hero" class="nav-logo"><img src="/logo.png" alt="Villa Sera" /></a>
-    <div class="nav-right">
-      <ul class="nav-links">
-        <li><a href="#bienvenida" data-i18n="nav_bienvenida">Welcome</a></li>
-        <li><a href="#esencial" data-i18n="nav_esencial">Essentials</a></li>
-        <li><a href="#mantenimiento" data-i18n="nav_mantenimiento">Scheduled visits</a></li>
-        <li><a href="#staff" data-i18n="nav_staff">Your team</a></li>
-        <li><a href="#espacios" data-i18n="nav_villa">The villa</a></li>
-        <li><a href="#servicios" data-i18n="nav_servicios">Add-ons</a></li>
-        <li><a href="#recomendaciones" data-i18n="nav_guia">Local guide</a></li>
-        <li><a href="#reglas" data-i18n="nav_reglas">House rules</a></li>
-      </ul>
+    <a href="#hero" class="nav-logo"><img src="/logo.png" alt="Villa Sera" width="180" height="58" /></a>
+    <div class="nav-desktop-menu">
+      <div class="nav-desktop-menu-inner">
+        <button type="button" class="nav-menu-trigger" id="nav-menu-trigger" aria-expanded="false" aria-haspopup="true" aria-controls="nav-dropdown-panel">
+          <span data-i18n="nav_menu_btn">Menu</span>
+          <svg class="nav-chevron" width="10" height="10" viewBox="0 0 12 12" aria-hidden="true"><path fill="currentColor" d="M6 8.5L1 3h10z"/></svg>
+        </button>
+        <div class="nav-dropdown-panel" id="nav-dropdown-panel" role="navigation" aria-labelledby="nav-menu-trigger" aria-hidden="true">
+          <ul class="nav-links">
+            <li><a href="#bienvenida" data-i18n="nav_bienvenida">Welcome</a></li>
+            <li><a href="#esencial" data-i18n="nav_esencial">Essentials</a></li>
+            <li><a href="#mantenimiento" data-i18n="nav_mantenimiento">Scheduled visits</a></li>
+            <li><a href="#staff" data-i18n="nav_staff">Your team</a></li>
+            <li><a href="#espacios" data-i18n="nav_villa">The villa</a></li>
+            <li><a href="#servicios" data-i18n="nav_servicios">Add-ons</a></li>
+            <li class="nav-local-guide"><a href="#recomendaciones" data-i18n="nav_guia">Local guide</a></li>
+            <li><a href="#reglas" data-i18n="nav_reglas">House rules</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="nav-actions">
       <div class="lang-switch" role="group" aria-label="Language">
         <button type="button" data-lang="en" aria-pressed="true">EN</button>
         <button type="button" data-lang="es" aria-pressed="false">ES</button>
       </div>
+      <button type="button" class="nav-burger" onclick="toggleMenu()" data-i18n-attr="aria-label:nav_menu_aria" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
     </div>
-    <button class="nav-burger" onclick="toggleMenu()" data-i18n-attr="aria-label:nav_menu_aria" aria-label="Menu">
-      <span></span><span></span><span></span>
-    </button>
   </nav>
 
   <div class="mobile-menu" id="mobile-menu">
@@ -1074,7 +1280,7 @@
       <li><a href="#staff" onclick="closeMenu()" data-i18n="nav_staff">Your team</a></li>
       <li><a href="#espacios" onclick="closeMenu()" data-i18n="nav_villa">The villa</a></li>
       <li><a href="#servicios" onclick="closeMenu()" data-i18n="nav_servicios">Add-ons</a></li>
-      <li><a href="#recomendaciones" onclick="closeMenu()" data-i18n="nav_guia">Local guide</a></li>
+      <li class="nav-local-guide"><a href="#recomendaciones" onclick="closeMenu()" data-i18n="nav_guia">Local guide</a></li>
       <li><a href="#reglas" onclick="closeMenu()" data-i18n="nav_reglas">House rules</a></li>
     </ul>
   </div>
@@ -1159,7 +1365,7 @@
         <div class="esencial-card">
           <div class="esencial-icon">❄️</div>
           <div class="esencial-card-title" data-i18n="card_ac_t">Air conditioning</div>
-          <p class="esencial-card-body" data-i18n="card_ac_b">Thermostats in each room. Recommended temperature: 22°C. Please switch off when leaving the room.</p>
+          <p class="esencial-card-body" data-i18n-html="card_ac_b"></p>
         </div>
         <div class="esencial-card">
           <div class="esencial-icon">📺</div>
@@ -1172,9 +1378,9 @@
           <p class="esencial-card-body" data-i18n="card_park_b">Private space for 2 vehicles in front of the villa. The gate opens with the remote at reception.</p>
         </div>
         <div class="esencial-card">
-          <div class="esencial-icon">⚡</div>
-          <div class="esencial-card-title" data-i18n="card_power_t">Power</div>
-          <p class="esencial-card-body" data-i18n="card_power_b">The villa has an automatic backup generator. If power drops, the system kicks in within 30 seconds.</p>
+          <div class="esencial-icon">🧹</div>
+          <div class="esencial-card-title" data-i18n="card_housekeeping_t">Housekeeping</div>
+          <p class="esencial-card-body" data-i18n="card_housekeeping_b">During your stay, the villa is cleaned only when you request the service. Cleaning is $60 USD per service. Please request at least 24 hours in advance.</p>
         </div>
         <div class="esencial-card">
           <div class="esencial-icon">♻️</div>
@@ -1273,13 +1479,13 @@
 
       <div class="espacios-strip fade-in" style="transition-delay:0.05s">
         <figure>
-          <img src="https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto/f_auto/v1775608196/CasaSergio179_orre1k.jpg" alt="" loading="lazy" decoding="async" width="800" height="600" data-i18n="photo_alt" />
+          <img src="https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto/f_auto/w_600/v1775608196/CasaSergio179_orre1k.jpg" alt="" loading="lazy" decoding="async" width="800" height="600" data-i18n="photo_alt" />
         </figure>
         <figure>
-          <img src="https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto/f_auto/v1775608194/CasaSergio10_czywqv.jpg" alt="" loading="lazy" decoding="async" width="800" height="600" data-i18n="photo_alt" />
+          <img src="https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto/f_auto/w_600/v1775608194/CasaSergio10_czywqv.jpg" alt="" loading="lazy" decoding="async" width="800" height="600" data-i18n="photo_alt" />
         </figure>
         <figure>
-          <img src="https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto/f_auto/v1775608192/CasaSergio238_jg6mpa.jpg" alt="" loading="lazy" decoding="async" width="800" height="600" data-i18n="photo_alt" />
+          <img src="https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto/f_auto/w_600/v1775608192/CasaSergio238_jg6mpa.jpg" alt="" loading="lazy" decoding="async" width="800" height="600" data-i18n="photo_alt" />
         </figure>
       </div>
 
@@ -1288,10 +1494,10 @@
           <div class="villa-space-media">
             <div class="villa-space-photos">
               <a href="https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto/f_auto/v1775608194/CasaSergio10_czywqv.jpg" target="_blank" rel="noopener noreferrer">
-                <img src="https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto/f_auto/v1775608194/CasaSergio10_czywqv.jpg" alt="" loading="lazy" decoding="async" width="800" height="600" data-i18n="photo_alt" />
+                <img src="https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto/f_auto/w_600/v1775608194/CasaSergio10_czywqv.jpg" alt="" loading="lazy" decoding="async" width="800" height="600" data-i18n="photo_alt" />
               </a>
               <a href="https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto/f_auto/v1775608197/CasaSergio184-2_aug1tr.jpg" target="_blank" rel="noopener noreferrer">
-                <img src="https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto/f_auto/v1775608197/CasaSergio184-2_aug1tr.jpg" alt="" loading="lazy" decoding="async" width="800" height="600" data-i18n="photo_alt" />
+                <img src="https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto/f_auto/w_600/v1775608197/CasaSergio184-2_aug1tr.jpg" alt="" loading="lazy" decoding="async" width="800" height="600" data-i18n="photo_alt" />
               </a>
             </div>
           </div>
@@ -1307,13 +1513,13 @@
           <div class="villa-space-media">
             <div class="villa-space-photos triple">
               <a href="https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto/f_auto/v1775609851/CasaSergio182_lazs9m.jpg" target="_blank" rel="noopener noreferrer">
-                <img src="https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto/f_auto/v1775609851/CasaSergio182_lazs9m.jpg" alt="" loading="lazy" decoding="async" width="800" height="600" data-i18n="photo_alt" />
+                <img src="https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto/f_auto/w_600/v1775609851/CasaSergio182_lazs9m.jpg" alt="" loading="lazy" decoding="async" width="800" height="600" data-i18n="photo_alt" />
               </a>
               <a href="https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto/f_auto/v1775609850/CasaSergio121_vcbafb.jpg" target="_blank" rel="noopener noreferrer">
-                <img src="https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto/f_auto/v1775609850/CasaSergio121_vcbafb.jpg" alt="" loading="lazy" decoding="async" width="800" height="600" data-i18n="photo_alt" />
+                <img src="https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto/f_auto/w_600/v1775609850/CasaSergio121_vcbafb.jpg" alt="" loading="lazy" decoding="async" width="800" height="600" data-i18n="photo_alt" />
               </a>
               <a href="https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto/f_auto/v1775609853/CasaSergio180_uaxxt7.jpg" target="_blank" rel="noopener noreferrer">
-                <img src="https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto/f_auto/v1775609853/CasaSergio180_uaxxt7.jpg" alt="" loading="lazy" decoding="async" width="800" height="600" data-i18n="photo_alt" />
+                <img src="https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto/f_auto/w_600/v1775609853/CasaSergio180_uaxxt7.jpg" alt="" loading="lazy" decoding="async" width="800" height="600" data-i18n="photo_alt" />
               </a>
             </div>
           </div>
@@ -1329,13 +1535,13 @@
           <div class="villa-space-media">
             <div class="villa-space-photos triple">
               <a href="https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto/f_auto/v1775608192/CasaSergio238_jg6mpa.jpg" target="_blank" rel="noopener noreferrer">
-                <img src="https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto/f_auto/v1775608192/CasaSergio238_jg6mpa.jpg" alt="" loading="lazy" decoding="async" width="800" height="600" data-i18n="photo_alt" />
+                <img src="https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto/f_auto/w_600/v1775608192/CasaSergio238_jg6mpa.jpg" alt="" loading="lazy" decoding="async" width="800" height="600" data-i18n="photo_alt" />
               </a>
               <a href="https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto/f_auto/v1775608196/CasaSergio179_orre1k.jpg" target="_blank" rel="noopener noreferrer">
-                <img src="https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto/f_auto/v1775608196/CasaSergio179_orre1k.jpg" alt="" loading="lazy" decoding="async" width="800" height="600" data-i18n="photo_alt" />
+                <img src="https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto/f_auto/w_600/v1775608196/CasaSergio179_orre1k.jpg" alt="" loading="lazy" decoding="async" width="800" height="600" data-i18n="photo_alt" />
               </a>
               <a href="https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto/f_auto/v1775610420/CasaSergio213_nxl7do.jpg" target="_blank" rel="noopener noreferrer">
-                <img src="https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto/f_auto/v1775610420/CasaSergio213_nxl7do.jpg" alt="" loading="lazy" decoding="async" width="800" height="600" data-i18n="photo_alt" />
+                <img src="https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto/f_auto/w_600/v1775610420/CasaSergio213_nxl7do.jpg" alt="" loading="lazy" decoding="async" width="800" height="600" data-i18n="photo_alt" />
               </a>
             </div>
           </div>
@@ -1351,16 +1557,16 @@
           <div class="villa-space-media">
             <div class="villa-space-photos">
               <a href="https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto/f_auto/v1775608196/CasaSergio194_xcwtwf.jpg" target="_blank" rel="noopener noreferrer">
-                <img src="https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto/f_auto/v1775608196/CasaSergio194_xcwtwf.jpg" alt="" loading="lazy" decoding="async" width="800" height="600" data-i18n="photo_alt" />
+                <img src="https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto/f_auto/w_600/v1775608196/CasaSergio194_xcwtwf.jpg" alt="" loading="lazy" decoding="async" width="800" height="600" data-i18n="photo_alt" />
               </a>
               <a href="https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto/f_auto/v1775608195/CasaSergio166_ysvalx.jpg" target="_blank" rel="noopener noreferrer">
-                <img src="https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto/f_auto/v1775608195/CasaSergio166_ysvalx.jpg" alt="" loading="lazy" decoding="async" width="800" height="600" data-i18n="photo_alt" />
+                <img src="https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto/f_auto/w_600/v1775608195/CasaSergio166_ysvalx.jpg" alt="" loading="lazy" decoding="async" width="800" height="600" data-i18n="photo_alt" />
               </a>
               <a href="https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto/f_auto/v1775608193/CasaSergio107_fiiith.jpg" target="_blank" rel="noopener noreferrer">
-                <img src="https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto/f_auto/v1775608193/CasaSergio107_fiiith.jpg" alt="" loading="lazy" decoding="async" width="800" height="600" data-i18n="photo_alt" />
+                <img src="https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto/f_auto/w_600/v1775608193/CasaSergio107_fiiith.jpg" alt="" loading="lazy" decoding="async" width="800" height="600" data-i18n="photo_alt" />
               </a>
               <a href="https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto/f_auto/v1775608193/CasaSergio161_rtzji2.jpg" target="_blank" rel="noopener noreferrer">
-                <img src="https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto/f_auto/v1775608193/CasaSergio161_rtzji2.jpg" alt="" loading="lazy" decoding="async" width="800" height="600" data-i18n="photo_alt" />
+                <img src="https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto/f_auto/w_600/v1775608193/CasaSergio161_rtzji2.jpg" alt="" loading="lazy" decoding="async" width="800" height="600" data-i18n="photo_alt" />
               </a>
             </div>
           </div>
@@ -1376,22 +1582,22 @@
           <div class="villa-space-media">
             <div class="villa-space-photos">
               <a href="https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto/f_auto/v1775608195/CasaSergio160_fhgop8.jpg" target="_blank" rel="noopener noreferrer">
-                <img src="https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto/f_auto/v1775608195/CasaSergio160_fhgop8.jpg" alt="" loading="lazy" decoding="async" width="800" height="600" data-i18n="photo_alt" />
+                <img src="https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto/f_auto/w_600/v1775608195/CasaSergio160_fhgop8.jpg" alt="" loading="lazy" decoding="async" width="800" height="600" data-i18n="photo_alt" />
               </a>
               <a href="https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto/f_auto/v1775610821/CasaSergio222_jkgjqi.jpg" target="_blank" rel="noopener noreferrer">
-                <img src="https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto/f_auto/v1775610821/CasaSergio222_jkgjqi.jpg" alt="" loading="lazy" decoding="async" width="800" height="600" data-i18n="photo_alt" />
+                <img src="https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto/f_auto/w_600/v1775610821/CasaSergio222_jkgjqi.jpg" alt="" loading="lazy" decoding="async" width="800" height="600" data-i18n="photo_alt" />
               </a>
               <a href="https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto/f_auto/v1775608192/CasaSergio156_ah4try.jpg" target="_blank" rel="noopener noreferrer">
-                <img src="https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto/f_auto/v1775608192/CasaSergio156_ah4try.jpg" alt="" loading="lazy" decoding="async" width="800" height="600" data-i18n="photo_alt" />
+                <img src="https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto/f_auto/w_600/v1775608192/CasaSergio156_ah4try.jpg" alt="" loading="lazy" decoding="async" width="800" height="600" data-i18n="photo_alt" />
               </a>
               <a href="https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto/f_auto/v1775608189/CasaSergio49_s5gvlh.jpg" target="_blank" rel="noopener noreferrer">
-                <img src="https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto/f_auto/v1775608189/CasaSergio49_s5gvlh.jpg" alt="" loading="lazy" decoding="async" width="800" height="600" data-i18n="photo_alt" />
+                <img src="https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto/f_auto/w_600/v1775608189/CasaSergio49_s5gvlh.jpg" alt="" loading="lazy" decoding="async" width="800" height="600" data-i18n="photo_alt" />
               </a>
               <a href="https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto/f_auto/v1775610756/CasaSergio31_tv1b17.jpg" target="_blank" rel="noopener noreferrer">
-                <img src="https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto/f_auto/v1775610756/CasaSergio31_tv1b17.jpg" alt="" loading="lazy" decoding="async" width="800" height="600" data-i18n="photo_alt" />
+                <img src="https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto/f_auto/w_600/v1775610756/CasaSergio31_tv1b17.jpg" alt="" loading="lazy" decoding="async" width="800" height="600" data-i18n="photo_alt" />
               </a>
               <a href="https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto/f_auto/v1775608190/CasaSergio75_uj8eaf.jpg" target="_blank" rel="noopener noreferrer">
-                <img src="https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto/f_auto/v1775608190/CasaSergio75_uj8eaf.jpg" alt="" loading="lazy" decoding="async" width="800" height="600" data-i18n="photo_alt" />
+                <img src="https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto/f_auto/w_600/v1775608190/CasaSergio75_uj8eaf.jpg" alt="" loading="lazy" decoding="async" width="800" height="600" data-i18n="photo_alt" />
               </a>
             </div>
           </div>
@@ -1407,19 +1613,19 @@
           <div class="villa-space-media">
             <div class="villa-space-photos quint">
               <a href="https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto/f_auto/v1775610757/CasaSergio153_fmuwv0.jpg" target="_blank" rel="noopener noreferrer">
-                <img src="https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto/f_auto/v1775610757/CasaSergio153_fmuwv0.jpg" alt="" loading="lazy" decoding="async" width="800" height="600" data-i18n="photo_alt" />
+                <img src="https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto/f_auto/w_600/v1775610757/CasaSergio153_fmuwv0.jpg" alt="" loading="lazy" decoding="async" width="800" height="600" data-i18n="photo_alt" />
               </a>
               <a href="https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto/f_auto/v1775610757/CasaSergio152_jzalzs.jpg" target="_blank" rel="noopener noreferrer">
-                <img src="https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto/f_auto/v1775610757/CasaSergio152_jzalzs.jpg" alt="" loading="lazy" decoding="async" width="800" height="600" data-i18n="photo_alt" />
+                <img src="https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto/f_auto/w_600/v1775610757/CasaSergio152_jzalzs.jpg" alt="" loading="lazy" decoding="async" width="800" height="600" data-i18n="photo_alt" />
               </a>
               <a href="https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto/f_auto/v1775610757/CasaSergio154_phdoc3.jpg" target="_blank" rel="noopener noreferrer">
-                <img src="https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto/f_auto/v1775610757/CasaSergio154_phdoc3.jpg" alt="" loading="lazy" decoding="async" width="800" height="600" data-i18n="photo_alt" />
+                <img src="https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto/f_auto/w_600/v1775610757/CasaSergio154_phdoc3.jpg" alt="" loading="lazy" decoding="async" width="800" height="600" data-i18n="photo_alt" />
               </a>
               <a href="https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto/f_auto/v1775610756/CasaSergio74_lkx0vi.jpg" target="_blank" rel="noopener noreferrer">
-                <img src="https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto/f_auto/v1775610756/CasaSergio74_lkx0vi.jpg" alt="" loading="lazy" decoding="async" width="800" height="600" data-i18n="photo_alt" />
+                <img src="https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto/f_auto/w_600/v1775610756/CasaSergio74_lkx0vi.jpg" alt="" loading="lazy" decoding="async" width="800" height="600" data-i18n="photo_alt" />
               </a>
               <a href="https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto/f_auto/v1775611026/CasaSergio45_w8cccf.jpg" target="_blank" rel="noopener noreferrer">
-                <img src="https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto/f_auto/v1775611026/CasaSergio45_w8cccf.jpg" alt="" loading="lazy" decoding="async" width="800" height="600" data-i18n="photo_alt" />
+                <img src="https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto/f_auto/w_600/v1775611026/CasaSergio45_w8cccf.jpg" alt="" loading="lazy" decoding="async" width="800" height="600" data-i18n="photo_alt" />
               </a>
             </div>
           </div>
@@ -1507,6 +1713,7 @@
       </div>
       <div class="tabs fade-in" style="transition-delay:0.1s">
         <button type="button" class="tab-btn active" onclick="switchTab('restaurantes', this)" data-i18n="tab_rest">Restaurants</button>
+        <button type="button" class="tab-btn" onclick="switchTab('cabo', this)" data-i18n="tab_things">Things to do</button>
         <button type="button" class="tab-btn" onclick="switchTab('emergencias', this)" data-i18n="tab_em">Emergencies</button>
       </div>
 
@@ -1521,7 +1728,7 @@
           <div class="recom-grid">
             <div class="recom-card has-photo">
               <div class="recom-card-img-wrap">
-                <img class="recom-card-img" src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=600&q=80&fit=crop" alt="Manta restaurant" loading="lazy" onerror="this.parentNode.style.background='linear-gradient(135deg,#0a2540,#163a5f)';this.remove()" />
+                <img class="recom-card-img" src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=400&q=80&fit=crop" alt="Manta restaurant" loading="lazy" onerror="this.parentNode.style.background='linear-gradient(135deg,#0a2540,#163a5f)';this.remove()" />
                 <span class="recom-top-badge" data-i18n="badge_tripadvisor">TripAdvisor #1</span>
               </div>
               <div class="recom-card-body">
@@ -1535,7 +1742,7 @@
             </div>
             <div class="recom-card has-photo">
               <div class="recom-card-img-wrap">
-                <img class="recom-card-img" src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=600&q=80&fit=crop" alt="El Farallon" loading="lazy" onerror="this.parentNode.style.background='linear-gradient(135deg,#0a2540,#163a5f)';this.remove()" />
+                <img class="recom-card-img" src="https://cdn.waldorfastorialoscabospedregal.com/wp-content/uploads/2021/11/14171804/El-Farallon-Restaurant-at-The-Resort-at-Pedregal.webp" alt="El Farallon" width="1920" height="1080" loading="lazy" decoding="async" onerror="this.parentNode.style.background='linear-gradient(135deg,#0a2540,#163a5f)';this.remove()" />
                 <span class="recom-top-badge" data-i18n="badge_luxury">Luxury Pick</span>
               </div>
               <div class="recom-card-body">
@@ -1549,7 +1756,17 @@
             </div>
             <div class="recom-card has-photo">
               <div class="recom-card-img-wrap">
-                <img class="recom-card-img" src="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=600&q=80&fit=crop" alt="Sunset Monalisa" loading="lazy" onerror="this.parentNode.style.background='linear-gradient(135deg,#0a2540,#163a5f)';this.remove()" />
+                <video
+                  class="recom-card-video"
+                  src="https://sunsetmonalisa.com/wp-content/uploads/2025/05/Sunset-Monalisa_Los-Cabos.mp4"
+                  poster="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=800&q=80&fit=crop"
+                  autoplay
+                  muted
+                  loop
+                  playsinline
+                  preload="metadata"
+                  aria-label="Sunset Monalisa"
+                ></video>
               </div>
               <div class="recom-card-body">
                 <div class="recom-stars">★★★★☆</div>
@@ -1572,7 +1789,7 @@
           <div class="recom-grid">
             <div class="recom-card has-photo">
               <div class="recom-card-img-wrap">
-                <img class="recom-card-img" src="https://images.unsplash.com/photo-1544025162-d76694265947?w=600&q=80&fit=crop" alt="Edith's restaurant" loading="lazy" onerror="this.parentNode.style.background='linear-gradient(135deg,#2a0a0a,#4a1a0a)';this.remove()" />
+                <img class="recom-card-img" src="https://images.unsplash.com/photo-1544025162-d76694265947?w=400&q=80&fit=crop" alt="Edith's restaurant" loading="lazy" onerror="this.parentNode.style.background='linear-gradient(135deg,#2a0a0a,#4a1a0a)';this.remove()" />
                 <span class="recom-top-badge" data-i18n="badge_local">Local Icon</span>
               </div>
               <div class="recom-card-body">
@@ -1586,7 +1803,7 @@
             </div>
             <div class="recom-card has-photo">
               <div class="recom-card-img-wrap">
-                <img class="recom-card-img" src="https://images.unsplash.com/photo-1558030006-450675393462?w=600&q=80&fit=crop" alt="Bourbon Street steakhouse" loading="lazy" onerror="this.parentNode.style.background='linear-gradient(135deg,#2a0a0a,#4a1a0a)';this.remove()" />
+                <img class="recom-card-img" src="https://images.unsplash.com/photo-1558030006-450675393462?w=400&q=80&fit=crop" alt="Bourbon Street steakhouse" loading="lazy" onerror="this.parentNode.style.background='linear-gradient(135deg,#2a0a0a,#4a1a0a)';this.remove()" />
               </div>
               <div class="recom-card-body">
                 <div class="recom-stars">★★★★☆</div>
@@ -1595,6 +1812,46 @@
                 <div class="recom-desc" data-i18n="r_bourbon_d">Classic cuts, full bar, and a lively atmosphere in the heart of the marina district.</div>
                 <div class="recom-meta" data-i18n="r_bourbon_m">🚗 20 min</div>
                 <a href="https://www.google.com/maps/search/Bourbon+Street+Cabo+San+Lucas" target="_blank" rel="noopener noreferrer" class="recom-maps-link" data-i18n="see_on_maps">See on Google Maps →</a>
+              </div>
+            </div>
+            <div class="recom-card has-photo">
+              <div class="recom-card-img-wrap">
+                <img class="recom-card-img" src="https://images.unsplash.com/photo-1600891964092-4316c288032e?w=400&q=80&fit=crop" alt="El Peregrino" loading="lazy" onerror="this.parentNode.style.background='linear-gradient(135deg,#2a0a0a,#4a1a0a)';this.remove()" />
+              </div>
+              <div class="recom-card-body">
+                <div class="recom-stars">★★★★★</div>
+                <div class="recom-name">El Peregrino</div>
+                <div class="recom-type" data-i18n="r_peregrino_type">Fine dining · Wood-fire grill</div>
+                <div class="recom-desc" data-i18n="r_peregrino_d">Exceptional cuts cooked over open fire in an intimate setting. One of Los Cabos' best-kept secrets.</div>
+                <div class="recom-meta" data-i18n="r_peregrino_m">🚗 20 min</div>
+                <a href="https://www.google.com/maps/search/El+Peregrino+Cabo+San+Lucas" target="_blank" rel="noopener noreferrer" class="recom-maps-link" data-i18n="see_on_maps">See on Google Maps →</a>
+              </div>
+            </div>
+            <div class="recom-card has-photo">
+              <div class="recom-card-img-wrap">
+                <img class="recom-card-img" src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=400&q=80&fit=crop" alt="Chambao" loading="lazy" onerror="this.parentNode.style.background='linear-gradient(135deg,#2a0a0a,#4a1a0a)';this.remove()" />
+              </div>
+              <div class="recom-card-body">
+                <div class="recom-stars">★★★★★</div>
+                <div class="recom-name">Chambao</div>
+                <div class="recom-type" data-i18n="r_chambao_type">Mediterranean · Beachfront</div>
+                <div class="recom-desc" data-i18n="r_chambao_d">Barefoot-luxury dining steps from the sand. Premium meats, fresh seafood, and signature cocktails at sunset.</div>
+                <div class="recom-meta" data-i18n="r_chambao_m">🚗 15 min · Medano Beach</div>
+                <a href="https://www.google.com/maps/search/Chambao+Cabo+San+Lucas" target="_blank" rel="noopener noreferrer" class="recom-maps-link" data-i18n="see_on_maps">See on Google Maps →</a>
+              </div>
+            </div>
+            <div class="recom-card has-photo">
+              <div class="recom-card-img-wrap">
+                <img class="recom-card-img" src="https://static.wixstatic.com/media/cb8446_3c2bfa63e6e64ec7bd1754ec79ecb4f0~mv2.webp/v1/fill/w_1376,h_430,al_c,q_85,enc_avif,quality_auto/background2_cabos_rosanegra.webp" alt="Rosa Negra" width="1376" height="430" loading="lazy" decoding="async" onerror="this.parentNode.style.background='linear-gradient(135deg,#2a0a0a,#4a1a0a)';this.remove()" />
+                <span class="recom-top-badge" data-i18n="badge_celeb">Celebrity Spot</span>
+              </div>
+              <div class="recom-card-body">
+                <div class="recom-stars">★★★★★</div>
+                <div class="recom-name">Rosa Negra</div>
+                <div class="recom-type" data-i18n="r_rosanegra_type">Latin cuisine · Lively atmosphere</div>
+                <div class="recom-desc" data-i18n="r_rosanegra_d">Mexico City's iconic restaurant, now in Los Cabos. Bold Latin flavors, DJ nights, and a scene made for celebration.</div>
+                <div class="recom-meta" data-i18n="r_rosanegra_m">🚗 15 min · Marina district</div>
+                <a href="https://www.google.com/maps/search/Rosa+Negra+Cabo+San+Lucas" target="_blank" rel="noopener noreferrer" class="recom-maps-link" data-i18n="see_on_maps">See on Google Maps →</a>
               </div>
             </div>
           </div>
@@ -1609,7 +1866,7 @@
           <div class="recom-grid">
             <div class="recom-card has-photo">
               <div class="recom-card-img-wrap">
-                <img class="recom-card-img" src="https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=600&q=80&fit=crop" alt="Mi Casa restaurant" loading="lazy" onerror="this.parentNode.style.background='linear-gradient(135deg,#1a2a0a,#2a400a)';this.remove()" />
+                <img class="recom-card-img" src="https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=400&q=80&fit=crop" alt="Mi Casa restaurant" loading="lazy" onerror="this.parentNode.style.background='linear-gradient(135deg,#1a2a0a,#2a400a)';this.remove()" />
                 <span class="recom-top-badge" data-i18n="badge_tripadvisor">TripAdvisor #1</span>
               </div>
               <div class="recom-card-body">
@@ -1623,7 +1880,7 @@
             </div>
             <div class="recom-card has-photo">
               <div class="recom-card-img-wrap">
-                <img class="recom-card-img" src="https://images.unsplash.com/photo-1611523658822-385aa008324c?w=600&q=80&fit=crop" alt="Los Tres Gallos" loading="lazy" onerror="this.parentNode.style.background='linear-gradient(135deg,#1a2a0a,#2a400a)';this.remove()" />
+                <img class="recom-card-img" src="https://www.cabovillas.com/website/assets/images/upload/1735549617-Los-Tres-Gallos-20.webp" alt="Los Tres Gallos" width="1600" height="1067" loading="lazy" decoding="async" onerror="this.parentNode.style.background='linear-gradient(135deg,#1a2a0a,#2a400a)';this.remove()" />
               </div>
               <div class="recom-card-body">
                 <div class="recom-stars">★★★★★</div>
@@ -1636,7 +1893,7 @@
             </div>
             <div class="recom-card has-photo">
               <div class="recom-card-img-wrap">
-                <img class="recom-card-img" src="https://images.unsplash.com/photo-1511690656952-34342bb7c2f2?w=600&q=80&fit=crop" alt="Acre" loading="lazy" onerror="this.parentNode.style.background='linear-gradient(135deg,#1a2a0a,#2a400a)';this.remove()" />
+                <img class="recom-card-img" src="https://images.unsplash.com/photo-1511690656952-34342bb7c2f2?w=400&q=80&fit=crop" alt="Acre" loading="lazy" onerror="this.parentNode.style.background='linear-gradient(135deg,#1a2a0a,#2a400a)';this.remove()" />
               </div>
               <div class="recom-card-body">
                 <div class="recom-stars">★★★★☆</div>
@@ -1649,15 +1906,15 @@
             </div>
             <div class="recom-card has-photo">
               <div class="recom-card-img-wrap">
-                <img class="recom-card-img" src="https://images.unsplash.com/photo-1533621834623-720a8e6dc448?w=600&q=80&fit=crop" alt="Flora's Field Kitchen" loading="lazy" onerror="this.parentNode.style.background='linear-gradient(135deg,#1a2a0a,#2a400a)';this.remove()" />
+                <img class="recom-card-img" src="https://lh3.googleusercontent.com/p/AF1QipM5Ot3xP42mQioeT0HAxP8Sr3chJeRYHC9LKYiT=w600-k-no" alt="" loading="lazy" decoding="async" width="1200" height="800" data-i18n="r_flora_name" onerror="this.parentNode.style.background='linear-gradient(135deg,#1a2a0a,#2a400a)';this.remove()" />
               </div>
               <div class="recom-card-body">
                 <div class="recom-stars">★★★★☆</div>
-                <div class="recom-name">Flora's Field Kitchen</div>
+                <div class="recom-name" data-i18n="r_flora_name">Flora's Farm</div>
                 <div class="recom-type" data-i18n="r_flora_type">Farm to table</div>
                 <div class="recom-desc" data-i18n="r_flora_d">Sunday brunch at a colonial hacienda. Authentic Mexican charm.</div>
                 <div class="recom-meta" data-i18n="r_flora_m">🚗 25 min</div>
-                <a href="https://www.google.com/maps/search/Flora%27s+Field+Kitchen+San+Jose+del+Cabo" target="_blank" rel="noopener noreferrer" class="recom-maps-link" data-i18n="see_on_maps">See on Google Maps →</a>
+                <a href="https://www.google.com/maps/place/Flora+Farms/@23.0794776,-109.6787292,17z/data=!4m9!3m8!1s0x86af5a108bb8f573:0xd65661a19c1976a4!5m2!4m1!1i2!8m2!3d23.079463!4d-109.676935!16s%2Fg%2F11gzb1nf5" target="_blank" rel="noopener noreferrer" class="recom-maps-link" data-i18n="see_on_maps">See on Google Maps →</a>
               </div>
             </div>
           </div>
@@ -1672,7 +1929,7 @@
           <div class="recom-grid">
             <div class="recom-card has-photo">
               <div class="recom-card-img-wrap">
-                <img class="recom-card-img" src="https://images.unsplash.com/photo-1617196034183-421b4040ed20?w=600&q=80&fit=crop" alt="Nick-San" loading="lazy" onerror="this.parentNode.style.background='linear-gradient(135deg,#0a0a2a,#0a1a3a)';this.remove()" />
+                <img class="recom-card-img" src="https://nicksan.com/wp-content/uploads/2024/10/Nicksan-Drone_2-scaled.webp" alt="Nick-San" loading="lazy" decoding="async" width="1200" height="800" onerror="this.parentNode.style.background='linear-gradient(135deg,#0a0a2a,#0a1a3a)';this.remove()" />
                 <span class="recom-top-badge" data-i18n="badge_celeb">Celebrity Spot</span>
               </div>
               <div class="recom-card-body">
@@ -1686,7 +1943,7 @@
             </div>
             <div class="recom-card has-photo">
               <div class="recom-card-img-wrap">
-                <img class="recom-card-img" src="https://images.unsplash.com/photo-1559410545-0bdcd187e0a6?w=600&q=80&fit=crop" alt="Nobu" loading="lazy" onerror="this.parentNode.style.background='linear-gradient(135deg,#0a0a2a,#0a1a3a)';this.remove()" />
+                <img class="recom-card-img" src="https://images.unsplash.com/photo-1559410545-0bdcd187e0a6?w=400&q=80&fit=crop" alt="Nobu" loading="lazy" onerror="this.parentNode.style.background='linear-gradient(135deg,#0a0a2a,#0a1a3a)';this.remove()" />
                 <span class="recom-top-badge" data-i18n="badge_world">World-famous</span>
               </div>
               <div class="recom-card-body">
@@ -1701,6 +1958,28 @@
           </div>
         </div>
 
+      </div>
+
+      <div id="tab-cabo" class="tab-panel fade-in">
+        <p class="cabo-intro" data-i18n-html="cabo_intro"></p>
+        <div class="cabo-area-grid">
+          <div class="cabo-area-card">
+            <h3 data-i18n="cabo_sl_title">Cabo San Lucas</h3>
+            <p class="cabo-card-body" data-i18n-html="cabo_sl_body"></p>
+          </div>
+          <div class="cabo-area-card">
+            <h3 data-i18n="cabo_sj_title">San José del Cabo</h3>
+            <p class="cabo-card-body" data-i18n-html="cabo_sj_body"></p>
+          </div>
+        </div>
+        <h4 class="cabo-highlights-title" data-i18n="cabo_highlights_title">Ideas for your stay</h4>
+        <ul class="cabo-highlights-list">
+          <li data-i18n-html="cabo_hi_arco"></li>
+          <li data-i18n-html="cabo_hi_plaza"></li>
+          <li data-i18n-html="cabo_hi_whale"></li>
+          <li data-i18n-html="cabo_hi_snorkel"></li>
+          <li data-i18n-html="cabo_hi_ts"></li>
+        </ul>
       </div>
 
       <div id="tab-emergencias" class="tab-panel fade-in">
@@ -1845,6 +2124,34 @@
       menuOpen = false;
       document.getElementById('mobile-menu').classList.remove('open');
     }
+
+    // ─── DESKTOP NAV DROPDOWN ───
+    (function () {
+      var trigger = document.getElementById('nav-menu-trigger');
+      var panel = document.getElementById('nav-dropdown-panel');
+      if (!trigger || !panel) return;
+      function setNavDropdownOpen(open) {
+        trigger.setAttribute('aria-expanded', open ? 'true' : 'false');
+        panel.classList.toggle('is-open', open);
+        panel.setAttribute('aria-hidden', open ? 'false' : 'true');
+      }
+      function toggleNavDropdown(e) {
+        if (e) e.stopPropagation();
+        setNavDropdownOpen(trigger.getAttribute('aria-expanded') !== 'true');
+      }
+      trigger.addEventListener('click', toggleNavDropdown);
+      document.addEventListener('click', function () {
+        setNavDropdownOpen(false);
+      });
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') setNavDropdownOpen(false);
+      });
+      panel.querySelectorAll('a[href^="#"]').forEach(function (a) {
+        a.addEventListener('click', function () {
+          setNavDropdownOpen(false);
+        });
+      });
+    })();
   </script>
 </body>
 </html>

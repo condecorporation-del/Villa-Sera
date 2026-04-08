@@ -168,7 +168,11 @@
   "footer": {
     "tagline": "An unrivaled private experience in Los Cabos",
     "rights": "All rights reserved",
-    "company": "Sera Holding"
+    "company": "Sera Holding",
+    "social_title": "Social",
+    "social_google": "Google · Villa Sera Los Cabos",
+    "social_instagram": "Instagram · Villa Sera",
+    "social_tiktok": "TikTok · @villaseraloscabos"
   },
   "whatsapp": {
     "tooltip": "Book now"
