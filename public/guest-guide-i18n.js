@@ -46,6 +46,10 @@
       card_park_t: 'Parking',
       card_park_b:
         'Private space for 2 vehicles in front of the villa. The gate opens with the remote at reception.',
+      card_loc_t: 'Location',
+      card_loc_b:
+        'Villa Sera is in Cabo San Lucas, Baja California Sur. Use the link below for turn-by-turn directions.',
+      card_loc_link: 'Open in Google Maps',
       card_housekeeping_t: 'Housekeeping',
       card_housekeeping_b:
         'During your stay, the villa is cleaned only when you request the service. Cleaning is $60 USD per service. Please request at least 24 hours in advance.',
@@ -284,6 +288,10 @@
       card_park_t: 'Estacionamiento',
       card_park_b:
         'Espacio privado para 2 vehículos frente a la villa. El portón se abre con control remoto en recepción.',
+      card_loc_t: 'Ubicación',
+      card_loc_b:
+        'Villa Sera se ubica en Cabo San Lucas, Baja California Sur. Use el enlace para indicaciones paso a paso en Google Maps.',
+      card_loc_link: 'Abrir en Google Maps',
       card_housekeeping_t: 'Limpieza',
       card_housekeeping_b:
         'Durante su estancia la casa solo se limpia cuando usted solicita el servicio. El servicio de limpieza tiene un costo de 60 USD. Debe solicitarse con 24 horas de anticipación.',

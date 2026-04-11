@@ -509,6 +509,21 @@
       color: var(--gold);
       letter-spacing: 0.1em;
     }
+    .esencial-map-link {
+      display: inline-block;
+      margin-top: 0.85rem;
+      font-size: 0.72rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--gold);
+      border-bottom: 1px solid rgba(201, 168, 76, 0.4);
+      padding-bottom: 2px;
+      transition: color 0.25s, border-color 0.25s;
+    }
+    .esencial-map-link:hover {
+      color: var(--gold-light);
+      border-color: var(--gold-light);
+    }
 
     /* ─── STAFF ─── */
     #staff { background: var(--bg-2); }
@@ -1402,6 +1417,12 @@
           <div class="esencial-icon">🚗</div>
           <div class="esencial-card-title" data-i18n="card_park_t">Parking</div>
           <p class="esencial-card-body" data-i18n="card_park_b">Private space for 2 vehicles in front of the villa. The gate opens with the remote at reception.</p>
+        </div>
+        <div class="esencial-card">
+          <div class="esencial-icon">📍</div>
+          <div class="esencial-card-title" data-i18n="card_loc_t">Location</div>
+          <p class="esencial-card-body" data-i18n="card_loc_b">Villa Sera is in Cabo San Lucas, Baja California Sur. Use the link below for turn-by-turn directions.</p>
+          <a class="esencial-map-link" href="https://maps.app.goo.gl/QXdkAHRz63Y5iSjGA" target="_blank" rel="noopener noreferrer" data-i18n="card_loc_link">Open in Google Maps</a>
         </div>
         <div class="esencial-card">
           <div class="esencial-icon">🧹</div>
