@@ -1,4 +1,4 @@
-const API_URL = process.env.NEXT_PUBLIC_ADMIN_API_URL || 'http://100.106.234.23:8001'
+const API_URL = process.env.NEXT_PUBLIC_ADMIN_API_URL || 'https://macsandbox.tail5f89e8.ts.net:8001'
 
 export async function checkHealth(): Promise<boolean> {
   try {
