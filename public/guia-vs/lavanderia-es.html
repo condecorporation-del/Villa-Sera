@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Lavandería — Villa Sera</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --gold: #c9a84c;
+  --ink: #1a1a1a;
+  --soft: #555;
+  --muted: #888;
+  --line: #e8e8e8;
+  --bg: #fafaf8;
+  --white: #fff;
+  --serif: 'Cormorant Garamond', Georgia, serif;
+  --sans: 'Jost', -apple-system, sans-serif;
+  --red: #c0392b;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--sans);
+  background: var(--bg);
+  color: var(--ink);
+  font-size: 17px;
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── HERO ── */
+.hero {
+  background: var(--ink);
+  color: #fff;
+  padding: 70px 60px 60px;
+  position: relative;
+  overflow: hidden;
+}
+.hero::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+}
+.hero-label {
+  font-size: 11px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 16px;
+}
+.hero-title {
+  font-family: var(--serif);
+  font-size: clamp(48px, 8vw, 72px);
+  font-weight: 400;
+  color: #fff;
+  line-height: 1.05;
+  margin-bottom: 20px;
+}
+.hero-subtitle {
+  font-size: 17px;
+  color: rgba(255,255,255,0.55);
+  font-weight: 300;
+  max-width: 560px;
+  line-height: 1.65;
+}
+.hero-nav {
+  display: flex;
+  gap: 12px;
+  margin-top: 40px;
+  flex-wrap: wrap;
+}
+.hero-nav a {
+  padding: 10px 22px;
+  border: 1px solid rgba(255,255,255,0.25);
+  color: rgba(255,255,255,0.75);
+  text-decoration: none;
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  transition: all 0.2s;
+}
+.hero-nav a:hover {
+  border-color: var(--gold);
+  color: var(--gold);
+}
+
+/* ── ALERT BAR ── */
+.alert-bar {
+  background: #fff8ec;
+  border-bottom: 1px solid #f0d89a;
+  padding: 18px 60px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.alert-icon { font-size: 20px; flex-shrink: 0; }
+.alert-text {
+  font-size: 15px;
+  color: var(--soft);
+  line-height: 1.5;
+}
+.alert-text strong { color: var(--ink); }
+
+/* ── IMAGE SECTION ── */
+.img-section {
+  background: var(--white);
+  padding: 60px;
+  border-bottom: 1px solid var(--line);
+  text-align: center;
+}
+.img-section-label {
+  font-size: 11px;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 12px;
+}
+.img-section-title {
+  font-family: var(--serif);
+  font-size: 32px;
+  font-weight: 400;
+  color: var(--ink);
+  margin-bottom: 32px;
+}
+.img-section img {
+  width: 100%;
+  max-width: 560px;
+  border-radius: 8px;
+  box-shadow: 0 4px 32px rgba(0,0,0,0.10);
+}
+
+/* ── SECTION ── */
+.section {
+  padding: 70px 60px;
+  border-bottom: 1px solid var(--line);
+}
+.section:nth-child(even) { background: var(--white); }
+.section-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  border: 2px solid var(--ink);
+  font-family: var(--serif);
+  font-size: 26px;
+  font-weight: 500;
+  color: var(--ink);
+  margin-bottom: 20px;
+  flex-shrink: 0;
+}
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 10px;
+}
+.section-title {
+  font-family: var(--serif);
+  font-size: clamp(30px, 5vw, 44px);
+  font-weight: 400;
+  color: var(--ink);
+  line-height: 1.1;
+}
+.section-subtitle {
+  font-size: 15px;
+  color: var(--muted);
+  font-weight: 300;
+  margin-bottom: 40px;
+  padding-left: 72px;
+}
+.divider {
+  width: 40px;
+  height: 2px;
+  background: var(--ink);
+  margin: 16px 0 40px 72px;
+}
+
+/* ── STEPS ── */
+.steps { display: flex; flex-direction: column; gap: 0; padding-left: 72px; }
+.step {
+  display: grid;
+  grid-template-columns: 40px 1fr;
+  gap: 20px;
+  padding: 28px 0;
+  border-bottom: 1px solid var(--line);
+  align-items: start;
+}
+.step:last-child { border-bottom: none; }
+.step-letter {
+  width: 40px;
+  height: 40px;
+  background: var(--ink);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 3px;
+}
+.step-letter span {
+  font-family: var(--serif);
+  font-size: 18px;
+  color: #fff;
+  font-weight: 500;
+}
+.step-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--ink);
+  margin-bottom: 8px;
+  line-height: 1.3;
+}
+.step-title .warn {
+  font-weight: 400;
+  color: var(--red);
+  font-size: 15px;
+}
+.step-body {
+  font-size: 16px;
+  color: var(--soft);
+  line-height: 1.75;
+  font-weight: 300;
+}
+.step-body strong { color: var(--ink); font-weight: 600; }
+.step-body ul {
+  margin-top: 10px;
+  padding-left: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.step-body ul li {
+  display: flex;
+  gap: 10px;
+  font-size: 15px;
+}
+.step-body ul li::before {
+  content: '·';
+  color: var(--gold);
+  font-size: 20px;
+  line-height: 1.3;
+  flex-shrink: 0;
+}
+
+/* ── SOLO STEP (Paso 1 sin sub-pasos) ── */
+.step-single {
+  padding: 28px 32px;
+  background: #f7f7f7;
+  border-radius: 8px;
+  display: flex;
+  align-items: flex-start;
+  gap: 18px;
+  margin-left: 72px;
+  margin-top: 8px;
+}
+.step-single-icon { font-size: 26px; flex-shrink: 0; margin-top: 2px; }
+.step-single-text {
+  font-size: 17px;
+  color: var(--soft);
+  line-height: 1.7;
+  font-weight: 300;
+}
+.step-single-text strong { color: var(--ink); font-weight: 600; }
+
+/* ── TIPS ── */
+.tips-section {
+  background: var(--ink);
+  padding: 60px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+.tip-card {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-left: 3px solid var(--gold);
+  padding: 24px 28px;
+  border-radius: 4px;
+}
+.tip-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--gold);
+  margin-bottom: 8px;
+  letter-spacing: 0.02em;
+}
+.tip-body {
+  font-size: 15px;
+  color: rgba(255,255,255,0.55);
+  font-weight: 300;
+  line-height: 1.65;
+}
+
+/* ── FOOTER ── */
+.footer {
+  background: var(--white);
+  padding: 28px 60px;
+  border-top: 1px solid var(--line);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.footer-brand {
+  font-family: var(--serif);
+  font-size: 18px;
+  color: var(--ink);
+}
+.footer-brand span { color: var(--gold); }
+.back-btn {
+  padding: 10px 22px;
+  border: 1px solid var(--ink);
+  color: var(--ink);
+  text-decoration: none;
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  transition: all 0.2s;
+}
+.back-btn:hover { background: var(--ink); color: #fff; }
+
+@media (max-width: 720px) {
+  .hero, .img-section, .section { padding: 44px 28px; }
+  .alert-bar { padding: 16px 28px; }
+  .section-subtitle, .divider, .steps { padding-left: 0; margin-left: 0; }
+  .step-single { margin-left: 0; }
+  .tips-section { padding: 40px 28px; grid-template-columns: 1fr; }
+  .footer { padding: 20px 28px; }
+}
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-label">Villa Sera · Instrucciones de la Villa</div>
+  <h1 class="hero-title">Lavandería</h1>
+  <p class="hero-subtitle">Torre LG de lavadora y secadora. Sigue estos pasos para usarla correctamente durante tu estancia.</p>
+  <nav class="hero-nav">
+    <a href="#encendido">Paso 1 · Encendido</a>
+    <a href="#lavadora">Paso 2 · Lavadora</a>
+    <a href="#secadora">Paso 3 · Secadora</a>
+  </nav>
+</div>
+
+<!-- ALERTA -->
+<div class="alert-bar">
+  <span class="alert-icon">⚠️</span>
+  <p class="alert-text">
+    <strong>Usa únicamente detergente HE (High Efficiency).</strong> El detergente normal puede dañar la lavadora. Lo encuentras en el estante superior del cuarto de lavandería.
+  </p>
+</div>
+
+<!-- IMAGEN DE REFERENCIA -->
+<div class="img-section">
+  <div class="img-section-label">Referencia visual</div>
+  <div class="img-section-title">Resumen de los 3 pasos</div>
+  <img src="/guia-vs/Lavanderia-ES.png" alt="Instrucciones de lavandería paso a paso" />
+</div>
+
+<!-- PASO 1: ENCENDIDO -->
+<div class="section" id="encendido">
+  <div class="section-header">
+    <div class="section-num">1</div>
+    <h2 class="section-title">Encendido</h2>
+  </div>
+  <p class="section-subtitle">Cómo encender la Torre LG</p>
+  <div class="divider"></div>
+  <div class="step-single">
+    <span class="step-single-icon">👆</span>
+    <p class="step-single-text">
+      Presiona y <strong>mantén presionado el botón de encendido</strong> durante 2 a 3 segundos, hasta que el panel de control se ilumine. La torre mostrará la pantalla principal lista para usar.<br><br>
+      El botón de encendido está ubicado en el panel central de la torre, entre la lavadora (abajo) y la secadora (arriba).
+    </p>
+  </div>
+</div>
+
+<!-- PASO 2: LAVADORA -->
+<div class="section" id="lavadora">
+  <div class="section-header">
+    <div class="section-num">2</div>
+    <h2 class="section-title">Lavadora — Configuración y Uso</h2>
+  </div>
+  <p class="section-subtitle">La lavadora es el módulo inferior de la torre</p>
+  <div class="divider"></div>
+  <div class="steps">
+
+    <div class="step">
+      <div class="step-letter"><span>A</span></div>
+      <div>
+        <div class="step-title">Cargar la colada</div>
+        <p class="step-body">
+          Abre la puerta de la lavadora (módulo de abajo) y carga tu ropa.
+          <strong>No sobrecargues</strong> — llena hasta ¾ de capacidad para un lavado óptimo. Si metes demasiada ropa, el centrifugado no funcionará bien y la ropa saldrá húmeda.
+        </p>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-letter"><span>B</span></div>
+      <div>
+        <div class="step-title">Añadir detergente HE</div>
+        <p class="step-body">
+          Jala el cajón de detergente (parte superior izquierda de la lavadora) hacia afuera. Vierte el detergente HE en el compartimento principal (el más grande). La cantidad recomendada está marcada dentro del cajón. Vuelve a cerrar el cajón.
+          <strong>No uses más de lo indicado</strong> — produce exceso de espuma.
+        </p>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-letter"><span>C</span></div>
+      <div>
+        <div class="step-title">Seleccionar ciclo</div>
+        <p class="step-body">
+          Gira la perilla del panel para seleccionar el ciclo adecuado:
+          <ul>
+            <li><strong>Normal</strong> — para ropa de uso diario (playeras, pantalones, ropa casual)</li>
+            <li><strong>Delicado</strong> — para ropa fina, lencería o telas sensibles</li>
+            <li><strong>Ropa de cama</strong> — para sábanas, fundas y toallas</li>
+            <li><strong>Colores</strong> — para ropa de colores que pueda desteñir</li>
+          </ul>
+        </p>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-letter"><span>D</span></div>
+      <div>
+        <div class="step-title">Iniciar la lavadora</div>
+        <p class="step-body">
+          Presiona el botón <strong>Start / Pause (▶‖)</strong> para comenzar el ciclo. La puerta se bloqueará automáticamente durante el lavado por seguridad. No intentes abrirla a la fuerza mientras está en operación.<br><br>
+          <strong>Duración típica:</strong> 45–60 minutos en ciclo Normal. La pantalla mostrará el tiempo restante.
+        </p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- PASO 3: SECADORA -->
+<div class="section" id="secadora">
+  <div class="section-header">
+    <div class="section-num">3</div>
+    <h2 class="section-title">Secadora — Configuración y Uso</h2>
+  </div>
+  <p class="section-subtitle">La secadora es el módulo superior de la torre</p>
+  <div class="divider"></div>
+  <div class="steps">
+
+    <div class="step">
+      <div class="step-letter"><span>A</span></div>
+      <div>
+        <div class="step-title">
+          Limpiar el filtro de pelusas
+          <span class="warn"> — obligatorio antes de cada uso</span>
+        </div>
+        <p class="step-body">
+          Abre la puerta de la secadora (módulo de arriba). El filtro de pelusas está ubicado <strong>en el interior de la puerta</strong>. Tómalo, retira las pelusas acumuladas con la mano o un trapo, y vuelve a insertarlo completamente.<br><br>
+          <strong>Un filtro obstruido puede causar sobrecalentamiento y apagado automático.</strong> Limpiarlo es el paso más importante antes de usar la secadora.
+        </p>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-letter"><span>B</span></div>
+      <div>
+        <div class="step-title">Seleccionar ciclo</div>
+        <p class="step-body">
+          Gira la perilla del panel de la secadora para elegir el ciclo correcto:
+          <ul>
+            <li><strong>Normal / Algodón</strong> — para ropa de algodón de uso diario</li>
+            <li><strong>Ropa de cama</strong> — para sábanas, fundas de almohada y edredones</li>
+            <li><strong>Delicado / Baja temperatura</strong> — para ropa fina o telas sintéticas</li>
+            <li><strong>Rápido (30 min)</strong> — para prendas ligeramente húmedas</li>
+          </ul>
+        </p>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-letter"><span>C</span></div>
+      <div>
+        <div class="step-title">Iniciar la secadora</div>
+        <p class="step-body">
+          Transfiere la ropa de la lavadora directamente a la secadora. No la dejes húmeda por más de 30 minutos o puede desarrollar olor.<br><br>
+          Presiona <strong>Start / Pause (▶‖)</strong> para iniciar. La pantalla mostrará el tiempo restante.<br><br>
+          <strong>Duración típica:</strong> 50–70 minutos dependiendo del ciclo y la cantidad de ropa.
+        </p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- TIPS -->
+<div class="tips-section">
+  <div class="tip-card">
+    <div class="tip-title">¿Necesitas ayuda?</div>
+    <p class="tip-body">Cecilia puede encargarse de la lavandería por ti. Avísale con anticipación para coordinar el servicio durante tu estancia.</p>
+  </div>
+  <div class="tip-card">
+    <div class="tip-title">Toallas y sábanas</div>
+    <p class="tip-body">Para solicitar cambio de toallas o sábanas sin lavarlas tú mismo, colócalas en el suelo del baño o comunícate con el equipo de Villa Sera.</p>
+  </div>
+  <div class="tip-card">
+    <div class="tip-title">Detergente disponible</div>
+    <p class="tip-body">Hay detergente HE en el estante superior del cuarto de lavandería. Si se termina, contacta a Marlon para reabastecerlo.</p>
+  </div>
+  <div class="tip-card">
+    <div class="tip-title">Ropa delicada</div>
+    <p class="tip-body">Para prendas muy delicadas (seda, lana, bordados), recomendamos lavarlas a mano en el fregadero del cuarto de servicio.</p>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+  <div class="footer-brand">Villa <span>Sera</span> · Los Cabos</div>
+  <a href="javascript:history.back()" class="back-btn">← Volver a la guía</a>
+</div>
+
+</body>
+</html>

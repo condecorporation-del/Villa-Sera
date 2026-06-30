@@ -1,0 +1,1590 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Villa Sera · Guía del huésped 2026 · Español</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ─────────────────────────────────────────
+   DESIGN SYSTEM — Villa Sera 2026
+───────────────────────────────────────── */
+:root {
+  --ink:#1a1a1a;
+  --ink-soft:#3d3d3d;
+  --muted:#666666;
+  --line:#e8e8e8;
+  --line-soft:#f0f0f0;
+  --surface:#ffffff;
+  --surface-soft:#fafafa;
+  --surface-muted:#f5f5f4;
+  --accent:#2a2a2a;
+  --radius:6px;
+  --radius-lg:10px;
+  --shadow:0 1px 2px rgba(0,0,0,0.04), 0 12px 32px rgba(0,0,0,0.05);
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family:'Jost',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  background:#e9e9e7; color:var(--ink); font-size:10.5px; line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3,h4 { font-family:'Cormorant Garamond',Georgia,serif; line-height:1.15; color:var(--ink); }
+img { display:block; max-width:100%; }
+
+.page {
+  width:210mm; min-height:297mm;
+  background:var(--surface);
+  margin:0 auto 16px;
+  position:relative; overflow:hidden;
+  display:flex; flex-direction:column;
+  border:1px solid var(--line);
+  border-radius:2px;
+  box-shadow:var(--shadow);
+}
+
+@media print {
+  * { -webkit-print-color-adjust:exact!important; print-color-adjust:exact!important; }
+  body { background:white; }
+  .page { margin:0; page-break-after:always; page-break-inside:avoid; min-height:297mm; height:297mm; }
+  .page:last-child { page-break-after:avoid; }
+  .notice-box, .notice-box.critical, .photo-box, .card-dark, .wifi-card { page-break-inside:avoid; }
+}
+@page { size:A4; margin:0; }
+
+/* CHROME */
+.top-bar {
+  height:3px; flex-shrink:0;
+  background:linear-gradient(90deg, transparent, var(--accent) 15%, var(--accent) 85%, transparent);
+  opacity:0.35;
+}
+.top-bar-thin { height:1px; background:var(--line); flex-shrink:0; }
+
+.page-footer {
+  min-height:8mm; background:var(--surface-soft);
+  border-top:1px solid var(--line);
+  display:flex; align-items:center; justify-content:space-between;
+  padding:2.5mm 12mm; flex-shrink:0; margin-top:auto;
+}
+.page-footer span { font-size:7px; letter-spacing:0.28em; text-transform:uppercase; color:var(--muted); }
+.page-footer .pgn {
+  font-family:'Cormorant Garamond',serif; font-size:15px; font-weight:500;
+  color:var(--ink-soft); letter-spacing:0.02em;
+}
+
+/* ─────────────────────────────────────────
+   TYPOGRAPHY
+───────────────────────────────────────── */
+.eyebrow {
+  font-family:'Jost',sans-serif;
+  font-size:7px; font-weight:600;
+  letter-spacing:0.38em; text-transform:uppercase;
+  color:var(--muted); margin-bottom:4px;
+}
+.eyebrow-inv { color:var(--muted); }
+.section-title {
+  font-family:'Cormorant Garamond',serif; font-size:28px; font-weight:500;
+  color:var(--ink); margin-bottom:6px; letter-spacing:-0.01em;
+}
+.section-title-inv { color:var(--ink); }
+.section-rule {
+  width:32px; height:2px;
+  background:linear-gradient(90deg, var(--accent), transparent);
+  margin-bottom:8px; border-radius:1px;
+}
+.section-rule-inv { background:var(--line); opacity:1; }
+.caption { font-size:8.5px; color:var(--muted); line-height:1.45; margin-top:2mm; font-style:italic; }
+.section-head { margin-bottom:1mm; }
+
+/* ─────────────────────────────────────────
+   LAYOUT
+───────────────────────────────────────── */
+.pb { flex:1; padding:10mm 12mm 8mm; display:flex; flex-direction:column; gap:6mm; }
+.pb-tight { gap:4mm; }
+.col2 { display:grid; grid-template-columns:1fr 1fr; gap:5mm; }
+.col3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:4mm; }
+.col4 { display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:3mm; }
+
+/* ─────────────────────────────────────────
+   PHOTO BLOCKS
+───────────────────────────────────────── */
+/* Full-width hero photo */
+.photo-hero {
+  width:100%; height:80mm;
+  object-fit:cover; object-position:center;
+  display:block;
+  flex-shrink:0;
+}
+/* Half-page photo */
+.photo-half {
+  width:100%; height:55mm;
+  object-fit:cover; object-position:center;
+  border-radius:var(--radius); display:block;
+  border:1px solid var(--line);
+}
+/* Third photo */
+.photo-third {
+  width:100%; height:42mm;
+  object-fit:cover; object-position:center;
+  border-radius:3px; display:block;
+}
+/* Quarter photo */
+.photo-quarter {
+  width:100%; height:32mm;
+  object-fit:cover; object-position:center;
+  border-radius:3px; display:block;
+}
+/* Tall sidebar photo */
+.photo-tall {
+  width:100%; height:100%;
+  object-fit:cover; object-position:center;
+  display:block;
+}
+/* Photo placeholder — replace src with your image URL */
+.photo-placeholder {
+  background:#f0f0f0;
+  border:2px dashed #ccc;
+  display:flex; align-items:center; justify-content:center;
+  border-radius:3px; flex-shrink:0;
+}
+.photo-placeholder span {
+  font-size:9px; color:#bbb; letter-spacing:0.15em;
+  text-transform:uppercase; text-align:center; line-height:1.6;
+}
+
+/* ─────────────────────────────────────────
+   STEPS
+───────────────────────────────────────── */
+.steps { display:flex; flex-direction:column; gap:3mm; }
+.step { display:flex; align-items:flex-start; gap:3.5mm; }
+.step-n {
+  width:20px; height:20px; border-radius:50%;
+  background:var(--surface); color:var(--accent);
+  border:1.5px solid var(--accent);
+  font-family:'Cormorant Garamond',serif; font-size:11px; font-weight:500;
+  display:flex; align-items:center; justify-content:center;
+  flex-shrink:0; margin-top:1px;
+}
+.step-n-sm {
+  width:16px; height:16px;
+  font-size:9px;
+}
+.step-n-inv { background:rgba(255,255,255,0.12); color:#fff; }
+.step-title { font-weight:600; font-size:10px; color:#111; margin-bottom:1px; }
+.step-title-inv { color:#fff; }
+.step-body { font-size:9.5px; color:#555; line-height:1.5; }
+.step-body-inv { color:rgba(255,255,255,0.65); }
+
+/* Sonos — QR descarga app */
+.sonos-qr-row {
+  display:flex; gap:5mm; margin-top:3mm; flex-wrap:wrap; align-items:flex-start;
+}
+.sonos-qr-item {
+  text-align:center; flex:1; min-width:26mm; max-width:42mm;
+}
+.sonos-qr-item img {
+  width:28mm; height:28mm; display:block; margin:0 auto 2mm;
+  object-fit:contain; border:1px solid #e8e8e8; border-radius:4px;
+}
+.sonos-qr-label {
+  font-size:7.5px; letter-spacing:0.18em; text-transform:uppercase;
+  color:#666; font-weight:600; line-height:1.35;
+}
+
+/* ─────────────────────────────────────────
+   BULLETS
+───────────────────────────────────────── */
+.blist { display:flex; flex-direction:column; gap:2.5mm; }
+.bi { display:flex; align-items:flex-start; gap:3mm; font-size:9.5px; color:#444; line-height:1.5; }
+.bi::before { content:''; width:4px; height:4px; border-radius:50%; background:var(--muted); flex-shrink:0; margin-top:5px; }
+.bi-inv { color:rgba(255,255,255,0.65); }
+.bi-inv::before { background:rgba(255,255,255,0.5); }
+
+/* ─────────────────────────────────────────
+   CARDS
+───────────────────────────────────────── */
+.card-dark, .card-feature {
+  background:var(--surface-muted); border:1px solid var(--line);
+  border-radius:var(--radius); padding:5mm 5.5mm; position:relative;
+}
+.card-light {
+  background:var(--surface-soft); border-radius:var(--radius);
+  padding:4.5mm 5mm; border:1px solid var(--line); border-left:3px solid var(--accent);
+}
+.card-outline {
+  background:var(--surface); border-radius:var(--radius);
+  padding:4.5mm 5mm; border:1px solid var(--line);
+}
+.card-stripe {
+  background:var(--surface-soft); border-radius:var(--radius);
+  padding:4.5mm 5mm; border:1px solid var(--line);
+  border-top:2px solid var(--accent);
+}
+
+.c-lbl { font-size:7.5px; letter-spacing:0.26em; text-transform:uppercase; color:var(--muted); margin-bottom:3px; font-weight:600; }
+.c-lbl-inv { color:var(--muted); }
+.c-val { font-family:'Cormorant Garamond',serif; font-size:20px; color:var(--ink); }
+.c-val-inv { font-family:'Cormorant Garamond',serif; font-size:17px; color:var(--ink); }
+.c-body { font-size:9.5px; color:var(--ink-soft); line-height:1.55; }
+.c-body-inv { font-size:9.5px; color:var(--ink-soft); line-height:1.55; }
+
+/* ─────────────────────────────────────────
+   INFO ROW
+───────────────────────────────────────── */
+.irow { display:flex; align-items:flex-start; gap:4mm; padding:3mm 0; border-bottom:1px solid #eee; }
+.irow:last-child { border-bottom:none; }
+.irow-dot { width:6px; height:6px; border-radius:50%; background:var(--line-strong, #d8d8d8); border:1px solid var(--muted); flex-shrink:0; margin-top:5px; }
+.irow-t { font-weight:600; font-size:10.5px; color:#111; margin-bottom:1px; }
+.irow-b { font-size:9.5px; color:#555; line-height:1.45; }
+
+/* ─────────────────────────────────────────
+   NOTE
+───────────────────────────────────────── */
+.note {
+  background:var(--surface-soft); border:1px solid var(--line);
+  border-left:3px solid var(--accent); border-radius:var(--radius);
+  padding:3.5mm 4mm; font-size:9.5px; color:var(--ink-soft); line-height:1.55;
+}
+.note b { color:var(--ink); }
+.note-dark { background:var(--surface-muted); border:1px solid var(--line); border-left:3px solid var(--accent); border-radius:var(--radius); padding:3.5mm 4mm; font-size:9.5px; color:var(--ink-soft); line-height:1.55; }
+.warning { background:var(--surface-soft); border:1px solid var(--line); border-left:3px solid var(--accent); border-radius:var(--radius); padding:3.5mm 4mm; font-size:9.5px; color:var(--ink-soft); line-height:1.55; }
+.warning b { color:var(--ink); }
+
+/* ─────────────────────────────────────────
+   AC MOCKUP
+───────────────────────────────────────── */
+.ac-mock {
+  background:var(--surface-soft); border-radius:var(--radius-lg);
+  padding:5mm 6mm; border:1px solid var(--line);
+}
+.ac-zone { font-size:7px; letter-spacing:0.28em; text-transform:uppercase; color:var(--muted); font-weight:600; }
+.ac-mode-pill {
+  display:inline-block; padding:2px 8px; border-radius:20px; font-size:7px; font-weight:600;
+  text-transform:uppercase; background:var(--surface); color:var(--ink-soft);
+  border:1px solid var(--line);
+}
+.ac-temp { font-family:'Cormorant Garamond',serif; font-size:56px; font-weight:400; color:var(--ink); line-height:1; margin:3mm 0 2mm; }
+.ac-temp sup { font-size:20px; vertical-align:super; color:var(--muted); font-weight:300; }
+.ac-btns { display:flex; gap:5px; margin-bottom:4mm; flex-wrap:wrap; }
+.ac-btn-on  { font-size:8px; padding:2px 8px; border-radius:4px; font-weight:600; background:var(--accent); color:#fff; }
+.ac-btn-off { font-size:8px; padding:2px 8px; border-radius:4px; font-weight:500; background:var(--surface); color:var(--muted); border:1px solid var(--line); }
+.ac-foot { display:flex; justify-content:space-between; align-items:center; padding-top:3mm; border-top:1px solid var(--line); }
+.ac-fan { font-size:8px; color:var(--muted); letter-spacing:0.1em; text-transform:uppercase; }
+.ac-arrows { display:flex; gap:4px; }
+.ac-arrow {
+  width:20px; height:20px; border-radius:50%; background:var(--surface);
+  border:1px solid var(--line); display:flex; align-items:center; justify-content:center;
+  font-size:10px; color:var(--muted);
+}
+.ac-covers { margin-top:3mm; padding-top:3mm; border-top:1px solid var(--line-soft); font-size:8.5px; color:var(--muted); line-height:1.5; }
+.ac-covers b { color:var(--ink-soft); }
+
+/* ─────────────────────────────────────────
+   REMOTE MOCKUP
+───────────────────────────────────────── */
+.remote { background:#1a1a1a; border-radius:10px; padding:4mm; border:1px solid rgba(255,255,255,0.04); display:flex; flex-direction:column; align-items:center; gap:3mm; }
+.r-screen { width:100%; background:#091409; border-radius:4px; padding:3mm; text-align:center; }
+.r-digits { font-family:'Jost',sans-serif; font-size:18px; font-weight:600; color:#4dff6e; letter-spacing:0.08em; }
+.r-mode-text { font-size:7.5px; color:rgba(77,255,110,0.4); letter-spacing:0.2em; margin-top:1px; }
+.r-grid { display:grid; grid-template-columns:1fr 1fr; gap:2mm; width:100%; }
+.r-btn { background:#252525; border-radius:3px; padding:2.5mm; text-align:center; font-size:8px; color:rgba(255,255,255,0.4); }
+.r-btn-full { grid-column:span 2; background:#162416; color:#4dff6e; }
+
+/* ─────────────────────────────────────────
+   WIFI BLOCK
+───────────────────────────────────────── */
+.wifi-card {
+  background:var(--surface-soft); border:1px solid var(--line);
+  border-radius:var(--radius-lg); padding:7mm 8mm; text-align:center;
+}
+.wifi-net { font-family:'Cormorant Garamond',serif; font-size:26px; color:var(--ink); margin:5px 0; }
+.wifi-div { width:28px; height:1px; background:var(--line); margin:8px auto; }
+.wifi-pw { font-family:'Jost',sans-serif; font-size:24px; font-weight:600; color:var(--ink); letter-spacing:0.05em; }
+
+/* ─────────────────────────────────────────
+   TABLE OF CONTENTS
+───────────────────────────────────────── */
+.toc-item { display:flex; align-items:center; padding:3.5mm 0; border-bottom:1px solid #eee; }
+.toc-item:last-child { border-bottom:none; }
+.toc-num { font-family:'Cormorant Garamond',serif; font-size:28px; font-weight:400; color:#d4d4d4; width:14mm; flex-shrink:0; line-height:1; }
+.toc-info { flex:1; }
+.toc-cat { font-size:7px; letter-spacing:0.35em; text-transform:uppercase; color:#aaa; font-weight:600; margin-bottom:2px; }
+.toc-title { font-family:'Cormorant Garamond',serif; font-size:15px; color:#111; }
+.toc-dots { flex:1; border-bottom:1px dotted #ddd; margin:0 5mm; position:relative; top:-2px; }
+.toc-pg { font-family:'Cormorant Garamond',serif; font-size:18px; color:#ccc; }
+
+/* ─────────────────────────────────────────
+   RULE ITEMS (for house rules)
+───────────────────────────────────────── */
+.rule-item {
+  display:flex; align-items:flex-start; gap:3.5mm;
+  background:var(--surface-soft); border:1px solid var(--line);
+  border-radius:var(--radius); padding:3mm 3.5mm;
+}
+.rule-dot {
+  width:14px; height:14px; border-radius:50%;
+  background:var(--surface); border:1.5px solid var(--accent);
+  flex-shrink:0; display:flex; align-items:center; justify-content:center; margin-top:1px;
+}
+.rule-dot::after { content:''; width:5px; height:1px; background:var(--accent); }
+.rule-t { font-size:9.5px; color:#333; line-height:1.45; }
+
+/* ─────────────────────────────────────────
+   EMERGENCY CARD
+───────────────────────────────────────── */
+.em {
+  background:var(--surface-soft); border:1px solid var(--line);
+  border-radius:var(--radius); padding:4.5mm 5mm;
+}
+.em-lbl { font-size:7.5px; letter-spacing:0.2em; text-transform:uppercase; color:var(--muted); margin-bottom:4px; font-weight:600; }
+.em-num { font-family:'Cormorant Garamond',serif; font-size:22px; color:var(--ink); margin-bottom:2px; }
+.em-note { font-size:9px; color:var(--muted); line-height:1.45; }
+
+/* ─────────────────────────────────────────
+   RESTAURANT CARD
+───────────────────────────────────────── */
+.rcard { display:flex; gap:3.5mm; padding:3mm 0; border-bottom:1px solid #eee; }
+.rcard:last-child { border-bottom:none; }
+.rcard-n { font-family:'Cormorant Garamond',serif; font-size:14px; color:#111; margin-bottom:2px; }
+.rcard-d { font-size:9px; color:#666; line-height:1.4; margin-bottom:2px; }
+.rcard-t { font-size:8px; color:#111; font-weight:600; }
+
+/* ─────────────────────────────────────────
+   SERVICE CARD
+───────────────────────────────────────── */
+.svc {
+  background:var(--surface); border:1px solid var(--line);
+  border-radius:var(--radius); padding:4mm;
+  border-top:2px solid var(--accent);
+  transition:box-shadow 0.15s ease;
+}
+.svc-n { font-family:'Cormorant Garamond',serif; font-size:14px; color:#111; margin-bottom:2px; }
+.svc-b { font-size:9px; color:#555; line-height:1.45; margin-bottom:4px; }
+.svc-cta { font-size:8.5px; color:#111; font-weight:600; }
+
+/* ─────────────────────────────────────────
+   CHAPTER HEADER (dark full-width)
+───────────────────────────────────────── */
+.chapter-header {
+  background:#111; padding:8mm 12mm; flex-shrink:0; position:relative; overflow:hidden;
+}
+.chapter-header::after {
+  content:''; position:absolute; bottom:0; left:0; right:0;
+  height:1px; background:linear-gradient(90deg,transparent,rgba(255,255,255,0.1),transparent);
+}
+.ch-num { font-family:'Cormorant Garamond',serif; font-size:50px; font-weight:300; color:rgba(255,255,255,0.07); position:absolute; top:2mm; right:10mm; line-height:1; }
+
+/* ─────────────────────────────────────────
+   TEMP GUIDE
+───────────────────────────────────────── */
+.tc { background:#f4f4f4; border-radius:3px; padding:3.5mm; text-align:center; border-top:2px solid #111; }
+.tc-l { font-size:8px; font-weight:600; text-transform:uppercase; letter-spacing:0.1em; color:#555; margin-bottom:2px; }
+.tc-r { font-family:'Cormorant Garamond',serif; font-size:14px; color:#111; margin-bottom:2px; }
+.tc-u { font-size:8.5px; color:#888; }
+
+/* ─────────────────────────────────────────
+   TEAM CARD
+───────────────────────────────────────── */
+.team {
+  background:var(--surface); border:1px solid var(--line);
+  border-radius:var(--radius); padding:5mm; text-align:center;
+}
+.team-av {
+  width:42px; height:42px; border-radius:50%;
+  background:var(--surface-muted); border:1.5px solid var(--accent);
+  margin:0 auto 5px; display:flex; align-items:center; justify-content:center;
+  font-family:'Cormorant Garamond',serif; font-size:15px; color:var(--ink);
+}
+.team-n { font-weight:600; font-size:11px; color:#111; margin-bottom:2px; }
+.team-r { font-size:8px; letter-spacing:0.15em; text-transform:uppercase; color:#888; margin-bottom:5px; }
+.team-b { font-size:9px; color:#555; line-height:1.45; margin-bottom:4px; }
+.team-w { font-size:9.5px; color:#111; font-weight:600; }
+
+/* ─────────────────────────────────────────
+   CHECKOUT STEP
+───────────────────────────────────────── */
+.co { text-align:center; }
+.co-n {
+  width:26px; height:26px; border-radius:50%;
+  background:var(--surface); color:var(--accent);
+  border:1.5px solid var(--accent);
+  font-family:'Cormorant Garamond',serif; font-size:12px; font-weight:500;
+  display:flex; align-items:center; justify-content:center; margin:0 auto 3px;
+}
+.co-l { font-size:8.5px; color:#444; line-height:1.35; }
+
+/* ─────────────────────────────────────────
+   COVER (print-first, text only + figuras geométricas)
+───────────────────────────────────────── */
+.cover-page { background:#fff!important; }
+.cover-top-strip {
+  height:11mm; background:var(--surface-soft); flex-shrink:0;
+  border-bottom:1px solid var(--line);
+  display:flex; align-items:center; justify-content:space-between;
+  padding:0 14mm; position:relative;
+}
+.cover-top-strip span {
+  font-size:8.5px; letter-spacing:0.36em; text-transform:uppercase;
+  color:var(--muted); font-weight:600;
+}
+.cover-main {
+  flex:1; position:relative; overflow:hidden;
+  display:flex; align-items:center; justify-content:center;
+  min-height:0; padding:0 11mm;
+}
+/* Anillo y figuras de fondo (solo bordes, sin imágenes) */
+.cover-deco-ring {
+  position:absolute; width:min(195mm, 92vw); height:min(195mm, 92vw);
+  border:1px solid #e5e5e5; border-radius:50%;
+  top:50%; left:50%; transform:translate(-50%, -48%);
+  pointer-events:none; z-index:0;
+}
+.cover-deco-ring::before {
+  content:''; position:absolute; inset:12mm; border:1px dashed #ececec;
+  border-radius:50%;
+}
+.cover-deco-corner {
+  position:absolute; width:22mm; height:22mm; z-index:0; pointer-events:none;
+  border-color:var(--line); border-style:solid; opacity:0.9;
+}
+.cover-deco-tl { top:9mm; left:9mm; border-width:2px 0 0 2px; }
+.cover-deco-tr { top:9mm; right:9mm; border-width:2px 2px 0 0; }
+.cover-deco-bl { bottom:9mm; left:9mm; border-width:0 0 2px 2px; }
+.cover-deco-br { bottom:9mm; right:9mm; border-width:0 2px 2px 0; }
+.cover-deco-dots {
+  position:absolute; bottom:18mm; right:16mm; z-index:0;
+  display:flex; gap:5px; pointer-events:none;
+}
+.cover-deco-dots span {
+  width:6px; height:6px; background:#111; border-radius:1px;
+  opacity:0.2;
+}
+.cover-deco-dots span:nth-child(2) { opacity:0.45; transform:rotate(45deg); }
+.cover-deco-dots span:nth-child(3) { opacity:0.3; border-radius:50%; background:transparent; border:2px solid #111; }
+.cover-body {
+  position:relative; z-index:1;
+  width:100%; max-width:168mm;
+  display:flex; flex-direction:column; justify-content:center;
+  padding:8mm 4mm 10mm 10mm;
+  border-left:3px solid var(--accent);
+}
+.cover-eyebrow {
+  font-size:11.5px; letter-spacing:0.48em; text-transform:uppercase;
+  color:#666; font-weight:600; margin-bottom:8mm;
+}
+.cover-title {
+  font-family:'Cormorant Garamond',serif; font-size:92px; font-weight:400;
+  line-height:0.9; color:#111; margin-bottom:6mm; letter-spacing:-0.02em;
+}
+.cover-tagline {
+  font-family:'Cormorant Garamond',serif; font-size:24px; font-style:italic;
+  font-weight:400; color:#444; margin-bottom:8mm; max-width:92%;
+  line-height:1.35;
+}
+.cover-rule-wrap { display:flex; align-items:center; gap:10px; margin-bottom:10mm; }
+.cover-rule { width:48px; height:2px; background:var(--accent); }
+.cover-rule-wrap::after {
+  content:''; flex:1; max-width:45mm; height:1px; background:linear-gradient(90deg, #ddd, transparent);
+}
+.cover-stats {
+  display:grid; grid-template-columns:repeat(4, 1fr); gap:5mm 6mm;
+  margin-top:1mm; padding:7mm 0 0; border-top:1px solid #e0e0e0;
+  position:relative;
+}
+.cover-stats::before {
+  content:''; position:absolute; top:-1px; left:0; width:10mm; height:2px; background:var(--accent);
+}
+.cover-stat-lbl {
+  font-size:9.5px; letter-spacing:0.24em; text-transform:uppercase;
+  color:#777; margin-bottom:4px; font-weight:600;
+}
+.cover-stat-val {
+  font-family:'Cormorant Garamond',serif; font-size:30px; color:#111;
+  line-height:1.1;
+}
+.cover-footer {
+  border-top:1px solid var(--line); padding:10mm 14mm 12mm; margin-top:auto;
+  display:flex; justify-content:space-between; align-items:flex-end; flex-shrink:0;
+  position:relative; background:var(--surface-soft);
+}
+.cover-footer-meta {
+  font-size:10.5px; letter-spacing:0.18em; color:#444; text-transform:uppercase;
+  font-weight:500;
+}
+.cover-footer-right { text-align:right; }
+.cover-footer-phone-lbl {
+  font-size:9.5px; letter-spacing:0.22em; text-transform:uppercase;
+  color:#666; margin-bottom:4px; font-weight:600;
+}
+.cover-footer-phone {
+  font-family:'Cormorant Garamond',serif; font-size:26px; color:#111;
+}
+.cover-heart {
+  font-family:'Cormorant Garamond',serif; font-size:12px; font-style:italic; font-weight:400;
+  color:#5a5349; margin-top:5mm; padding-top:4mm; border-top:1px solid #e5e0d8;
+  max-width:96%; line-height:1.5;
+}
+.section-kicker {
+  font-family:'Cormorant Garamond',serif; font-size:11px; font-style:italic; color:#666;
+  margin-top:-2mm; margin-bottom:3mm; line-height:1.45;
+}
+
+/* ─────────────────────────────────────────
+   NOTICE BOXES & PHOTO PLACEHOLDERS
+───────────────────────────────────────── */
+.notice-box {
+  border-radius:3px; padding:3.5mm 4mm;
+  font-size:9.5px; color:#444; line-height:1.55;
+  border-left:2px solid #ccc; background:#fafafa;
+}
+.notice-box b { color:#111; }
+.notice-box.critical {
+  background:var(--surface-muted); border:1px solid var(--line);
+  border-left:3px solid var(--accent); color:var(--ink-soft);
+}
+.notice-box.critical b { color:var(--ink); }
+.photo-box {
+  background:var(--surface-soft); border:1px dashed var(--line-strong, #ddd);
+  border-radius:var(--radius);
+  min-height:42mm; display:flex; align-items:center; justify-content:center;
+  text-align:center; padding:5mm;
+}
+.photo-box span {
+  font-size:8px; letter-spacing:0.22em; text-transform:uppercase;
+  color:#999; font-weight:600; line-height:1.6; max-width:90%;
+}
+.photo-box-sm { min-height:32mm; }
+.photo-box-lg { min-height:55mm; }
+.glance-grid { display:grid; grid-template-columns:1fr 1fr; gap:3mm; }
+.glance-item {
+  background:var(--surface-soft); border-radius:var(--radius);
+  padding:3mm 3.5mm; border:1px solid var(--line);
+}
+.glance-lbl { font-size:7px; letter-spacing:0.28em; text-transform:uppercase; color:#888; font-weight:600; margin-bottom:2px; }
+.glance-val { font-size:9.5px; color:#333; line-height:1.45; }
+@media print {
+  .cover-deco-ring, .cover-deco-corner, .cover-deco-dots { -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  .cover-stats { grid-template-columns:repeat(4, 1fr)!important; }
+}
+/* ═══════════════════════════════════════════════════
+   VILLA SERA · SCREEN DESIGN — White + Gold
+   ═══════════════════════════════════════════════════ */
+@media screen {
+  body {
+    background: #F5F3EF !important;
+    font-family: 'Inter', system-ui, sans-serif !important;
+    font-size: 17px !important;
+    font-weight: 400 !important;
+    line-height: 1.85 !important;
+    color: #1A1A1A !important;
+    padding: 40px 16px 100px !important;
+    -webkit-font-smoothing: antialiased !important;
+  }
+  .page {
+    width: 100% !important;
+    max-width: 880px !important;
+    min-height: unset !important;
+    height: auto !important;
+    overflow: visible !important;
+    margin: 0 auto 24px !important;
+    background: #FFFFFF !important;
+    border: 1px solid #E5DDD0 !important;
+    border-radius: 4px !important;
+    box-shadow: 0 2px 20px rgba(0,0,0,0.07) !important;
+  }
+  .pb { padding: 52px 60px 48px !important; gap: 32px !important; display: flex !important; flex-direction: column !important; }
+  .top-bar {
+    height: 4px !important;
+    background: linear-gradient(90deg, transparent, #C9A84C 15%, #C9A84C 85%, transparent) !important;
+    border-radius: 4px 4px 0 0 !important;
+    flex-shrink: 0 !important;
+  }
+  .top-bar-thin { height: 1px !important; background: #E5DDD0 !important; }
+
+  /* EYEBROWS */
+  .eyebrow {
+    font-size: 10px !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.32em !important;
+    text-transform: uppercase !important;
+    color: #C9A84C !important;
+    margin-bottom: 12px !important;
+  }
+
+  /* HEADINGS */
+  .section-title {
+    font-family: 'Cormorant Garamond', Georgia, serif !important;
+    font-size: 54px !important;
+    font-weight: 500 !important;
+    color: #111111 !important;
+    line-height: 1.0 !important;
+    letter-spacing: -0.01em !important;
+  }
+  .section-kicker {
+    font-size: 16px !important;
+    color: #555555 !important;
+    line-height: 1.65 !important;
+    font-weight: 400 !important;
+    margin-top: 10px !important;
+  }
+  .caption { font-size: 13px !important; color: #888888 !important; line-height: 1.6 !important; }
+
+  /* STEPS */
+  .steps { gap: 0 !important; }
+  .step {
+    padding: 18px 0 !important;
+    border-bottom: 1px solid #EEE8E0 !important;
+    display: grid !important;
+    grid-template-columns: 44px 1fr !important;
+    gap: 16px !important;
+    align-items: start !important;
+  }
+  .step:last-child { border-bottom: none !important; }
+  .step-n {
+    width: 36px !important; height: 36px !important;
+    font-family: 'Cormorant Garamond', serif !important;
+    font-size: 18px !important;
+    background: #111111 !important;
+    color: #C9A84C !important;
+    border-radius: 50% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-shrink: 0 !important;
+  }
+  .step-title { font-size: 16px !important; font-weight: 600 !important; color: #111111 !important; margin-bottom: 5px !important; line-height: 1.4 !important; }
+  .step-body { font-size: 15px !important; line-height: 1.85 !important; color: #444444 !important; font-weight: 400 !important; }
+  .step-body b, .step-body strong { color: #111111 !important; font-weight: 600 !important; }
+
+  /* ITEM ROWS */
+  .irow { padding: 18px 0 !important; border-bottom: 1px solid #EEE8E0 !important; }
+  .irow-t { font-size: 16px !important; font-weight: 600 !important; color: #111111 !important; margin-bottom: 5px !important; line-height: 1.4 !important; }
+  .irow-b { font-size: 15px !important; line-height: 1.85 !important; color: #444444 !important; font-weight: 400 !important; }
+  .irow-b b, .irow-b strong { color: #111111 !important; font-weight: 600 !important; }
+
+  /* NOTES */
+  .note {
+    font-size: 15px !important; line-height: 1.8 !important;
+    padding: 18px 22px !important;
+    color: #333333 !important;
+    background: #FDFAF4 !important;
+    border: 1px solid #E5D9B8 !important;
+    border-left: 4px solid #C9A84C !important;
+    border-radius: 0 4px 4px 0 !important;
+  }
+  .note b, .note strong { color: #111111 !important; font-weight: 600 !important; }
+  .notice-box {
+    font-size: 15px !important; line-height: 1.8 !important;
+    padding: 18px 22px !important;
+    color: #333333 !important;
+    background: #FDFAF4 !important;
+    border: 1px solid #E5D9B8 !important;
+    border-left: 4px solid #C9A84C !important;
+    border-radius: 0 4px 4px 0 !important;
+  }
+  .notice-box b, .notice-box strong { color: #111111 !important; font-weight: 600 !important; }
+  .notice-box.critical {
+    background: #FEF5F4 !important;
+    border-color: #F5C6C0 !important;
+    border-left-color: #C0392B !important;
+    color: #4A1A16 !important;
+  }
+
+  /* CARDS — always light, never dark */
+  .card-light { background: #FAF7F2 !important; border: 1px solid #E5DDD0 !important; border-radius: 4px !important; padding: 22px 26px !important; }
+  .card-dark  { background: #F5F0E8 !important; border: 1px solid #DDD0BB !important; border-left: 4px solid #C9A84C !important; border-radius: 0 4px 4px 0 !important; padding: 22px 26px !important; }
+  .card-outline { background: transparent !important; border: 1px solid #DDD0BB !important; border-radius: 4px !important; padding: 22px 26px !important; }
+  .c-lbl { font-size: 10px !important; letter-spacing: 0.26em !important; text-transform: uppercase !important; color: #C9A84C !important; font-weight: 600 !important; margin-bottom: 5px !important; }
+  .c-body { font-size: 15px !important; line-height: 1.75 !important; color: #444444 !important; font-weight: 400 !important; }
+  .c-body b, .c-body strong { color: #111111 !important; font-weight: 600 !important; }
+  .c-val { font-size: 16px !important; color: #111111 !important; font-weight: 600 !important; }
+  .c-val-inv { font-size: 16px !important; color: #111111 !important; font-weight: 600 !important; }
+
+  /* WIFI */
+  .wifi-card { background: #FAF7F2 !important; border: 1px solid #E5DDD0 !important; border-radius: 4px !important; }
+  .wifi-net { font-family: 'Cormorant Garamond', serif !important; font-size: 34px !important; font-weight: 500 !important; color: #111111 !important; }
+  .wifi-div { background: #DDD0BB !important; }
+  .wifi-pw { font-family: 'Cormorant Garamond', serif !important; font-size: 44px !important; font-weight: 600 !important; color: #C9A84C !important; letter-spacing: 0.04em !important; }
+
+  /* TABLE OF CONTENTS */
+  .toc-item { padding: 13px 0 !important; border-bottom: 1px solid #EEE8E0 !important; }
+  .toc-num { font-family: 'Cormorant Garamond', serif !important; font-size: 34px !important; font-weight: 400 !important; color: #D4B87A !important; width: 20mm !important; line-height: 1 !important; flex-shrink: 0 !important; }
+  .toc-cat { font-size: 10px !important; letter-spacing: 0.26em !important; text-transform: uppercase !important; color: #C9A84C !important; margin-bottom: 3px !important; font-weight: 600 !important; }
+  .toc-title { font-size: 17px !important; font-weight: 600 !important; color: #111111 !important; line-height: 1.3 !important; }
+  .toc-pg { font-family: 'Cormorant Garamond', serif !important; font-size: 34px !important; font-weight: 400 !important; color: #D4B87A !important; line-height: 1 !important; text-align: right !important; flex-shrink: 0 !important; }
+  .toc-dots { display: none !important; }
+  .toc-sub { font-size: 14px !important; color: #777777 !important; padding-left: 20mm !important; padding-bottom: 4px !important; line-height: 1.7 !important; }
+
+  /* PAGE FOOTER */
+  .page-footer { padding: 16px 60px !important; border-top: 1px solid #EEE8E0 !important; background: #FAF8F5 !important; border-radius: 0 0 4px 4px !important; }
+  .page-footer span { font-size: 11px !important; color: #999999 !important; letter-spacing: 0.12em !important; }
+  .page-footer .pgn { font-family: 'Cormorant Garamond', serif !important; font-size: 30px !important; font-weight: 400 !important; color: #C9A84C !important; }
+
+  /* PHOTOS */
+  .photo-hero { height: 280px !important; border-radius: 4px !important; }
+  .photo-half { height: 220px !important; border-radius: 4px !important; }
+  .photo-third { height: 180px !important; border-radius: 4px !important; }
+  .photo-box { border-radius: 4px !important; overflow: hidden !important; }
+
+  /* LAYOUT */
+  .col2 { gap: 28px !important; }
+  .col3 { gap: 20px !important; }
+
+  /* GLANCE */
+  .glance-item { background: #FAF7F2 !important; border: 1px solid #E5DDD0 !important; border-radius: 4px !important; }
+  .glance-lbl { font-size: 9px !important; letter-spacing: 0.25em !important; color: #C9A84C !important; font-weight: 600 !important; }
+  .glance-val { font-size: 13px !important; color: #333333 !important; }
+
+  /* COVER */
+  .cover-page { background: #FFFFFF !important; }
+  .cover-top-strip { background: #FAF8F5 !important; border-bottom-color: #EEE8E0 !important; }
+  .cover-top-strip span { color: #999999 !important; font-size: 11px !important; letter-spacing: 0.28em !important; }
+  .cover-deco-ring { border-color: rgba(201,168,76,0.15) !important; }
+  .cover-deco-ring::before { border-color: rgba(201,168,76,0.08) !important; }
+  .cover-deco-corner { border-color: rgba(201,168,76,0.3) !important; }
+  .cover-deco-dots span { background: #C9A84C !important; opacity: 0.4 !important; }
+  .cover-body { border-left-color: #C9A84C !important; }
+  .cover-eyebrow { font-size: 11px !important; letter-spacing: 0.36em !important; color: #C9A84C !important; font-weight: 600 !important; }
+  .cover-title { font-family: 'Cormorant Garamond', Georgia, serif !important; color: #111111 !important; }
+  .cover-tagline { font-family: 'Cormorant Garamond', serif !important; font-size: 22px !important; font-style: italic !important; color: #555555 !important; font-weight: 400 !important; line-height: 1.5 !important; }
+  .cover-rule { background: #C9A84C !important; }
+  .cover-rule-wrap::after { background: linear-gradient(90deg, rgba(201,168,76,0.25), transparent) !important; }
+  .cover-stats { border-top-color: #EEE8E0 !important; }
+  .cover-stat-lbl { font-size: 10px !important; letter-spacing: 0.2em !important; color: #999999 !important; text-transform: uppercase !important; }
+  .cover-stat-val { font-family: 'Cormorant Garamond', serif !important; font-size: 26px !important; color: #111111 !important; font-weight: 500 !important; }
+  .cover-heart { font-size: 14px !important; color: #888888 !important; font-weight: 400 !important; font-style: italic !important; }
+  .cover-footer { background: #FAF8F5 !important; border-top-color: #EEE8E0 !important; }
+  .cover-footer-meta { color: #AAAAAA !important; font-size: 13px !important; }
+  .cover-footer-phone-lbl { color: #AAAAAA !important; letter-spacing: 0.2em !important; font-size: 10px !important; }
+  .cover-footer-phone { font-family: 'Cormorant Garamond', serif !important; font-size: 22px !important; color: #C9A84C !important; font-weight: 500 !important; }
+}
+@media screen and (max-width: 680px) {
+  .cover-stats { grid-template-columns: repeat(2, 1fr) !important; }
+  .cover-title { font-size: 72px !important; }
+  .pb { padding-left: 28px !important; padding-right: 28px !important; }
+  .page-footer { padding-left: 28px !important; padding-right: 28px !important; }
+}
+</style>
+</head>
+<body>
+
+
+<!-- ═══════════════════════════════════════════════
+  PÁGINA 1 · PORTADA (solo texto, optimizada para impresión)
+═══════════════════════════════════════════════ -->
+<div class="page cover-page">
+  <div class="cover-top-strip">
+    <span>A Sera Holding Property</span>
+    <span>Los Cabos · Baja California Sur · México</span>
+  </div>
+  <div class="cover-main">
+    <div class="cover-deco-ring" aria-hidden="true"></div>
+    <div class="cover-deco-corner cover-deco-tl" aria-hidden="true"></div>
+    <div class="cover-deco-corner cover-deco-tr" aria-hidden="true"></div>
+    <div class="cover-deco-corner cover-deco-bl" aria-hidden="true"></div>
+    <div class="cover-deco-corner cover-deco-br" aria-hidden="true"></div>
+    <div class="cover-deco-dots" aria-hidden="true"><span></span><span></span><span></span></div>
+    <div class="cover-body">
+      <div class="cover-eyebrow">Guía del huésped · 2026</div>
+      <div class="cover-title">Villa<br>Sera</div>
+      <p class="cover-tagline">Tu refugio frente al Mar de Cortés — pensado para descansar, celebrar y desconectar con quienes más quieres.</p>
+      <p style="font-size:9.5px;letter-spacing:0.2em;text-transform:uppercase;color:var(--muted);margin-bottom:6mm;">Casa 504 · Vía de Cañadas · Seguridad privada 24 hrs</p>
+      <div class="cover-rule-wrap" aria-hidden="true"><div class="cover-rule"></div></div>
+      <div class="cover-stats">
+        <div><div class="cover-stat-lbl">Check-in</div><div class="cover-stat-val">4:00 PM</div></div>
+        <div><div class="cover-stat-lbl">Check-out</div><div class="cover-stat-val">11:00 AM</div></div>
+        <div><div class="cover-stat-lbl">Máx. huéspedes</div><div class="cover-stat-val">8</div></div>
+        <div><div class="cover-stat-lbl">Habitaciones</div><div class="cover-stat-val">4 suites</div></div>
+      </div>
+      <p class="cover-heart">Con el cariño y la atención del equipo Villa Sera — Marlon y el equipo están disponibles para prioridades, coordinación y soporte durante tu estancia.</p>
+    </div>
+  </div>
+  <div class="cover-footer">
+    <div class="cover-footer-meta">villa-sera.com · @villasera</div>
+    <div class="cover-footer-right">
+      <div class="cover-footer-phone-lbl">House Manager</div>
+      <div class="cover-footer-phone">+52 624 217 5935</div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════
+  PÁGINA 2 · ÍNDICE
+═══════════════════════════════════════════════ -->
+<div class="page">
+  <div class="top-bar"></div>
+  <div class="pb">
+    <div>
+      <div class="eyebrow">Contenido</div>
+      <div class="section-title" style="font-size:32px;">Índice</div>
+      <div class="section-rule"></div>
+    </div>
+    <div>
+      <div class="toc-item"><div class="toc-num">00</div><div class="toc-info"><div class="toc-cat">Resumen</div><div class="toc-title">Dirección, accesos, estacionamiento y seguridad</div></div><div class="toc-dots"></div><div class="toc-pg">03</div></div>
+      <div class="toc-item"><div class="toc-num">01</div><div class="toc-info"><div class="toc-cat">Contactos</div><div class="toc-title">Equipo, concierge y groceries pre-arrival</div></div><div class="toc-dots"></div><div class="toc-pg">03</div></div>
+      <div class="toc-item"><div class="toc-num">02</div><div class="toc-info"><div class="toc-cat">La villa</div><div class="toc-title">Distribución, suites, pantry y cuarto TV</div></div><div class="toc-dots"></div><div class="toc-pg">04</div></div>
+      <div class="toc-item"><div class="toc-num">03</div><div class="toc-info"><div class="toc-cat">Sistemas</div><div class="toc-title">WiFi, TV, Sonos, generador y lavandería</div></div><div class="toc-dots"></div><div class="toc-pg">05</div></div>
+      <div class="toc-item"><div class="toc-num">04</div><div class="toc-info"><div class="toc-cat">Clima</div><div class="toc-title">Termostatos, mini-splits y mosquiteros</div></div><div class="toc-dots"></div><div class="toc-pg">06</div></div>
+      <div class="toc-item"><div class="toc-num">05</div><div class="toc-info"><div class="toc-cat">Audio · Sonos</div><div class="toc-title">App, AirPlay y bocinas por zona</div></div><div class="toc-dots"></div><div class="toc-pg">07</div></div>
+      <div class="toc-item"><div class="toc-num">06</div><div class="toc-info"><div class="toc-cat">Cocina y servicios</div><div class="toc-title">Electrodomésticos, agua, basura y plomería</div></div><div class="toc-dots"></div><div class="toc-pg">09</div></div>
+      <div class="toc-item"><div class="toc-num">07</div><div class="toc-info"><div class="toc-cat">Asador</div><div class="toc-title">Weber, carbón y cocina de alberca</div></div><div class="toc-dots"></div><div class="toc-pg">10</div></div>
+      <div class="toc-item"><div class="toc-num">08</div><div class="toc-info"><div class="toc-cat">Exteriores</div><div class="toc-title">Alberca, jacuzzi, escaleras y playa</div></div><div class="toc-dots"></div><div class="toc-pg">11</div></div>
+      <div class="toc-item"><div class="toc-num">09</div><div class="toc-info"><div class="toc-cat">Gimnasio y playa</div><div class="toc-title">Caminadora, acceso privado y disclaimer</div></div><div class="toc-dots"></div><div class="toc-pg">08</div></div>
+      <div class="toc-item"><div class="toc-num">10</div><div class="toc-info"><div class="toc-cat">Guía local</div><div class="toc-title">Amenidades, comercios y restaurantes</div></div><div class="toc-dots"></div><div class="toc-pg">13</div></div>
+      <div class="toc-item"><div class="toc-num">11</div><div class="toc-info"><div class="toc-cat">Servicios premium</div><div class="toc-title">Chef, yate, spa y concierge</div></div><div class="toc-dots"></div><div class="toc-pg">12</div></div>
+      <div class="toc-item"><div class="toc-num">12</div><div class="toc-info"><div class="toc-cat">Emergencias</div><div class="toc-title">Contactos, hospitales y seguridad</div></div><div class="toc-dots"></div><div class="toc-pg">14</div></div>
+      <div class="toc-item"><div class="toc-num">13</div><div class="toc-info"><div class="toc-cat">Check-out</div><div class="toc-title">Reglamento y salida antes de las 12:00</div></div><div class="toc-dots"></div><div class="toc-pg">15</div></div>
+    </div>
+    <div style="margin-top:auto;">
+      <div class="card-dark" style="display:flex;align-items:center;justify-content:space-between;gap:5mm;">
+        <div><div class="c-lbl-inv">Tu punto de contacto</div><div class="c-val-inv">Un solo contacto para todo: Marlon — coordinación, prioridades y soporte oportuno.</div></div>
+        <div style="text-align:right;flex-shrink:0;"><div class="c-lbl-inv">WhatsApp</div><div class="c-val-inv" style="font-size:22px;">+52 624 217 5935</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="page-footer"><span>Villa Sera · Guía del Huésped 2026</span><span class="pgn">02</span><span>villa-sera.com</span></div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════
+  PÁGINA 3 · BIENVENIDA + EQUIPO
+═══════════════════════════════════════════════ -->
+<div class="page">
+  <div class="pb pb-tight" style="padding-top:7mm;">
+    <div>
+      <div class="eyebrow">00 · Resumen</div>
+      <div class="section-title" style="font-size:22px;">Ubicación y logística</div>
+      <div class="section-rule"></div>
+    </div>
+    <div class="col2" style="gap:4mm;align-items:start;">
+      <div>
+        <div class="glance-grid" style="margin-bottom:3mm;">
+          <div class="glance-item"><div class="glance-lbl">Dirección</div><div class="glance-val"><b>Casa 504</b> · Vía de Cañadas<br>Comunidad con seguridad privada 24 hrs</div></div>
+          <div class="glance-item"><div class="glance-lbl">Estacionamiento</div><div class="glance-val">2 autos · se entrega control de garage</div></div>
+          <div class="glance-item"><div class="glance-lbl">Entrada principal</div><div class="glance-val">Acceso de huéspedes por entrada frontal</div></div>
+          <div class="glance-item"><div class="glance-lbl">Entrada de servicio</div><div class="glance-val">Personal y proveedores autorizados</div></div>
+        </div>
+        <div class="photo-box photo-box-lg"><span>[ Foto: Entrada principal y fachada ]</span></div>
+      </div>
+      <div>
+        <div class="eyebrow" style="margin-bottom:3mm;">01 · Contactos y servicios</div>
+        <div class="card-dark" style="padding:5mm 6mm;margin-bottom:3mm;">
+          <div style="font-family:'Cormorant Garamond',serif;font-size:13px;font-style:italic;color:var(--ink-soft);line-height:1.65;margin-bottom:5px;">"Recibirte en Villa Sera es un honor. Esta casa es tuya durante tu estancia — y mi equipo está aquí para coordinar lo que necesites con calma y prontitud."</div>
+          <div style="font-size:8px;letter-spacing:0.22em;text-transform:uppercase;color:var(--muted);">— Marlon Alexis Herrera · House Manager</div>
+        </div>
+        <div class="col3" style="gap:2.5mm;">
+          <div class="team" style="padding:3.5mm;"><div class="team-av" style="width:34px;height:34px;font-size:12px;">MA</div><div class="team-n" style="font-size:10px;">Marlon Alexis Herrera</div><div class="team-r">House Manager</div><div class="team-b" style="font-size:8.5px;">Coordinación general y soporte técnico. Enfoque diurno y asistencia oportuna; disponible para prioridades e imprevistos.</div><div class="team-w" style="font-size:9px;">+52 624 217 5935</div></div>
+          <div class="team" style="padding:3.5mm;"><div class="team-av" style="width:34px;height:34px;font-size:12px;">CH</div><div class="team-n" style="font-size:10px;">Chef de Cuisine</div><div class="team-r">Cocina personalizada</div><div class="team-b" style="font-size:8.5px;">Menús con ingredientes de Baja: desayunos, comidas familiares o cenas de celebración.</div><div class="team-w" style="font-size:9px;">Vía Marlon</div></div>
+          <div class="team" style="padding:3.5mm;"><div class="team-av" style="width:34px;height:34px;font-size:12px;">CV</div><div class="team-n" style="font-size:10px;">Cecilia Velázquez</div><div class="team-r">Housekeeping</div><div class="team-b" style="font-size:8.5px;">Camas, detalles y el orden que invita a relajarse en cada suite.</div><div class="team-w" style="font-size:9px;">Vía Marlon</div></div>
+        </div>
+        <div class="note" style="margin-top:3mm;"><b>Concierge pre-arrival:</b> Antes o durante tu estancia, Marlon coordina súper (groceries a precio de costo con recibo), transportación, yates, masajes, reservas y experiencias — un solo mensaje basta.</div>
+      </div>
+    </div>
+  </div>
+  <div class="page-footer"><span>Villa Sera · Guía del Huésped 2026</span><span class="pgn">03</span><span>villa-sera.com</span></div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════
+  PÁGINA 4 · LA VILLA — ESPACIOS
+═══════════════════════════════════════════════ -->
+<div class="page">
+  <div class="top-bar"></div>
+  <div class="pb" style="padding-top:8mm;">
+    <div>
+      <div class="eyebrow">02 · La villa</div>
+      <div class="section-title" style="font-size:24px;">Distribución y suites</div>
+      <p class="section-kicker">Piso principal para convivir; nivel inferior para descanso, media, gimnasio y playa privada.</p>
+      <div class="section-rule"></div>
+    </div>
+
+    <div class="col2" style="gap:4mm;align-items:start;">
+      <div>
+        <img src="https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto/f_auto/w_600/v1775608197/CasaSergio184-2_aug1tr.jpg" class="photo-half" style="height:36mm;margin-bottom:3mm;" alt="Terraza y alberca">
+        <div class="photo-box photo-box-sm" style="margin-bottom:3mm;min-height:28mm;"><span>[ Foto: Estancia principal / áreas comunes ]</span></div>
+        <div class="eyebrow" style="margin-bottom:2px;">Piso principal</div>
+        <div class="blist">
+          <div class="bi"><div><b>Sala de doble altura</b> con vista al Mar de Cortés</div></div>
+          <div class="bi"><div><b>Comedor</b> para 8 personas</div></div>
+          <div class="bi"><div><b>Cocina principal</b> equipada para montaje profesional</div></div>
+          <div class="bi"><div><b>Lavandería</b> en el mismo nivel</div></div>
+          <div class="bi"><div><b>Master Suite</b> — cama King Size, terraza con vista al mar, tina, regadera y walk-in closet</div></div>
+          <div class="bi"><div><b>Sala principal</b> — doble altura, TCL 55" con Fire TV Stick, bar y comedor para 8</div></div>
+        </div>
+      </div>
+      <div>
+        <img src="https://res.cloudinary.com/dt9iyiorn/image/upload/q_auto/f_auto/w_600/v1775608196/CasaSergio194_xcwtwf.jpg" class="photo-half" style="height:40mm; margin-bottom:3mm;" alt="Interior Villa Sera">
+        <div class="eyebrow" style="margin-bottom:2px;">Nivel inferior · Suites y media</div>
+        <div class="blist">
+          <div class="bi"><div><b>Recámara 2:</b> cama King Size</div></div>
+          <div class="bi"><div><b>Recámara 3:</b> cama King Size</div></div>
+          <div class="bi"><div><b>Recámara 4:</b> cama Queen Size</div></div>
+          <div class="bi"><div><b>Cuarto de TV:</b> Smart TV TCL 55" con Fire TV Stick (premium y canales en vivo). <b>Sofá cama</b> — sábanas y ropa de cama complementaria en el clóset del lado izquierdo al entrar.</div></div>
+        </div>
+        <div class="notice-box critical" style="margin-top:3mm;"><b>Pantry (acceso restringido):</b> Al entrar desde la cochera, a la derecha está el pantry de la casa. Se mantiene cerrado con llave y <b>no hay acceso para huéspedes</b>.</div>
+      </div>
+    </div>
+
+    <div class="col2" style="gap:3mm;">
+      <div class="card-stripe">
+        <div class="eyebrow" style="margin-bottom:2px;">Terraza y alberca</div>
+        <div style="font-size:9px;color:#555;line-height:1.45;">Alberca infinita 1.2–1.8 m con vista al Arco, splash pool, comedor exterior para 8, asador Weber y Sonos.</div>
+      </div>
+      <div class="card-stripe">
+        <div class="eyebrow" style="margin-bottom:2px;">Gimnasio</div>
+        <div style="font-size:9px;color:#555;line-height:1.45;">Caminadora con vista al mar, pesas y tapete de yoga. Siempre cubrir la banda tras cada uso.</div>
+      </div>
+      <div class="card-stripe">
+        <div class="eyebrow" style="margin-bottom:2px;">Cocina de alberca</div>
+        <div style="font-size:9px;color:#555;line-height:1.45;">Cocina 2 completa: refrigerador, tarja y trastes independientes. Carbón y aditamentos del Weber se guardan aquí.</div>
+      </div>
+      <div class="card-stripe">
+        <div class="eyebrow" style="margin-bottom:2px;">Mantenimiento</div>
+        <div style="font-size:9px;color:#555;line-height:1.45;">Jardines: martes · Alberca: viernes · Limpieza profunda: a solicitud ($60 USD, 24 h de aviso).</div>
+      </div>
+    </div>
+  </div>
+  <div class="page-footer"><span>Villa Sera · Guía del Huésped 2026</span><span class="pgn">04</span><span>villa-sera.com</span></div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════
+  PÁGINA 5 · WIFI + TV + FIRE TV
+═══════════════════════════════════════════════ -->
+<div class="page">
+  <div class="top-bar-thin"></div>
+  <div class="pb">
+    <div>
+      <div class="eyebrow">03 · Sistemas de la casa</div>
+      <div class="section-title">WiFi, TV, Sonos, generador y lavandería</div>
+      <div class="section-rule"></div>
+    </div>
+    <div class="col2" style="gap:6mm;align-items:start;">
+      <div style="display:flex;flex-direction:column;gap:4mm;">
+        <div class="wifi-card">
+          <div class="c-lbl-inv">Red WiFi</div>
+          <div class="wifi-net">VillaSera_Guest</div>
+          <div class="wifi-div"></div>
+          <div class="c-lbl-inv">Contraseña</div>
+          <div class="wifi-pw" style="font-size:22px;">Villa Sera2025</div>
+        </div>
+        <div class="notice-box"><b>Router:</b> En el mueble de la cocina principal, arriba de la cafetera Nespresso. Si falla la red: desconecta 30 segundos y vuelve a conectar — se restaura en 1–2 min.</div>
+        <div class="notice-box critical"><b>Planta de emergencia:</b> Ante un apagón se activa sola y respalda el piso superior (master, cocina, sala). <b>Los AC de recámaras 2, 3, 4 y cuarto TV no se energizan con el generador</b> — diseño intencional para cuidar la carga.</div>
+        <div class="card-light">
+          <div class="c-lbl">Lavandería · Torre LG</div>
+          <div class="c-body" style="margin-top:2px;">Torre vertical lavado/secado LG (color negro) en la lavandería. Detergente en estante superior. Ciclo Normal para ropa diaria; secado en ciclo estándar. Cecilia puede asistir — avisa con anticipación.</div>
+        </div>
+        <div>
+          <div class="eyebrow" style="margin-bottom:4mm;">Televisiones (todas TCL Smart TV 55")</div>
+          <div class="irow"><div class="irow-dot"></div><div><div class="irow-t">Sala principal</div><div class="irow-b">TCL 55" smart · <b>Amazon Fire TV Stick</b> en HDMI (canales en vivo + Netflix, Prime, YouTube, etc.) · controles TCL y Fire en mesa de centro</div></div></div>
+          <div class="irow"><div class="irow-dot"></div><div><div class="irow-t">Suite master</div><div class="irow-b">TCL 55" smart · apps integradas (Netflix, YouTube, Prime…) · inicia sesión con tu cuenta</div></div></div>
+          <div class="irow"><div class="irow-dot"></div><div><div class="irow-t">Cuartos 2 y 3</div><div class="irow-b">TCL 55" smart · apps integradas · inicia sesión con tu cuenta</div></div></div>
+          <div class="irow" style="border-bottom:none;"><div class="irow-dot"></div><div><div class="irow-t">Cuarto de TV</div><div class="irow-b">TCL 55" con <b>Fire TV Stick</b> (premium y canales en vivo) · sofá cama · sábanas en clóset izquierdo al entrar</div></div></div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:4mm;">
+        <div>
+          <div class="eyebrow" style="margin-bottom:4mm;">Sala principal — Fire TV Stick (canales y apps)</div>
+          <div class="steps">
+            <div class="step"><div class="step-n">1</div><div><div class="step-title">Enciende la TCL y elige el HDMI del Fire TV</div><div class="step-body">Con el control de la televisión, enciende y selecciona la entrada <b>HDMI</b> donde está el Fire TV Stick (suele decir “Fire TV” o HDMI1). Si ves la antena/cable, cambia de fuente hasta ver el menú del Fire.</div></div></div>
+            <div class="step"><div class="step-n">2</div><div><div class="step-title">Usa el control del Fire TV</div><div class="step-body">El control pequeño negro controla el Stick. Botón <b>casa</b> (Inicio) siempre te regresa al menú principal. Si no responde, comprueba las pilas o apunta al televisor.</div></div></div>
+            <div class="step"><div class="step-n">3</div><div><div class="step-title">Ver canales en vivo</div><div class="step-body">En la pantalla de inicio, baja hasta <b>“Tus apps y canales”</b> o la fila de aplicaciones. Abre la app de <b>TV en vivo / lista de canales</b> (ya está configurada). Espera a que cargue la guía; la primera vez puede tardar unos segundos.</div></div></div>
+            <div class="step"><div class="step-n">4</div><div><div class="step-title">Navegar canales</div><div class="step-body">Con las <b>flechas</b> elige canal o categoría; botón central <b>OK</b> para ver. <b>Atrás</b> (←) sube un nivel. Si la imagen se congela, mantén el botón <b>Inicio</b> y cierra la app, o desenchufa el Fire TV 10 s y vuelve a conectar.</div></div></div>
+            <div class="step"><div class="step-n">5</div><div><div class="step-title">Netflix, Prime, YouTube…</div><div class="step-body">Ábrelos desde el inicio del Fire TV o con el micrófono del control: <b>“Alexa, abrir Netflix”</b> (si el control tiene micrófono). Usa tu propia cuenta donde haga falta.</div></div></div>
+          </div>
+        </div>
+        <div class="note"><b>Otras habitaciones (TCL smart):</b> Abre Netflix, YouTube, Prime, etc. desde el control. En la misma red <b>VillaSera_Guest</b>, muchas TCL permiten <b>Chromecast</b> o duplicar pantalla desde el celular.</div>
+        <div class="note"><b>Audio Sonos:</b> App Sonos o AirPlay directo desde Spotify/Apple Music. Bocinas en terraza, sala, master y cocina — ver página 07.</div>
+        <div class="note"><b>¿Problemas con el WiFi?</b> Reinicia el router (ubicación arriba). Si persiste, contacta a Marlon.</div>
+        <div class="note"><b>Cuentas de streaming:</b> Inicia sesión en tu Netflix, Disney+, Prime u otras en cada TV. Recuerda <b>cerrar sesión</b> al hacer check-out.</div>
+      </div>
+    </div>
+  </div>
+  <div class="page-footer"><span>Villa Sera · Guía del Huésped 2026</span><span class="pgn">05</span><span>villa-sera.com</span></div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════
+  PÁGINA 6 · CLIMA — AC
+═══════════════════════════════════════════════ -->
+<div class="page">
+  <div class="top-bar"></div>
+  <div class="pb" style="padding-top:8mm;">
+    <div>
+      <div class="eyebrow" style="color:#aaa;">04 · Clima</div>
+      <div class="section-title" style="font-size:24px;">Sistema de Aire Acondicionado</div>
+      <div class="section-rule"></div>
+    </div>
+    <div class="col2" style="gap:5mm;">
+      <div>
+        <div class="eyebrow" style="margin-bottom:3mm;">Display A · Bar / Áreas comunes</div>
+        <div class="ac-mock">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4mm;"><div class="ac-zone">ZONA 01 · ÁREAS PRINCIPALES</div><div class="ac-mode-pill">● FRÍO</div></div>
+          <div class="ac-temp">22<sup>°C</sup></div>
+          <div class="ac-btns"><div class="ac-btn-on">Frío</div><div class="ac-btn-off">Calor</div><div class="ac-btn-off">Ventilador</div><div class="ac-btn-off">Auto</div></div>
+          <div class="ac-foot"><div class="ac-fan">VENTILADOR · AUTO</div><div class="ac-arrows"><div class="ac-arrow">▲</div><div class="ac-arrow">▼</div></div></div>
+          <div class="ac-covers">Cubre: <b>Cocina principal · Sala · Comedor · Pasillo de entrada</b></div>
+        </div>
+        <div style="font-size:9px;color:#666;margin-top:2mm;line-height:1.5;">Termostato digital al <b style="color:#111;">lado izquierdo del bar</b>. Sugerido: <b style="color:#111;">22°C</b>, modo Cool, ventilador Auto.</div>
+      </div>
+      <div>
+        <div class="eyebrow" style="margin-bottom:3mm;">Display B · Suite Master</div>
+        <div class="ac-mock">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4mm;"><div class="ac-zone">ZONA 02 · SUITE MASTER</div><div class="ac-mode-pill">● FRÍO</div></div>
+          <div class="ac-temp">21<sup>°C</sup></div>
+          <div class="ac-btns"><div class="ac-btn-on">Frío</div><div class="ac-btn-off">Calor</div><div class="ac-btn-off">Ventilador</div><div class="ac-btn-off">Auto</div></div>
+          <div class="ac-foot"><div class="ac-fan">VENTILADOR · BAJO</div><div class="ac-arrows"><div class="ac-arrow">▲</div><div class="ac-arrow">▼</div></div></div>
+          <div class="ac-covers">Cubre: <b>Recámara master · Baño · Walk-in closet</b></div>
+        </div>
+        <div style="font-size:9px;color:#666;margin-top:2mm;line-height:1.5;">Termostato en la <b style="color:#111;">pared frente a la cama</b>. Sugerido: <b style="color:#111;">21°C</b>, modo Cool.</div>
+      </div>
+    </div>
+    <div class="col2" style="gap:5mm;">
+      <div>
+        <div class="eyebrow" style="margin-bottom:3mm;">Mini-splits independientes</div>
+        <div class="blist">
+          <div class="bi"><div><b>Recámaras 2 y 3:</b> controles en burós de noche.</div></div>
+          <div class="bi"><div><b>Recámara 4:</b> control dentro del cajón del buró — modo copo de nieve para frío.</div></div>
+          <div class="bi"><div><b>Cuarto de TV:</b> control colgado en la pared junto a la puerta.</div></div>
+          <div class="bi"><div>Baterías de repuesto en cajón de cocina. Apunta el control hacia la unidad.</div></div>
+          <div class="bi"><div><b>Apaga el AC</b> al salir del cuarto o de la villa.</div></div>
+        </div>
+      </div>
+      <div>
+        <div class="note"><b>Confort sin AC:</b> Todos los cuartos tienen mosquiteros. Si prefieres apagar el aire y dormir escuchando las olas del mar, cierra el mosquitero y disfruta la brisa.</div>
+      </div>
+    </div>
+  </div>
+  <div class="page-footer"><span>Villa Sera · Guía del Huésped 2026</span><span class="pgn">06</span><span>villa-sera.com</span></div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════
+  PÁGINA 7 · SONOS
+═══════════════════════════════════════════════ -->
+<div class="page">
+  <div class="top-bar-thin"></div>
+  <div class="pb" style="padding-top:6mm; gap:5mm;">
+    <div>
+      <div class="eyebrow">05 · Audio</div>
+      <div class="section-title" style="font-size:24px;">Sonos — Música en Toda la Villa</div>
+      <div class="section-rule"></div>
+    </div>
+    <div class="col2" style="gap:6mm;align-items:start;">
+      <div>
+        <div class="eyebrow" style="margin-bottom:4mm;">3 pasos para tener música en toda la villa</div>
+        <div class="steps">
+          <div class="step"><div class="step-n">1</div><div><div class="step-title">Descarga la app Sonos</div><div class="step-body">Gratis en App Store y Google Play — abajo puedes escanear el QR de tu tienda. ¿Ya la tienes? Salta al paso 2.</div></div></div>
+          <div class="step"><div class="step-n">2</div><div><div class="step-title">Conéctate a VillaSera_Guest</div><div class="step-body">Tu teléfono debe estar en la misma red que las bocinas. La app descubre todos los altavoces automáticamente.</div></div></div>
+          <div class="step"><div class="step-n">3</div><div><div class="step-title">Elige cuartos y reproduce</div><div class="step-body">Selecciona uno o varios cuartos. Controla el volumen por zona. Reproduce desde Spotify, Apple Music, Tidal o cualquier fuente.</div></div></div>
+        </div>
+        <div class="eyebrow" style="margin:5mm 0 2mm;">Descarga la app — escanea con la cámara</div>
+        <div class="sonos-qr-row">
+          <div class="sonos-qr-item">
+            <img src="Sonos-QR-AppStore.png" alt="Código QR: Sonos en App Store">
+            <div class="sonos-qr-label">App Store · iPhone / iPad</div>
+          </div>
+          <div class="sonos-qr-item">
+            <img src="Sonos-QR-PlayStore.png" alt="Código QR: Sonos en Google Play">
+            <div class="sonos-qr-label">Google Play · Android</div>
+          </div>
+        </div>
+        <div class="eyebrow" style="margin:5mm 0 3mm;">Ubicación de bocinas</div>
+        <div class="irow"><div class="irow-dot"></div><div><div class="irow-t">Terraza principal y alberca</div><div class="irow-b">Bocinas exteriores impermeables. Al 50% de volumen se escucha perfectamente en toda la terraza.</div></div></div>
+        <div class="irow"><div class="irow-dot"></div><div><div class="irow-t">Sala principal</div><div class="irow-b">Par estéreo completo. También funciona como soundbar con el televisor vía AirPlay.</div></div></div>
+        <div class="irow"><div class="irow-dot"></div><div><div class="irow-t">Suite master</div><div class="irow-b">Bocina de mesa de noche. Ideal para música ambiental y playlists para dormir.</div></div></div>
+        <div class="irow" style="border-bottom:none;"><div class="irow-dot"></div><div><div class="irow-t">Cocina y comedor</div><div class="irow-b">Perfecta para cocinar y cenas. Vinculada al grupo de sala por default.</div></div></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:4mm;">
+        <div>
+          <div class="eyebrow" style="margin-bottom:4mm;">Sin app — usa AirPlay directamente</div>
+          <div class="steps">
+            <div class="step"><div class="step-n">1</div><div><div class="step-title">Abre Spotify o Apple Music</div><div class="step-body">Confirma que estás en la WiFi VillaSera_Guest.</div></div></div>
+            <div class="step"><div class="step-n">2</div><div><div class="step-title">Toca el ícono AirPlay</div><div class="step-body">El triángulo con círculos en Spotify, o el ícono de bocina en Apple Music.</div></div></div>
+            <div class="step"><div class="step-n">3</div><div><div class="step-title">Selecciona una bocina Villa Sera</div><div class="step-body">Elige Terraza, Sala o cualquier cuarto. La música empieza al instante.</div></div></div>
+          </div>
+        </div>
+        <div class="card-dark" style="padding:5mm;">
+          <div class="c-lbl" style="margin-bottom:4px;">Sugerencia</div>
+          <div class="c-body-inv">Pide a Marlon la lista de reproducción Villa Sera en Spotify — pensada para atardeceres en la terraza, mañanas en la alberca y noches frente al Mar de Cortés. Si prefieres la playa, Cecilia puede conseguirte bocinas Bluetooth portátiles.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="page-footer"><span>Villa Sera · Guía del Huésped 2026</span><span class="pgn">07</span><span>villa-sera.com</span></div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════
+  PÁGINA 8 · CAMINADORA (TREADMILL)
+═══════════════════════════════════════════════ -->
+<div class="page">
+  <div class="top-bar"></div>
+  <div class="pb" style="padding-top:8mm; gap:5mm;">
+    <div>
+      <div class="eyebrow">07 · Gimnasio y playa</div>
+      <div class="section-title" style="font-size:24px;">Caminadora — Uso y Cuidado</div>
+      <div class="section-rule"></div>
+    </div>
+
+    <div class="col2" style="gap:6mm; align-items:start;">
+      <div>
+        <img src="Villa-Serena246.jpg" alt="Caminadora en terraza con vista al Mar de Cortés" class="photo-half" style="height:85mm; margin-bottom:3mm; width:100%;">
+        <div class="caption">La caminadora de Villa Sera da directamente al Mar de Cortés — siempre tapa la banda después de usar.</div>
+      </div>
+
+      <!-- Instrucciones -->
+      <div style="display:flex;flex-direction:column;gap:4mm;">
+        <div class="notice-box critical">
+          <b>Cubierta protectora — obligatorio:</b> El salitre del mar daña la banda y los rieles. Coloca la cubierta impermeable inmediatamente después de cada uso. Atomizador con agua y jabón neutro en el estante — rocía banda y rieles, limpia con trapo y cubre.
+        </div>
+
+        <div>
+          <div class="eyebrow" style="margin-bottom:4mm;">Antes de usar</div>
+          <div class="steps">
+            <div class="step"><div class="step-n">1</div><div><div class="step-title">Retira la cubierta</div><div class="step-body">Levanta la cubierta protectora y dóblala. Colócala a un lado o en el estante del equipo.</div></div></div>
+            <div class="step"><div class="step-n">2</div><div><div class="step-title">Enciende en la consola</div><div class="step-body">Presiona el botón de encendido en la consola principal. La pantalla se iluminará en 2–3 segundos.</div></div></div>
+            <div class="step"><div class="step-n">3</div><div><div class="step-title">Coloca el clip de seguridad</div><div class="step-body">Engancha el clip rojo de emergencia a tu ropa. Si te caes, detiene la banda automáticamente.</div></div></div>
+            <div class="step"><div class="step-n">4</div><div><div class="step-title">Usa los controles</div><div class="step-body">Start/Stop para iniciar y detener · ▲▼ para velocidad · Incline para inclinación. Los botones están marcados en la consola.</div></div></div>
+          </div>
+        </div>
+
+        <div>
+          <div class="eyebrow" style="margin-bottom:4mm;">Después de usar — obligatorio</div>
+          <div class="steps">
+            <div class="step"><div class="step-n">1</div><div><div class="step-title">Apaga el equipo</div><div class="step-body">Presiona Stop y luego el botón de apagado. Espera que la banda se detenga completamente.</div></div></div>
+            <div class="step"><div class="step-n">2</div><div><div class="step-title">Aplica el atomizador</div><div class="step-body">Solución de agua y jabón neutro en el atomizador del estante. Rocía banda y rieles para eliminar sudor y sal.</div></div></div>
+            <div class="step"><div class="step-n">3</div><div><div class="step-title">Limpia con el trapo</div><div class="step-body">Pasa el trapo por la banda y rieles. Deja airear 1 minuto.</div></div></div>
+            <div class="step"><div class="step-n">4</div><div><div class="step-title">Coloca la cubierta</div><div class="step-body"><b>Siempre cubre la caminadora al terminar.</b> El salitre del mar penetra aunque no se vea y deteriora la banda con el tiempo.</div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="page-footer"><span>Villa Sera · Guía del Huésped 2026</span><span class="pgn">08</span><span>villa-sera.com</span></div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════
+  PÁGINA 8B · LAVANDERÍA — TORRE LG
+═══════════════════════════════════════════════ -->
+<div class="page">
+  <div class="top-bar"></div>
+  <div class="pb">
+    <div class="eyebrow">Villa Sera · Electrodomésticos</div>
+    <div class="section-title">Lavandería</div>
+    <div class="section-kicker">Torre LG lavadora y secadora · Cuarto de lavandería, nivel inferior</div>
+
+    <div class="notice-box" style="background:#fff8ec;border-color:#f0d89a;color:#7a5c00;">
+      <b>Solo detergente HE (High Efficiency).</b> El detergente normal puede dañar la lavadora. Lo encuentras en el estante superior del cuarto de lavandería. Si se termina, contáctate con Marlon.
+    </div>
+
+    <div style="text-align:center;">
+      <img src="Lavanderia-ES.png" alt="Instrucciones de lavandería paso a paso" style="width:100%;max-width:560px;border-radius:6px;box-shadow:0 2px 16px rgba(0,0,0,0.10);">
+    </div>
+
+    <!-- Paso 1 -->
+    <div>
+      <div class="eyebrow" style="margin-bottom:6px;">Paso 1 · Encendido</div>
+      <div class="irow" style="border-top:1px solid #e8e8e8;">
+        <div class="irow-t">Presiona y mantén el botón de encendido por 2–3 segundos</div>
+        <div class="irow-b">El panel de control se iluminará y mostrará la pantalla principal. El botón está en el panel central, entre la lavadora (abajo) y la secadora (arriba).</div>
+      </div>
+    </div>
+
+    <!-- Paso 2 -->
+    <div>
+      <div class="eyebrow" style="margin-bottom:6px;">Paso 2 · Lavadora (módulo inferior)</div>
+      <div class="irow" style="border-top:1px solid #e8e8e8;">
+        <div class="irow-t">A · Cargar la ropa</div>
+        <div class="irow-b">Abre la puerta inferior y carga tu ropa. <b>No sobrecargues</b> — llena hasta ¾ de capacidad. Demasiada ropa impide el centrifugado y la ropa sale húmeda.</div>
+      </div>
+      <div class="irow">
+        <div class="irow-t">B · Añadir detergente HE</div>
+        <div class="irow-b">Jala el cajón de detergente (parte superior izquierda). Vierte el detergente HE en el compartimento principal hasta la línea indicada. Cierra el cajón.</div>
+      </div>
+      <div class="irow">
+        <div class="irow-t">C · Seleccionar ciclo e iniciar</div>
+        <div class="irow-b">Gira la perilla: <b>Normal</b> para ropa diaria · <b>Ropa de cama</b> para sábanas/toallas · <b>Delicado</b> para telas finas. Presiona <b>Start/Pause ▶‖</b>. Duración: 45–60 min. La puerta se bloquea automáticamente.</div>
+      </div>
+    </div>
+
+    <!-- Paso 3 -->
+    <div>
+      <div class="eyebrow" style="margin-bottom:6px;">Paso 3 · Secadora (módulo superior)</div>
+      <div class="irow" style="border-top:1px solid #e8e8e8;">
+        <div class="irow-t">A · Limpiar el filtro de pelusas — obligatorio antes de cada uso</div>
+        <div class="irow-b">Abre la puerta de la secadora. El filtro está dentro de la puerta. Retira las pelusas con la mano o un trapo y vuelve a insertarlo. Un filtro obstruido causa sobrecalentamiento.</div>
+      </div>
+      <div class="irow">
+        <div class="irow-t">B · Seleccionar ciclo e iniciar</div>
+        <div class="irow-b">Gira la perilla: <b>Normal/Algodón</b> · <b>Ropa de cama</b> · <b>Delicado/Baja temperatura</b> · <b>Rápido 30 min</b>. Transfiere la ropa de inmediato — si la dejas húmeda más de 30 min puede desarrollar olor. Presiona <b>Start/Pause ▶‖</b>. Duración: 50–70 min.</div>
+      </div>
+    </div>
+
+    <div class="note">
+      <b>¿Necesitas ayuda?</b> Cecilia puede encargarse de la lavandería — avísale con anticipación. Para solicitar cambio de toallas o sábanas, colócalas en el suelo del baño o contacta al equipo.
+    </div>
+  </div>
+  <div class="page-footer"><span>Villa Sera · Guía del Huésped 2026</span><span class="pgn">09</span><span>villa-sera.com</span></div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════
+  PÁGINA 9 · COCINA + ELECTRODOMÉSTICOS
+═══════════════════════════════════════════════ -->
+<div class="page">
+  <div class="top-bar-thin"></div>
+  <div class="pb" style="gap:5mm;">
+    <div>
+      <div class="eyebrow">05 · Cocina y servicios</div>
+      <div class="section-title">Cocina, agua y servicios</div>
+      <div class="section-rule"></div>
+    </div>
+
+    <div class="notice-box critical" style="margin-bottom:3mm;"><b>Plomería sanitaria:</b> Prohibido tirar toallitas húmedas (baby wipes) o productos higiénicos al inodoro. Usa los botes de basura obligatoriamente.</div>
+
+    <img src="Villa-Sera-Cocina.jpg" alt="Cocina principal de Villa Sera" class="photo-hero" style="height:34mm;">
+
+    <div class="col2" style="gap:5mm; align-items:start;">
+      <div>
+        <div class="irow"><div class="irow-dot"></div><div><div class="irow-t">Máquina Nespresso</div><div class="irow-b">En el mostrador (router WiFi arriba de esta cafetera). Cápsulas en canastilla lateral. Espumador de leche junto al equipo.</div></div></div>
+        <div class="irow"><div class="irow-dot"></div><div><div class="irow-t">Hielera automática</div><div class="irow-b">Junto al refrigerador. Se reabastece en ~30 min tras vaciarse.</div></div></div>
+        <div class="irow"><div class="irow-dot"></div><div><div class="irow-t">Licuadora profesional</div><div class="irow-b">Segundo gabinete bajo mostrador (izq. a der.). Enjuaga y devuelve después de usar.</div></div></div>
+        <div class="irow" style="border-bottom:none;"><div class="irow-dot"></div><div><div class="irow-t">Refrigerador y minibar</div><div class="irow-b">Agua, jugos y cerveza. Reposición diaria del minibar.</div></div></div>
+      </div>
+      <div>
+        <div class="irow"><div class="irow-dot"></div><div><div class="irow-t">Lavavajillas</div><div class="irow-b">Tabletas bajo fregadero. Ciclo Normal ~1 h.</div></div></div>
+        <div class="irow"><div class="irow-dot"></div><div><div class="irow-t">Basura</div><div class="irow-b">Recolección <b>lunes, miércoles y viernes</b>. Bolsas negras obligatorias (debajo del fregadero) para botes exteriores — sin bolsa no recogen.</div></div></div>
+        <div class="irow"><div class="irow-dot"></div><div><div class="irow-t">Agua e insumos</div><div class="irow-b"><b>El agua del grifo no es para beber.</b> Usa dispensador o garrafón filtrado. Avisar a Cecilia si se agota antes del reabasto.</div></div></div>
+        <div class="irow" style="border-bottom:none;"><div class="irow-dot"></div><div><div class="irow-t">Dispensador</div><div class="irow-b">Agua filtrada para consumo diario en cocina y áreas comunes.</div></div></div>
+      </div>
+    </div>
+    <div class="note"><b>Groceries pre-arrival:</b> Envía tu lista a Marlon — surtimos antes de tu llegada o durante la estancia, a precio de costo con recibo.</div>
+  </div>
+  <div class="page-footer"><span>Villa Sera · Guía del Huésped 2026</span><span class="pgn">09</span><span>villa-sera.com</span></div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════
+  PÁGINA 10 · ASADOR
+═══════════════════════════════════════════════ -->
+<div class="page">
+  <div class="top-bar"></div>
+  <div class="pb" style="padding-top:8mm;">
+    <div>
+      <div class="eyebrow" style="color:#aaa;">08 · Asador</div>
+      <div class="section-title" style="font-size:24px;">Cómo Usar el Asador de Carbón</div>
+      <div class="section-rule"></div>
+    </div>
+
+    <div class="col2" style="gap:6mm; align-items:start;">
+      <div>
+        <img src="Villa Grill.png" alt="Asador en terraza con vista al mar" class="photo-half" style="height:72mm; margin-bottom:3mm; width:100%;">
+        <div style="font-family:'Cormorant Garamond',serif;font-size:16px;color:#111;margin-bottom:3px;">Asador Weber con chimenea de encendido</div>
+        <div style="font-size:9.5px;color:#555;line-height:1.5;">En la terraza principal. <b>Carbón, chimenea, pinzas y encendedor</b> en la cocina de alberca (Cocina 2). Sin combustible líquido.</div>
+
+        <div style="margin-top:4mm;">
+          <div class="eyebrow" style="margin-bottom:3mm;">Guía de temperaturas</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:2.5mm;">
+            <div class="tc"><div class="tc-l">Alto</div><div class="tc-r">230°C+</div><div class="tc-u">Steaks y hamburguesas</div></div>
+            <div class="tc"><div class="tc-l">Medio-alto</div><div class="tc-r">180°C</div><div class="tc-u">Pollo, pescado</div></div>
+            <div class="tc"><div class="tc-l">Medio</div><div class="tc-r">150°C</div><div class="tc-u">Costillas, cerdo</div></div>
+            <div class="tc"><div class="tc-l">Bajo</div><div class="tc-r">120°C</div><div class="tc-u">BBQ lento</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Instrucciones -->
+      <div>
+        <div class="eyebrow" style="margin-bottom:4mm;">Cómo encender — 7 pasos</div>
+        <div class="steps">
+          <div class="step"><div class="step-n">1</div><div><div class="step-title">Llena la chimenea ¾ con carbón</div><div class="step-body">La bolsa está en el gabinete del asador. No llenes de más.</div></div></div>
+          <div class="step"><div class="step-n">2</div><div><div class="step-title">Coloca los iniciadores debajo</div><div class="step-body">1–2 bloques de cera natural bajo la rejilla de la chimenea. Nunca uses combustible líquido.</div></div></div>
+          <div class="step"><div class="step-n">3</div><div><div class="step-title">Pon la chimenea en el asador</div><div class="step-body">Todas las ventillas abiertas para buena circulación de aire.</div></div></div>
+          <div class="step"><div class="step-n">4</div><div><div class="step-title">Enciende los iniciadores</div><div class="step-body">Usa el encendedor largo por los hoyos de abajo. No necesitas meter la mano.</div></div></div>
+          <div class="step"><div class="step-n">5</div><div><div class="step-title">Espera 15–20 minutos</div><div class="step-body">Listo cuando los carbones de arriba brillen naranja con ceniza blanco-grisácea. No apures este paso.</div></div></div>
+          <div class="step"><div class="step-n">6</div><div><div class="step-title">Vierte el carbón y extiende</div><div class="step-body">Usa guantes térmicos. Inclina la chimenea para verter. Extiende parejo con las pinzas. Coloca la parrilla encima.</div></div></div>
+          <div class="step"><div class="step-n">7</div><div><div class="step-title">Precalienta 5 min → ¡A cocinar!</div><div class="step-body">Cepilla la parrilla cuando esté caliente. Ya está lista.</div></div></div>
+        </div>
+
+        <div class="notice-box critical" style="margin-top:4mm;"><b>Seguridad:</b> Nunca uses combustible líquido. Cierra ventillas para apagar. Espera 2 h antes de tocar ceniza. Extinguidor: cocina, compartimiento inferior izquierdo.</div>
+
+        <div style="margin-top:3mm;">
+          <div class="eyebrow" style="margin-bottom:3mm;">Limpieza después de asar</div>
+          <div class="blist">
+            <div class="bi">Cepilla la parrilla mientras aún está caliente — la grasa fría es mucho más difícil de limpiar</div>
+            <div class="bi">Cierra todas las ventillas para apagar los carbones</div>
+            <div class="bi">Espera que enfríe completamente (1–2 hrs) antes de mover la ceniza</div>
+            <div class="bi">Desecha la ceniza fría en el cubo metálico junto al asador — nunca en bolsas de plástico</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="page-footer"><span>Villa Sera · Guía del Huésped 2026</span><span class="pgn">10</span><span>villa-sera.com</span></div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════
+  PÁGINA 11 · ALBERCA + SPLASH POOL + PLAYA
+═══════════════════════════════════════════════ -->
+<div class="page">
+  <div class="top-bar-thin"></div>
+  <div class="pb" style="padding-top:6mm; gap:5mm;">
+    <div>
+      <div class="eyebrow">06 · Exteriores</div>
+      <div class="section-title" style="font-size:24px;">Terraza, alberca y playa</div>
+      <div class="section-rule"></div>
+    </div>
+    <div class="notice-box critical" style="margin-bottom:3mm;"><b>Escaleras a la alberca:</b> Ten cuidado al bajar — hay un cambio de nivel pronunciado. Usa el pasamanos y calzado antiderrapante.</div>
+    <div class="col3" style="gap:3.5mm;">
+      <div class="card-stripe">
+        <div class="eyebrow" style="margin-bottom:2px;">Alberca y chapoteadero</div>
+        <div style="font-family:'Cormorant Garamond',serif;font-size:13px;color:#111;margin-bottom:4px;">1.2 m – 1.8 m de profundidad</div>
+        <div class="blist">
+          <div class="bi" style="font-size:9px;">Toallas en gabinete junto a regadera exterior</div>
+          <div class="bi" style="font-size:9px;">Luces automáticas al anochecer</div>
+          <div class="bi" style="font-size:9px;"><b>Cero vidrio</b> en el área — solo plástico</div>
+          <div class="bi" style="font-size:9px;">Reja cerrada cuando haya niños</div>
+          <div class="bi" style="font-size:9px;">No clavados — alberca no calentada</div>
+        </div>
+        <div style="font-size:8px;font-weight:600;color:#111;margin-top:4mm;">Servicio: cada viernes</div>
+      </div>
+      <div class="card-stripe">
+        <div class="eyebrow" style="margin-bottom:2px;">Splash pool (niños)</div>
+        <div style="font-family:'Cormorant Garamond',serif;font-size:13px;color:#111;margin-bottom:4px;">Agua poco profunda · chapoteadero</div>
+        <div class="blist">
+          <div class="bi" style="font-size:9px;">Pensada para niños; un adulto responsable debe supervisar siempre</div>
+          <div class="bi" style="font-size:9px;">No es para nadar ni zambullirse — evita correr en los bordes mojados</div>
+          <div class="bi" style="font-size:9px;">Juguetes plásticos y flotadores están bien; nada de vidrio en el área</div>
+          <div class="bi" style="font-size:9px;">Misma zona exterior que la alberca: mantén la reja cerrada si hay pequeños cerca del agua</div>
+          <div class="bi" style="font-size:9px;">Si notas filtro o agua turbia, avisa a Marlon o a tu equipo de casa</div>
+        </div>
+        <div style="font-size:8px;font-weight:600;color:#111;margin-top:4mm;">Servicio: cada viernes</div>
+      </div>
+      <div class="card-stripe">
+        <div class="eyebrow" style="margin-bottom:2px;">Jacuzzi — apagado obligatorio</div>
+        <div style="font-family:'Cormorant Garamond',serif;font-size:13px;color:#111;margin-bottom:4px;">Al terminar de usarlo</div>
+        <div class="blist">
+          <div class="bi" style="font-size:9px;">Entra a <b>Recámara 2</b></div>
+          <div class="bi" style="font-size:9px;">A mano derecha, apaga la caldera</div>
+          <div class="bi" style="font-size:9px;">Apaga <b>Jets</b> y <b>Heater</b></div>
+        </div>
+      </div>
+      <div class="card-stripe">
+        <div class="eyebrow" style="margin-bottom:2px;">Playa privada</div>
+        <div style="font-family:'Cormorant Garamond',serif;font-size:13px;color:#111;margin-bottom:4px;">Acceso exclusivo</div>
+        <div class="blist">
+          <div class="bi" style="font-size:9px;">Escaleras de piedra a la derecha de la villa</div>
+          <div class="bi" style="font-size:9px;">Regadera de enjuague arriba, al inicio de la escalera</div>
+          <div class="bi" style="font-size:9px;">Camastros, sombrilla y snorkel al pie</div>
+        </div>
+        <div class="notice-box" style="margin-top:3mm;font-size:8.5px;"><b>Beach disclaimer:</b> La playa es nadable, pero el Mar de Cortés es complejo. El nado es bajo tu propio riesgo y discreción. Consulta condiciones con Marlon.</div>
+      </div>
+    </div>
+  </div>
+  <div class="page-footer"><span>Villa Sera · Guía del Huésped 2026</span><span class="pgn">11</span><span>villa-sera.com</span></div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════
+  PÁGINA 12 · SERVICIOS PREMIUM
+═══════════════════════════════════════════════ -->
+<div class="page">
+  <div class="top-bar"></div>
+  <div class="pb" style="padding-top:8mm; gap:5mm;">
+    <div>
+      <div class="eyebrow">09 · Servicios premium</div>
+      <div class="section-title" style="font-size:24px;">Eleva tu estancia</div>
+      <p class="section-kicker">Experiencias que diseñamos contigo, con tiempo, discreción y un estándar muy alto.</p>
+      <div class="section-rule"></div>
+      <div style="font-size:9.5px;color:#555;">Coordinación directa con Marlon · inversión según servicio · WhatsApp <b style="color:#111;">+52 624 217 5935</b></div>
+    </div>
+    <div class="col3" style="gap:3.5mm;">
+      <div class="svc"><div class="svc-n">Chef Privado</div><div class="svc-b">Menús con ingredientes locales frescos. Desayuno, comida o cenas privadas. Servicio completo incluyendo montaje y limpieza.</div><div class="svc-cta">Solicitar vía WhatsApp →</div></div>
+      <div class="svc"><div class="svc-n">Yate Privado</div><div class="svc-b">Tours al Arco, snorkel, pesca deportiva, avistamiento de ballenas (temporada) y cruceros al atardecer. Medio o día completo.</div><div class="svc-cta">Solicitar vía WhatsApp →</div></div>
+      <div class="svc"><div class="svc-n">Spa y Masajes</div><div class="svc-b">Terapeutas certificados en la villa. Sueco, tejido profundo, piedras calientes, masaje de pareja, faciales, manicure y pedicure.</div><div class="svc-cta">Solicitar vía WhatsApp →</div></div>
+      <div class="svc"><div class="svc-n">Deportes Acuáticos</div><div class="svc-b">Paddle board, kayak, snorkel, parasailing, clases de surf y Jet Ski. Equipo entregado en la playa o la villa.</div><div class="svc-cta">Solicitar vía WhatsApp →</div></div>
+      <div class="svc"><div class="svc-n">Transporte de Lujo</div><div class="svc-b">SUV privado, tour en helicóptero sobre el Arco, jets privados y traslados VIP al aeropuerto. Reserva anticipada requerida.</div><div class="svc-cta">Solicitar vía WhatsApp →</div></div>
+      <div class="svc"><div class="svc-n">Eventos Privados</div><div class="svc-b">Bodas, cumpleaños, propuestas, despedidas de soltero y retiros corporativos. Coordinación completa: flores, catering, DJ, fotografía.</div><div class="svc-cta">Solicitar vía WhatsApp →</div></div>
+      <div class="svc"><div class="svc-n">Golf</div><div class="svc-b">Tee times en Quivira, El Camaleón y Palmilla — campos de clase mundial. Renta de palos, caddies y transporte incluidos.</div><div class="svc-cta">Solicitar vía WhatsApp →</div></div>
+      <div class="svc"><div class="svc-n">Yoga y Fitness</div><div class="svc-b">Clases privadas de yoga al amanecer en la terraza o playa. Entrenador personal, instructor de Pilates o guía de meditación.</div><div class="svc-cta">Solicitar vía WhatsApp →</div></div>
+      <div class="svc"><div class="svc-n">Servicio de Compras</div><div class="svc-b">Envíale tu lista a Marlon y surtimos la villa antes de tu llegada o durante la estancia. Se cobra a precio de costo con recibo.</div><div class="svc-cta">Solicitar vía WhatsApp →</div></div>
+    </div>
+    <div class="card-dark" style="display:flex;align-items:center;justify-content:space-between;gap:5mm;">
+      <div><div class="c-lbl-inv">Concierge</div><div class="c-val-inv">Si es importante para ti, es importante para nosotros.</div></div>
+      <div style="text-align:right;flex-shrink:0;"><div class="c-lbl-inv">WhatsApp</div><div class="c-val-inv" style="font-size:22px;">+52 624 217 5935</div></div>
+    </div>
+  </div>
+  <div class="page-footer"><span>Villa Sera · Guía del Huésped 2026</span><span class="pgn">12</span><span>villa-sera.com</span></div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════
+  PÁGINA 13 · RESTAURANTES + ACTIVIDADES
+═══════════════════════════════════════════════ -->
+<div class="page">
+  <div class="top-bar-thin"></div>
+  <div class="pb">
+    <div>
+      <div class="eyebrow">08 · Guía local</div>
+      <div class="section-title">Guía local</div>
+      <p class="section-kicker">Amenidades incluidas, comercios cercanos y restaurantes del momento — Marlon gestiona reservas.</p>
+      <div class="section-rule"></div>
+    </div>
+    <div class="note" style="margin-bottom:4mm;"><b>Amenidades incluidas:</b> Jabón de baño, body wash, body lotion, shampoo y acondicionador en todas las suites y baños.</div>
+    <div class="col2" style="gap:6mm;">
+      <div>
+        <div class="eyebrow" style="margin-bottom:3mm;">Comercios de proximidad</div>
+        <div class="irow"><div class="irow-dot"></div><div><div class="irow-t">La Comer · Plaza Las Glorias</div><div class="irow-b">12 min en auto</div></div></div>
+        <div class="irow"><div class="irow-dot"></div><div><div class="irow-t">Soriana · 24 hrs</div><div class="irow-b">10 min en auto</div></div></div>
+        <div class="irow"><div class="irow-dot"></div><div><div class="irow-t">Costco</div><div class="irow-b">15 min en auto</div></div></div>
+        <div class="irow"><div class="irow-dot"></div><div><div class="irow-t">Farmacias del Ahorro · 24 hrs con médico</div><div class="irow-b">8 min en auto</div></div></div>
+        <div class="irow" style="border-bottom:none;"><div class="irow-dot"></div><div><div class="irow-t">La Europea · vinos y licores</div><div class="irow-b">12 min · Plaza Las Glorias</div></div></div>
+        <div class="eyebrow" style="margin:4mm 0 3mm;">Restaurantes del momento</div>
+        <div class="blist">
+          <div class="bi">Comal · Helios · Rosa Negra · Jerry's</div>
+          <div class="bi">Nick-San · Manta · El Farallon · Sunset Monalisa</div>
+        </div>
+      </div>
+      <div>
+        <div class="eyebrow" style="margin-bottom:3mm;">Selección detallada</div>
+        <div class="rcard"><div><div class="rcard-n">Manta</div><div class="rcard-d">Mariscos modernos · One&Only Palmilla. Reserva con anticipación.</div><div class="rcard-t">15 min · Vía Marlon</div></div></div>
+        <div class="rcard"><div><div class="rcard-n">El Farallon</div><div class="rcard-d">Waldorf Pedregal · pescado en tanque vivo sobre el acantilado.</div><div class="rcard-t">20 min</div></div></div>
+        <div class="rcard"><div><div class="rcard-n">Sunset Monalisa</div><div class="rcard-d">Vista legendaria al Arco · cena especial al atardecer.</div><div class="rcard-t">10 min</div></div></div>
+        <div class="rcard"><div><div class="rcard-n">Nick-San</div><div class="rcard-d">Sashimi y rolls de autor · Centro Marina.</div><div class="rcard-t">10 min</div></div></div>
+        <div class="rcard"><div><div class="rcard-n">Jerry's</div><div class="rcard-d">Clásico cabense de mariscos y ambiente relajado — muy pedido por locales y huéspedes.</div><div class="rcard-t">Vía Marlon</div></div></div>
+        <div class="rcard" style="border-bottom:none;"><div><div class="rcard-n">Comal · Rosa Negra · Helios</div><div class="rcard-d">Ambiente contemporáneo y cocina de Baja — favoritos actuales del destino.</div><div class="rcard-t">Vía concierge</div></div></div>
+        <div style="height:1px;background:#eee;margin:2mm 0;"></div>
+        <div class="eyebrow" style="margin-bottom:3mm;">No te pierdas</div>
+        <div class="blist">
+          <div class="bi"><b>El Arco</b> — taxi acuático desde la marina (~$15 USD) o tour privado vía Marlon</div>
+          <div class="bi"><b>Pesca deportiva</b> — marlín, atún y dorado de clase mundial. Salen a las 6 AM. Tu pesca la prepara el chef.</div>
+          <div class="bi"><b>Art Walk San José</b> — cada jueves (nov–jun). Galerías, música y comida callejera en el centro histórico.</div>
+          <div class="bi"><b>Todos Santos</b> — Pueblo Mágico, 1 hr al norte. El legendario Hotel California y mezcal artesanal.</div>
+          <div class="bi"><b>Avistamiento de ballenas</b> — temporada dic–abr. Uno de los mejores lugares del mundo.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="page-footer"><span>Villa Sera · Guía del Huésped 2026</span><span class="pgn">13</span><span>villa-sera.com</span></div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════
+  PÁGINA 14 · INFO PRÁCTICA + EMERGENCIAS
+═══════════════════════════════════════════════ -->
+<div class="page">
+  <div class="top-bar"></div>
+  <div class="pb" style="padding-top:8mm; gap:5mm;">
+    <div>
+      <div class="eyebrow">10 · Emergencias</div>
+      <div class="section-title" style="font-size:24px;">Todo lo que Necesitas Saber</div>
+      <div class="section-rule"></div>
+    </div>
+
+    <div class="col2" style="gap:5mm;">
+      <div style="display:flex;flex-direction:column;gap:4mm;">
+        <div>
+          <div class="eyebrow" style="margin-bottom:3mm;">Cómo moverse</div>
+          <div class="irow"><div class="irow-dot"></div><div><div class="irow-t">Uber y Didi</div><div class="irow-b">Ambas apps funcionan en Los Cabos. Descárgalas antes de llegar. Más baratas y seguras que los taxis de calle.</div></div></div>
+          <div class="irow"><div class="irow-dot"></div><div><div class="irow-t">Chofer privado (recomendado)</div><div class="irow-b">Marlon coordina choferes confiables de habla inglesa. Ideal para excursiones a Todos Santos o San José.</div></div></div>
+          <div class="irow" style="border-bottom:none;"><div class="irow-dot"></div><div><div class="irow-t">Renta de auto</div><div class="irow-b">Licencias internacionales aceptadas. Hertz y Alamo en el aeropuerto. Recomendado: SUV compacta.</div></div></div>
+        </div>
+        <div>
+          <div class="eyebrow" style="margin-bottom:3mm;">Esenciales cercanos</div>
+          <div class="irow"><div class="irow-dot"></div><div><div class="irow-t">Supermercado La Comer</div><div class="irow-b">El mejor súper. Productos internacionales, vinos y licores. Plaza Las Glorias. 12 min en auto</div></div></div>
+          <div class="irow"><div class="irow-dot"></div><div><div class="irow-t">Farmacias del Ahorro · 24 hrs</div><div class="irow-b">Farmacia 24 horas con médico de guardia (~$5 USD). 8 min en auto</div></div></div>
+          <div class="irow"><div class="irow-dot"></div><div><div class="irow-t">La Europea · Vinos y licores</div><div class="irow-b">Mejor selección de vinos, espirituales y productos importados. Plaza Las Glorias. 12 min en auto</div></div></div>
+          <div class="irow" style="border-bottom:none;"><div class="irow-dot"></div><div><div class="irow-t">Datos útiles</div><div class="irow-b">Moneda: Peso mexicano (MXN) · Dólares aceptados ampliamente · Propina: 15–20% en restaurantes · Zona horaria: MST UTC-7 · Voltaje: 110V enchufes tipo americano</div></div></div>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:3.5mm;">
+        <div class="eyebrow" style="margin-bottom:1mm;">Contactos de emergencia</div>
+        <div class="em"><div class="em-lbl">House Manager · Primer contacto</div><div class="em-num">+52 624 217 5935</div><div class="em-note">Marlon Alexis Herrera. Emergencias y coordinación — respuesta prioritaria.</div></div>
+        <div class="em"><div class="em-lbl">Policía · Bomberos · Emergencias</div><div class="em-num">911</div><div class="em-note">Servicio de emergencias general. Igual que en EE.UU. / Canadá.</div></div>
+        <div class="em"><div class="em-lbl">Hospital H+ Los Cabos · Recomendado</div><div class="em-num">+52 624 104 9300</div><div class="em-note">Mejor hospital privado. Urgencias 24 hrs. Médicos de habla inglesa. 15 min en auto</div></div>
+        <div class="em"><div class="em-lbl">Cruz Roja · Ambulancia</div><div class="em-num">+52 624 143 3300</div><div class="em-note">Servicio de ambulancia de Los Cabos.</div></div>
+        <div class="em"><div class="em-lbl">Farmacia del Ahorro · 24 hrs</div><div class="em-num">+52 624 143 8929</div><div class="em-note">Farmacia con médico de guardia. Rápida para emergencias menores. 8 min en auto</div></div>
+        <div>
+          <div class="eyebrow" style="margin-bottom:3mm;">Equipo de seguridad en la villa</div>
+          <div class="blist">
+            <div class="bi">Extinguidor: gabinete cocina, compartimiento inferior izquierdo</div>
+            <div class="bi">Botiquín: baño de la suite master, repisa superior</div>
+            <div class="bi">Salvavidas: gabinete de alberca, panel derecho</div>
+            <div class="bi">Caja fuerte: clóset de la suite master — código te lo da Marlon al llegar</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="page-footer"><span>Villa Sera · Guía del Huésped 2026</span><span class="pgn">14</span><span>villa-sera.com</span></div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════
+  PÁGINA 15 · REGLAS + CHECK-OUT + CIERRE
+═══════════════════════════════════════════════ -->
+<div class="page">
+  <div class="top-bar-thin"></div>
+  <div class="pb" style="gap:5mm;">
+    <div>
+      <div class="eyebrow">09 · Salida</div>
+      <div class="section-title">Antes de partir · 11:00 AM</div>
+      <div class="section-rule"></div>
+    </div>
+
+    <div>
+      <div class="eyebrow" style="margin-bottom:4mm;">Reglamento de la villa</div>
+      <div class="col2" style="gap:3mm;">
+        <div class="rule-item"><div class="rule-dot"></div><div class="rule-t">No fumar dentro de la villa. Área de fumadores en la terraza exterior únicamente.</div></div>
+        <div class="rule-item"><div class="rule-dot"></div><div class="rule-t">No se aceptan mascotas sin autorización previa por escrito.</div></div>
+        <div class="rule-item"><div class="rule-dot"></div><div class="rule-t">Máximo 8 huéspedes por noche. Visitas diurnas con aviso previo.</div></div>
+        <div class="rule-item"><div class="rule-dot"></div><div class="rule-t">Eventos o fiestas requieren autorización — silencio en exteriores desde las 11:00 PM.</div></div>
+        <div class="rule-item"><div class="rule-dot"></div><div class="rule-t">La playa privada es exclusiva para huéspedes de Villa Sera.</div></div>
+        <div class="rule-item"><div class="rule-dot"></div><div class="rule-t">Reporta cualquier daño inmediatamente — los accidentes se entienden, la honestidad se agradece.</div></div>
+        <div class="rule-item"><div class="rule-dot"></div><div class="rule-t">No tire toallitas húmedas ni productos higiénicos al inodoro — use botes de basura.</div></div>
+        <div class="rule-item"><div class="rule-dot"></div><div class="rule-t">Sin vidrio en el área de alberca o splash pool — se proporcionan vasos de plástico.</div></div>
+        <div class="rule-item"><div class="rule-dot"></div><div class="rule-t">Apague el jacuzzi (Recámara 2) al terminar de usarlo — Jets y Heater.</div></div>
+        <div class="rule-item"><div class="rule-dot"></div><div class="rule-t">Niños siempre supervisados cerca del agua — sin excepción.</div></div>
+        <div class="rule-item"><div class="rule-dot"></div><div class="rule-t">Apaga todos los ACs y luces al salir de la villa.</div></div>
+        <div class="rule-item"><div class="rule-dot"></div><div class="rule-t">No muevas ni saques el mobiliario de la propiedad.</div></div>
+        <div class="rule-item"><div class="rule-dot"></div><div class="rule-t">Cubre la caminadora después de cada uso — el salitre daña la banda.</div></div>
+        <div class="rule-item"><div class="rule-dot"></div><div class="rule-t">Cierra sesión en tus cuentas de streaming en todos los televisores al hacer check-out.</div></div>
+      </div>
+    </div>
+
+    <div>
+      <div class="eyebrow" style="margin-bottom:4mm;">Check-out · Lista — antes de las 11:00 AM</div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:3mm;">
+        <div class="co"><div class="co-n">1</div><div class="co-l">Devuelve llaves, controles de TV, AC, reja de alberca y garage</div></div>
+        <div class="co"><div class="co-n">2</div><div class="co-l">Apaga todos los ACs, jacuzzi (Rec. 2) y aparatos eléctricos</div></div>
+        <div class="co"><div class="co-n">3</div><div class="co-l">Cierra ventanas, puertas y terrazas (hermeticidad)</div></div>
+        <div class="co"><div class="co-n">4</div><div class="co-l">Cierra sesión de streaming en todas las TCL</div></div>
+        <div class="co"><div class="co-n">5</div><div class="co-l">Cubre la caminadora con su funda impermeable</div></div>
+        <div class="co"><div class="co-n">6</div><div class="co-l">Basura en botes exteriores con bolsas negras</div></div>
+        <div class="co"><div class="co-n">7</div><div class="co-l">Revisa que no queden pertenencias en clósets o caja fuerte</div></div>
+        <div class="co"><div class="co-n">8</div><div class="co-l">Avisa a Marlon por WhatsApp cuando estés listo para salir</div></div>
+      </div>
+    </div>
+
+    <!-- Cierre -->
+    <div class="card-feature" style="text-align:center;padding:7mm;display:flex;flex-direction:column;align-items:center;gap:6px;flex:1;justify-content:center;">
+      <div style="font-family:'Cormorant Garamond',serif;font-size:13px;font-style:italic;color:var(--muted);">Gracias por quedarte en</div>
+      <div style="font-family:'Cormorant Garamond',serif;font-size:36px;font-weight:400;color:var(--ink);">Villa Sera</div>
+      <div style="width:28px;height:1px;background:var(--line);"></div>
+      <div style="font-family:'Cormorant Garamond',serif;font-size:14px;font-style:italic;color:var(--ink-soft);max-width:85%;">"Que el mar, la luz y la calma de este rincón te acompañen mucho después de haber cerrado la puerta."</div>
+      <div style="font-size:8.5px;letter-spacing:0.22em;text-transform:uppercase;color:var(--muted);margin-top:3px;">Los Cabos · México · A Sera Holding Property</div>
+      <div style="font-size:10px;color:var(--muted);">villa-sera.com · @villasera · villasera@seraholding.com</div>
+    </div>
+  </div>
+  <div class="page-footer"><span>Villa Sera · Guía del Huésped 2026</span><span class="pgn">15</span><span>villa-sera.com</span></div>
+</div>
+
+
+</body>
+</html>
