@@ -7,7 +7,7 @@ const intlMiddleware = createMiddleware(routing);
 
 export default function proxy(request: NextRequest) {
   const p = request.nextUrl.pathname;
-  if (p === '/guest-guide' || p.startsWith('/guest-guide/')) {
+  if (p === '/guest-guide' || p.startsWith('/guest-guide/') || p.startsWith('/admin')) {
     return NextResponse.next();
   }
   return intlMiddleware(request);
