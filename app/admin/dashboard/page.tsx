@@ -69,9 +69,10 @@ export default function Dashboard() {
   const [csvLoading, setCsvLoading] = useState(false)
   const [csvResult, setCsvResult] = useState<string | null>(null)
   const csvRef = useRef<HTMLInputElement>(null)
+  const pidRef = useRef<number | null>(null)
 
   const loadAll = useCallback(async (propId?: number) => {
-    const p = propId ?? pid
+    const p = propId ?? pidRef.current
     try {
       const suffix = p ? `?propiedad_id=${p}` : ''
       const [props, res, mant, fin, gf, sum] = await Promise.all([
@@ -88,18 +89,22 @@ export default function Dashboard() {
       setFinanzas(fin)
       setGastosFijos(gf)
       setResumen(sum)
-      if (!pid && props.length) setPid(props[0].id)
+      if (!pidRef.current && props.length) {
+        pidRef.current = props[0].id
+        setPid(props[0].id)
+      }
     } catch { router.replace('/admin') }
-  }, [pid, router])
+  }, [router])
 
   useEffect(() => {
     if (!localStorage.getItem('admin_token')) { router.replace('/admin'); return }
     loadAll()
     const iv = setInterval(() => checkHealth().then(setOnline), 30000)
     return () => clearInterval(iv)
-  }, [router, loadAll])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
-  function changeProp(id: number) { setPid(id); loadAll(id) }
+  function changeProp(id: number) { pidRef.current = id; setPid(id); loadAll(id) }
 
   async function importCSV() {
     if (!csvFile || !pid) return
