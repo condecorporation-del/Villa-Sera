@@ -1,392 +1,705 @@
 'use client'
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { api, logout, checkHealth } from '@/lib/admin-api'
 
-const GOLD = '#C9A84C'
-const BG = '#0a0a0a'
-const CARD = '#111111'
-const BORDER = '#1e1e1e'
-const TEXT = '#F8F4EF'
-const MUTED = '#888'
+// ── THEME ─────────────────────────────────────────────────
+const G = '#C9A84C'       // gold
+const BG = '#0a0a0a'      // background
+const C1 = '#111111'      // card
+const C2 = '#181818'      // card alt
+const BD = '#222222'      // border
+const TX = '#F8F4EF'      // text
+const MU = '#666666'      // muted
+const GR = '#22c55e'      // green
+const RD = '#ef4444'      // red
 
-type Tab = 'resumen' | 'reservaciones' | 'mantenimiento' | 'finanzas'
+// ── TYPES ─────────────────────────────────────────────────
+type Tab = 'dashboard' | 'reservas' | 'finanzas' | 'mantenimiento'
+type FinTab = 'ingresos' | 'fijos' | 'gastos'
 
 interface Resumen {
-  propiedades: number
-  reservaciones_activas: number
-  mantenimientos_pendientes: number
-  mantenimientos_urgentes: string[]
-  ingresos_mes: number
-  gastos_mes: number
-  balance_mes: number
+  ganancia_neta: number; ingresos_mes: number; gastos_mes: number
+  gastos_fijos_mes: number; gastos_variables_mes: number
+  ocupacion_porcentaje: number; noches_ocupadas: number
+  reservaciones_activas: number; mantenimientos_pendientes: number
+  mantenimientos_urgentes: { id: number; titulo: string; prioridad: string; fecha: string | null }[]
 }
-
 interface Propiedad { id: number; nombre: string; direccion: string }
 interface Reservacion {
   id: number; huesped_nombre: string; check_in: string; check_out: string
-  monto_total: number; estado: string; notas: string; propiedad_id: number
+  noches: number; monto_total: number; estado: string; notas: string
+  propiedad_id: number; fuente: string; codigo_confirmacion: string
 }
 interface Mantenimiento {
   id: number; titulo: string; estado: string; prioridad: string
-  fecha_programada: string; costo: number; proveedor: string; propiedad_id: number; recurrente: boolean
+  fecha_programada: string | null; costo: number | null; proveedor: string | null
+  propiedad_id: number; recurrente: boolean; descripcion: string
 }
 interface Finanza {
   id: number; tipo: string; categoria: string; descripcion: string
-  monto: number; fecha: string; comprobante_nombre: string; propiedad_id: number
+  monto: number; fecha: string; comprobante_nombre: string | null; propiedad_id: number; fuente: string
+}
+interface GastoFijo {
+  id: number; nombre: string; monto: number; categoria: string
+  dia_cobro: number | null; propiedad_id: number
 }
 
+// ── HELPERS ───────────────────────────────────────────────
+const usd = (n: number) => '$' + Math.abs(n).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })
+const fDate = (s: string) => s ? new Date(s).toLocaleDateString('es-MX', { day: '2-digit', month: 'short' }) : '—'
+const fDateLong = (s: string) => s ? new Date(s).toLocaleDateString('es-MX', { day: '2-digit', month: 'short', year: 'numeric' }) : '—'
+const isOverdue = (s: string | null) => s ? new Date(s) < new Date() : false
+
+// ── MAIN ──────────────────────────────────────────────────
 export default function Dashboard() {
   const router = useRouter()
-  const [tab, setTab] = useState<Tab>('resumen')
+  const [tab, setTab] = useState<Tab>('dashboard')
+  const [finTab, setFinTab] = useState<FinTab>('ingresos')
   const [online, setOnline] = useState(true)
   const [propiedades, setPropiedades] = useState<Propiedad[]>([])
-  const [propiedadSel, setPropiedadSel] = useState<number | null>(null)
+  const [pid, setPid] = useState<number | null>(null)
   const [resumen, setResumen] = useState<Resumen | null>(null)
   const [reservaciones, setReservaciones] = useState<Reservacion[]>([])
   const [mantenimientos, setMantenimientos] = useState<Mantenimiento[]>([])
   const [finanzas, setFinanzas] = useState<Finanza[]>([])
-  const [showForm, setShowForm] = useState(false)
-  const [formType, setFormType] = useState<'reservacion' | 'mantenimiento' | 'finanza' | null>(null)
+  const [gastosFijos, setGastosFijos] = useState<GastoFijo[]>([])
+  const [modal, setModal] = useState<string | null>(null)
+  const [csvFile, setCsvFile] = useState<File | null>(null)
+  const [csvLoading, setCsvLoading] = useState(false)
+  const [csvResult, setCsvResult] = useState<string | null>(null)
+  const csvRef = useRef<HTMLInputElement>(null)
 
-  const loadData = useCallback(async () => {
+  const loadAll = useCallback(async (propId?: number) => {
+    const p = propId ?? pid
     try {
-      const [props, res, mant, fin, sum] = await Promise.all([
+      const suffix = p ? `?propiedad_id=${p}` : ''
+      const [props, res, mant, fin, gf, sum] = await Promise.all([
         api.get('/api/propiedades'),
-        api.get('/api/reservaciones'),
-        api.get('/api/mantenimientos'),
-        api.get('/api/finanzas'),
-        api.get('/api/resumen'),
+        api.get(`/api/reservaciones${suffix}`),
+        api.get(`/api/mantenimientos${suffix}`),
+        api.get(`/api/finanzas${suffix}`),
+        api.get(`/api/gastos-fijos${suffix}`),
+        api.get(`/api/resumen${suffix}`),
       ])
       setPropiedades(props)
       setReservaciones(res)
       setMantenimientos(mant)
       setFinanzas(fin)
+      setGastosFijos(gf)
       setResumen(sum)
-      if (props.length > 0 && !propiedadSel) setPropiedadSel(props[0].id)
-    } catch {
-      router.replace('/admin')
-    }
-  }, [router, propiedadSel])
+      if (!pid && props.length) setPid(props[0].id)
+    } catch { router.replace('/admin') }
+  }, [pid, router])
 
   useEffect(() => {
     if (!localStorage.getItem('admin_token')) { router.replace('/admin'); return }
-    loadData()
-    const interval = setInterval(async () => {
-      const h = await checkHealth()
-      setOnline(h)
-    }, 30000)
-    return () => clearInterval(interval)
-  }, [router, loadData])
+    loadAll()
+    const iv = setInterval(() => checkHealth().then(setOnline), 30000)
+    return () => clearInterval(iv)
+  }, [router, loadAll])
 
-  function handleLogout() { logout(); router.replace('/admin') }
+  function changeProp(id: number) { setPid(id); loadAll(id) }
 
-  const fmt = (n: number) => n?.toLocaleString('es-MX', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }) ?? '$0'
-  const fmtDate = (s: string) => s ? new Date(s).toLocaleDateString('es-MX', { day: '2-digit', month: 'short', year: 'numeric' }) : '—'
+  async function importCSV() {
+    if (!csvFile || !pid) return
+    setCsvLoading(true); setCsvResult(null)
+    const fd = new FormData()
+    fd.append('propiedad_id', String(pid))
+    fd.append('archivo', csvFile)
+    try {
+      const r = await api.postForm('/api/importar-airbnb', fd)
+      setCsvResult(`✓ ${r.reservas_creadas} reservas y ${r.ingresos_creados} ingresos importados${r.errores?.length ? ` (${r.errores.length} errores)` : ''}`)
+      loadAll()
+    } catch (e: unknown) {
+      setCsvResult(`Error: ${e instanceof Error ? e.message : 'desconocido'}`)
+    } finally { setCsvLoading(false) }
+  }
 
-  const prioColor = (p: string) => p === 'alta' ? '#ef4444' : p === 'media' ? GOLD : '#22c55e'
-  const estadoColor = (e: string) => e === 'completado' ? '#22c55e' : e === 'en_proceso' ? GOLD : '#888'
+  const ingresos = finanzas.filter(f => f.tipo === 'ingreso')
+  const gastos = finanzas.filter(f => f.tipo === 'gasto')
+  const pendientes = mantenimientos.filter(m => m.estado !== 'completado')
+  const completados = mantenimientos.filter(m => m.estado === 'completado')
+
+  // ── STYLES ──────────────────────────────────────────────
+  const s = {
+    wrap: { minHeight: '100vh', background: BG, color: TX, fontFamily: "'Inter',system-ui,sans-serif", paddingBottom: 80 } as React.CSSProperties,
+    header: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 16px', borderBottom: `1px solid ${BD}`, position: 'sticky' as const, top: 0, background: BG, zIndex: 50 },
+    card: { background: C1, border: `1px solid ${BD}`, borderRadius: 12, padding: '16px' } as React.CSSProperties,
+    row: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '13px 0', borderBottom: `1px solid ${BD}` } as React.CSSProperties,
+    btn: (color = G, text = BG) => ({ background: color, color: text, border: 'none', padding: '10px 18px', borderRadius: 8, cursor: 'pointer', fontSize: 14, fontWeight: 600 } as React.CSSProperties),
+    btnSm: (color = G, text = BG) => ({ background: color, color: text, border: 'none', padding: '6px 12px', borderRadius: 6, cursor: 'pointer', fontSize: 12, fontWeight: 600 } as React.CSSProperties),
+    btnGhost: { background: 'none', border: `1px solid ${BD}`, color: MU, padding: '6px 12px', borderRadius: 6, cursor: 'pointer', fontSize: 12 } as React.CSSProperties,
+    lbl: { fontSize: 10, letterSpacing: '0.15em', textTransform: 'uppercase' as const, color: MU, marginBottom: 4, display: 'block' },
+    inp: { width: '100%', background: '#0f0f0f', border: `1px solid ${BD}`, color: TX, padding: '10px 12px', borderRadius: 8, fontSize: 14, boxSizing: 'border-box' as const },
+    section: { padding: '0 16px' } as React.CSSProperties,
+    badge: (c: string) => ({ fontSize: 11, padding: '3px 8px', borderRadius: 20, background: c + '20', color: c, fontWeight: 600 }) as React.CSSProperties,
+  }
 
   return (
-    <div style={{ minHeight: '100vh', background: BG, color: TEXT, fontFamily: "'Inter', system-ui, sans-serif" }}>
+    <div style={s.wrap}>
       {/* Header */}
-      <div style={{ borderBottom: `1px solid ${BORDER}`, padding: '0 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 56 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-          <span style={{ fontFamily: 'Georgia,serif', fontSize: 18, color: GOLD }}>VS</span>
-          <span style={{ fontSize: 13, color: MUTED }}>Admin</span>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-            <div style={{ width: 6, height: 6, borderRadius: '50%', background: online ? '#22c55e' : '#ef4444', boxShadow: online ? '0 0 4px #22c55e' : 'none' }} />
-            <span style={{ fontSize: 11, color: online ? '#86efac' : '#fca5a5' }}>{online ? 'online' : 'offline'}</span>
-          </div>
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-          <select
-            value={propiedadSel ?? ''}
-            onChange={e => setPropiedadSel(Number(e.target.value))}
-            style={{ background: '#1a1a1a', border: `1px solid ${BORDER}`, color: TEXT, padding: '6px 10px', borderRadius: 6, fontSize: 13 }}
-          >
+      <div style={s.header}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <span style={{ fontFamily: 'Georgia,serif', fontSize: 20, color: G }}>VS</span>
+          <select value={pid ?? ''} onChange={e => changeProp(Number(e.target.value))}
+            style={{ background: '#111', border: `1px solid ${BD}`, color: TX, padding: '4px 8px', borderRadius: 6, fontSize: 13 }}>
             {propiedades.map(p => <option key={p.id} value={p.id}>{p.nombre}</option>)}
           </select>
-          <button onClick={handleLogout} style={{ background: 'none', border: `1px solid ${BORDER}`, color: MUTED, padding: '6px 14px', borderRadius: 6, cursor: 'pointer', fontSize: 13 }}>
-            Salir
-          </button>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+            <div style={{ width: 7, height: 7, borderRadius: '50%', background: online ? GR : RD, boxShadow: online ? `0 0 5px ${GR}` : 'none' }} />
+            <span style={{ fontSize: 11, color: online ? '#86efac' : '#fca5a5' }}>{online ? 'online' : 'offline'}</span>
+          </div>
+          <button onClick={() => { logout(); router.replace('/admin') }} style={s.btnGhost}>Salir</button>
         </div>
       </div>
 
-      {/* Tabs */}
-      <div style={{ borderBottom: `1px solid ${BORDER}`, padding: '0 24px', display: 'flex', gap: 0 }}>
-        {(['resumen', 'reservaciones', 'mantenimiento', 'finanzas'] as Tab[]).map(t => (
-          <button key={t} onClick={() => setTab(t)} style={{
-            padding: '14px 20px', background: 'none', border: 'none', cursor: 'pointer',
-            fontSize: 13, color: tab === t ? GOLD : MUTED,
-            borderBottom: tab === t ? `2px solid ${GOLD}` : '2px solid transparent',
-            textTransform: 'capitalize', transition: 'color 0.2s'
+      {/* Content */}
+      <div style={{ paddingTop: 16 }}>
+
+        {/* ── DASHBOARD TAB ── */}
+        {tab === 'dashboard' && resumen && (
+          <div style={s.section}>
+            {/* Ganancia neta — headline */}
+            <div style={{ ...s.card, textAlign: 'center', marginBottom: 16, background: 'linear-gradient(135deg,#111,#1a1400)' }}>
+              <div style={s.lbl}>Ganancia Neta del Mes</div>
+              <div style={{ fontFamily: 'Georgia,serif', fontSize: 48, color: resumen.ganancia_neta >= 0 ? G : RD, lineHeight: 1.1 }}>
+                {resumen.ganancia_neta < 0 ? '-' : ''}{usd(resumen.ganancia_neta)}
+              </div>
+              <div style={{ fontSize: 12, color: MU, marginTop: 6 }}>
+                {usd(resumen.ingresos_mes)} ingresos − {usd(resumen.gastos_mes)} gastos
+              </div>
+            </div>
+
+            {/* KPI grid */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 16 }}>
+              {[
+                { lbl: 'Ingresos', val: usd(resumen.ingresos_mes), color: GR },
+                { lbl: 'Gastos Fijos', val: usd(resumen.gastos_fijos_mes), color: RD },
+                { lbl: 'Gastos Variables', val: usd(resumen.gastos_variables_mes), color: '#f97316' },
+                { lbl: 'Ocupación', val: `${resumen.ocupacion_porcentaje}%`, color: '#60a5fa' },
+              ].map(({ lbl, val, color }) => (
+                <div key={lbl} style={{ ...s.card, textAlign: 'center' }}>
+                  <div style={s.lbl}>{lbl}</div>
+                  <div style={{ fontSize: 22, color, fontFamily: 'Georgia,serif' }}>{val}</div>
+                </div>
+              ))}
+            </div>
+
+            {/* Upcoming maintenance alerts */}
+            {pendientes.length > 0 && (
+              <div style={{ marginBottom: 16 }}>
+                <div style={{ ...s.lbl, marginBottom: 8 }}>Mantenimientos Pendientes</div>
+                {pendientes.slice(0, 3).map(m => (
+                  <div key={m.id} style={{ ...s.card, marginBottom: 8, borderLeft: `3px solid ${m.prioridad === 'alta' ? RD : m.prioridad === 'media' ? G : GR}` }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <div>
+                        <div style={{ fontSize: 14, fontWeight: 600 }}>{m.titulo}</div>
+                        {m.fecha_programada && (
+                          <div style={{ fontSize: 12, color: isOverdue(m.fecha_programada) ? RD : MU, marginTop: 2 }}>
+                            {isOverdue(m.fecha_programada) ? '⚠ Vencido — ' : ''}{fDateLong(m.fecha_programada)}
+                          </div>
+                        )}
+                      </div>
+                      <button onClick={async () => { await api.patch(`/api/mantenimientos/${m.id}/completar`); loadAll() }}
+                        style={{ ...s.btnSm(GR, '#000'), fontSize: 18, padding: '4px 10px' }}>✓</button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Next check-ins */}
+            {reservaciones.filter(r => new Date(r.check_in) > new Date()).slice(0, 2).map(r => (
+              <div key={r.id} style={{ ...s.card, marginBottom: 8, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div>
+                  <div style={{ fontSize: 13, color: MU, marginBottom: 2 }}>Próximo check-in</div>
+                  <div style={{ fontSize: 15, fontWeight: 600 }}>{r.huesped_nombre}</div>
+                  <div style={{ fontSize: 12, color: MU }}>{fDate(r.check_in)} · {r.noches} noches</div>
+                </div>
+                <div style={{ fontFamily: 'Georgia,serif', fontSize: 20, color: GR }}>{r.monto_total ? usd(r.monto_total) : '—'}</div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* ── RESERVAS TAB ── */}
+        {tab === 'reservas' && (
+          <div style={s.section}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
+              <span style={{ ...s.lbl, marginBottom: 0 }}>{reservaciones.length} reservaciones</span>
+              <div style={{ display: 'flex', gap: 8 }}>
+                <button onClick={() => setModal('csv')} style={s.btnSm('#1a1a1a', G)}>↑ Airbnb CSV</button>
+                <button onClick={() => setModal('reservacion')} style={s.btn()}>+ Nueva</button>
+              </div>
+            </div>
+            {reservaciones.map(r => (
+              <div key={r.id} style={{ ...s.card, marginBottom: 10 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+                      <span style={{ fontSize: 15, fontWeight: 600 }}>{r.huesped_nombre}</span>
+                      {r.fuente === 'airbnb' && <span style={s.badge('#ff5a5f')}>Airbnb</span>}
+                    </div>
+                    <div style={{ fontSize: 13, color: MU }}>{fDate(r.check_in)} → {fDate(r.check_out)} · {r.noches} noches</div>
+                    {r.notas && <div style={{ fontSize: 12, color: MU, marginTop: 4 }}>{r.notas}</div>}
+                  </div>
+                  <div style={{ textAlign: 'right' }}>
+                    <div style={{ fontFamily: 'Georgia,serif', fontSize: 18, color: GR }}>{r.monto_total ? usd(r.monto_total) : '—'}</div>
+                    <div style={s.badge(r.estado === 'confirmada' ? GR : r.estado === 'completada' ? '#60a5fa' : MU)}>{r.estado}</div>
+                  </div>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 10 }}>
+                  <button onClick={async () => { await api.delete(`/api/reservaciones/${r.id}`); loadAll() }}
+                    style={{ ...s.btnGhost, color: RD, borderColor: RD + '40' }}>Eliminar</button>
+                </div>
+              </div>
+            ))}
+            {reservaciones.length === 0 && <Empty msg="No hay reservaciones" />}
+          </div>
+        )}
+
+        {/* ── FINANZAS TAB ── */}
+        {tab === 'finanzas' && (
+          <div>
+            {/* Sub-tabs */}
+            <div style={{ display: 'flex', borderBottom: `1px solid ${BD}`, marginBottom: 16, padding: '0 16px' }}>
+              {([['ingresos', 'Ingresos'], ['fijos', 'Gastos Fijos'], ['gastos', 'Variables']] as [FinTab, string][]).map(([key, lbl]) => (
+                <button key={key} onClick={() => setFinTab(key)} style={{
+                  flex: 1, padding: '11px 4px', background: 'none', border: 'none', cursor: 'pointer', fontSize: 13,
+                  color: finTab === key ? G : MU, borderBottom: finTab === key ? `2px solid ${G}` : '2px solid transparent', fontWeight: finTab === key ? 600 : 400
+                }}>{lbl}</button>
+              ))}
+            </div>
+
+            <div style={s.section}>
+              {/* INGRESOS */}
+              {finTab === 'ingresos' && (
+                <>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
+                    <div style={{ fontFamily: 'Georgia,serif', fontSize: 22, color: GR }}>{usd(ingresos.reduce((a, f) => a + f.monto, 0))}</div>
+                    <div style={{ display: 'flex', gap: 8 }}>
+                      <button onClick={() => setModal('csv')} style={s.btnSm('#1a1a1a', G)}>↑ Airbnb</button>
+                      <button onClick={() => setModal('ingreso')} style={s.btn()}>+ Agregar</button>
+                    </div>
+                  </div>
+                  {ingresos.map(f => <FinanzaRow key={f.id} f={f} onDelete={() => { api.delete(`/api/finanzas/${f.id}`).then(() => loadAll()) }} />)}
+                  {ingresos.length === 0 && <Empty msg="Sin ingresos este mes" />}
+                </>
+              )}
+
+              {/* GASTOS FIJOS */}
+              {finTab === 'fijos' && (
+                <>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
+                    <div>
+                      <div style={s.lbl}>Total mensual</div>
+                      <div style={{ fontFamily: 'Georgia,serif', fontSize: 22, color: RD }}>{usd(gastosFijos.reduce((a, g) => a + g.monto, 0))}</div>
+                    </div>
+                    <button onClick={() => setModal('gasto_fijo')} style={s.btn()}>+ Agregar</button>
+                  </div>
+                  {gastosFijos.map(g => (
+                    <div key={g.id} style={{ ...s.card, marginBottom: 10, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <div>
+                        <div style={{ fontSize: 15, fontWeight: 600 }}>{g.nombre}</div>
+                        <div style={{ fontSize: 12, color: MU }}>{g.categoria}{g.dia_cobro ? ` · día ${g.dia_cobro}` : ''}</div>
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                        <div style={{ fontFamily: 'Georgia,serif', fontSize: 18, color: RD }}>{usd(g.monto)}</div>
+                        <button onClick={async () => { await api.delete(`/api/gastos-fijos/${g.id}`); loadAll() }}
+                          style={{ background: 'none', border: 'none', color: RD + '80', cursor: 'pointer', fontSize: 18 }}>×</button>
+                      </div>
+                    </div>
+                  ))}
+                  {gastosFijos.length === 0 && <Empty msg="Sin gastos fijos registrados" />}
+                </>
+              )}
+
+              {/* GASTOS VARIABLES */}
+              {finTab === 'gastos' && (
+                <>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
+                    <div style={{ fontFamily: 'Georgia,serif', fontSize: 22, color: '#f97316' }}>{usd(gastos.reduce((a, f) => a + f.monto, 0))}</div>
+                    <button onClick={() => setModal('gasto')} style={s.btn()}>+ Agregar</button>
+                  </div>
+                  {gastos.map(f => <FinanzaRow key={f.id} f={f} onDelete={() => { api.delete(`/api/finanzas/${f.id}`).then(() => loadAll()) }} />)}
+                  {gastos.length === 0 && <Empty msg="Sin gastos variables" />}
+                </>
+              )}
+
+              {/* Resumen footer */}
+              {resumen && (
+                <div style={{ ...s.card, marginTop: 20, background: '#0d0d0d' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
+                    <span style={{ color: MU, fontSize: 13 }}>Ingresos</span>
+                    <span style={{ color: GR, fontSize: 13, fontWeight: 600 }}>+{usd(resumen.ingresos_mes)}</span>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
+                    <span style={{ color: MU, fontSize: 13 }}>Gastos Fijos</span>
+                    <span style={{ color: RD, fontSize: 13 }}>−{usd(resumen.gastos_fijos_mes)}</span>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 12 }}>
+                    <span style={{ color: MU, fontSize: 13 }}>Gastos Variables</span>
+                    <span style={{ color: '#f97316', fontSize: 13 }}>−{usd(resumen.gastos_variables_mes)}</span>
+                  </div>
+                  <div style={{ borderTop: `1px solid ${BD}`, paddingTop: 12, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span style={{ fontWeight: 700, fontSize: 15 }}>Ganancia Neta</span>
+                    <span style={{ fontFamily: 'Georgia,serif', fontSize: 24, color: resumen.ganancia_neta >= 0 ? G : RD, fontWeight: 600 }}>
+                      {resumen.ganancia_neta < 0 ? '-' : ''}{usd(resumen.ganancia_neta)}
+                    </span>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* ── MANTENIMIENTO TAB ── */}
+        {tab === 'mantenimiento' && (
+          <div style={s.section}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+              <span style={{ ...s.lbl, marginBottom: 0 }}>{pendientes.length} pendientes</span>
+              <button onClick={() => setModal('mantenimiento')} style={s.btn()}>+ Nuevo</button>
+            </div>
+
+            {pendientes.length > 0 && (
+              <>
+                <div style={s.lbl}>Pendientes</div>
+                {pendientes.map(m => (
+                  <div key={m.id} style={{ ...s.card, marginBottom: 10, borderLeft: `3px solid ${m.prioridad === 'alta' ? RD : m.prioridad === 'media' ? G : GR}` }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                      <div style={{ flex: 1, marginRight: 12 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+                          <span style={{ fontSize: 15, fontWeight: 600 }}>{m.titulo}</span>
+                          <span style={s.badge(m.prioridad === 'alta' ? RD : m.prioridad === 'media' ? G : GR)}>{m.prioridad}</span>
+                        </div>
+                        {m.descripcion && <div style={{ fontSize: 12, color: MU, marginBottom: 4 }}>{m.descripcion}</div>}
+                        <div style={{ fontSize: 12, color: isOverdue(m.fecha_programada) ? RD : MU }}>
+                          {m.fecha_programada ? (isOverdue(m.fecha_programada) ? '⚠ Vencido: ' : 'Para: ') + fDateLong(m.fecha_programada) : ''}
+                          {m.proveedor ? ` · ${m.proveedor}` : ''}
+                          {m.recurrente ? ' · ↻ recurrente' : ''}
+                        </div>
+                      </div>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 6, alignItems: 'flex-end' }}>
+                        <button onClick={async () => { await api.patch(`/api/mantenimientos/${m.id}/completar`); loadAll() }}
+                          style={{ ...s.btn(GR, '#000'), padding: '8px 14px', fontSize: 18 }}>✓</button>
+                        <button onClick={async () => { await api.delete(`/api/mantenimientos/${m.id}`); loadAll() }}
+                          style={{ ...s.btnGhost, color: RD + '80', borderColor: RD + '30', padding: '4px 10px' }}>×</button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </>
+            )}
+
+            {completados.length > 0 && (
+              <>
+                <div style={{ ...s.lbl, marginTop: 20 }}>Completados ({completados.length})</div>
+                {completados.slice(0, 5).map(m => (
+                  <div key={m.id} style={{ ...s.card, marginBottom: 8, opacity: 0.6 }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <span style={{ fontSize: 14, textDecoration: 'line-through', color: MU }}>{m.titulo}</span>
+                      <span style={{ fontSize: 12, color: GR }}>✓</span>
+                    </div>
+                  </div>
+                ))}
+              </>
+            )}
+            {mantenimientos.length === 0 && <Empty msg="Sin tareas de mantenimiento" />}
+          </div>
+        )}
+      </div>
+
+      {/* ── BOTTOM NAV ── */}
+      <div style={{
+        position: 'fixed', bottom: 0, left: 0, right: 0, background: '#0d0d0d',
+        borderTop: `1px solid ${BD}`, display: 'flex', zIndex: 100,
+        paddingBottom: 'env(safe-area-inset-bottom, 0px)'
+      }}>
+        {([
+          ['dashboard', '◈', 'Inicio'],
+          ['reservas', '⌂', 'Reservas'],
+          ['finanzas', '$', 'Finanzas'],
+          ['mantenimiento', '⚙', 'Manten.'],
+        ] as [Tab, string, string][]).map(([key, icon, lbl]) => (
+          <button key={key} onClick={() => setTab(key)} style={{
+            flex: 1, background: 'none', border: 'none', cursor: 'pointer',
+            padding: '10px 4px 8px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3
           }}>
-            {t}
+            <span style={{ fontSize: 20, color: tab === key ? G : MU }}>{icon}</span>
+            <span style={{ fontSize: 10, color: tab === key ? G : MU, fontWeight: tab === key ? 700 : 400 }}>{lbl}</span>
           </button>
         ))}
       </div>
 
-      <div style={{ padding: 24, maxWidth: 1100, margin: '0 auto' }}>
+      {/* ── MODALS ── */}
+      {modal && (
+        <Modal onClose={() => { setModal(null); setCsvResult(null); setCsvFile(null) }}>
+          {/* CSV Import */}
+          {modal === 'csv' && (
+            <div>
+              <ModalTitle>Importar Airbnb CSV</ModalTitle>
+              <p style={{ fontSize: 13, color: MU, marginBottom: 16 }}>Descarga el reporte de Airbnb en formato CSV desde Reservaciones → Historial de transacciones → Exportar.</p>
+              <input ref={csvRef} type="file" accept=".csv" onChange={e => setCsvFile(e.target.files?.[0] ?? null)}
+                style={{ ...s.inp, padding: '8px', color: MU, marginBottom: 12 }} />
+              {csvResult && <div style={{ padding: '10px 12px', background: csvResult.startsWith('✓') ? GR + '15' : RD + '15', borderRadius: 8, fontSize: 13, color: csvResult.startsWith('✓') ? GR : RD, marginBottom: 12 }}>{csvResult}</div>}
+              <button onClick={importCSV} disabled={!csvFile || csvLoading} style={{ ...s.btn(), width: '100%', opacity: csvFile ? 1 : 0.5 }}>
+                {csvLoading ? 'Importando...' : 'Importar'}
+              </button>
+            </div>
+          )}
 
-        {/* RESUMEN */}
-        {tab === 'resumen' && resumen && (
-          <div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px,1fr))', gap: 16, marginBottom: 32 }}>
-              {[
-                { label: 'Propiedades', value: resumen.propiedades, color: GOLD },
-                { label: 'Reservaciones activas', value: resumen.reservaciones_activas, color: '#60a5fa' },
-                { label: 'Mantenimientos pendientes', value: resumen.mantenimientos_pendientes, color: resumen.mantenimientos_pendientes > 0 ? '#facc15' : '#22c55e' },
-                { label: 'Ingresos este mes', value: fmt(resumen.ingresos_mes), color: '#22c55e' },
-                { label: 'Gastos este mes', value: fmt(resumen.gastos_mes), color: '#ef4444' },
-                { label: 'Balance del mes', value: fmt(resumen.balance_mes), color: resumen.balance_mes >= 0 ? '#22c55e' : '#ef4444' },
-              ].map(({ label, value, color }) => (
-                <div key={label} style={{ background: CARD, border: `1px solid ${BORDER}`, borderRadius: 8, padding: '20px 22px' }}>
-                  <div style={{ fontSize: 11, letterSpacing: '0.15em', color: MUTED, textTransform: 'uppercase', marginBottom: 8 }}>{label}</div>
-                  <div style={{ fontSize: 28, fontFamily: 'Georgia,serif', color, fontWeight: 400 }}>{value}</div>
-                </div>
-              ))}
-            </div>
-            {resumen.mantenimientos_urgentes.length > 0 && (
-              <div style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.25)', borderRadius: 8, padding: '16px 20px' }}>
-                <div style={{ fontSize: 11, letterSpacing: '0.15em', color: '#ef4444', textTransform: 'uppercase', marginBottom: 10 }}>Mantenimientos urgentes</div>
-                {resumen.mantenimientos_urgentes.map((t, i) => (
-                  <div key={i} style={{ fontSize: 14, color: '#fca5a5', padding: '4px 0' }}>• {t}</div>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
+          {/* Nueva Reservación */}
+          {modal === 'reservacion' && pid && (
+            <FormReservacion pid={pid} onSaved={() => { setModal(null); loadAll() }} />
+          )}
 
-        {/* RESERVACIONES */}
-        {tab === 'reservaciones' && (
-          <div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-              <div style={{ fontSize: 11, letterSpacing: '0.15em', color: MUTED, textTransform: 'uppercase' }}>
-                {reservaciones.filter(r => !propiedadSel || r.propiedad_id === propiedadSel).length} reservaciones
-              </div>
-              <button onClick={() => { setFormType('reservacion'); setShowForm(true) }} style={{
-                background: GOLD, color: '#0a0a0a', border: 'none', padding: '8px 18px', borderRadius: 6, cursor: 'pointer', fontSize: 13, fontWeight: 600
-              }}>+ Nueva</button>
-            </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-              {reservaciones
-                .filter(r => !propiedadSel || r.propiedad_id === propiedadSel)
-                .map(r => (
-                  <div key={r.id} style={{ background: CARD, border: `1px solid ${BORDER}`, borderRadius: 8, padding: '16px 20px', display: 'grid', gridTemplateColumns: '1fr 1fr 120px 100px', gap: 16, alignItems: 'center' }}>
-                    <div>
-                      <div style={{ fontWeight: 600, fontSize: 15 }}>{r.huesped_nombre}</div>
-                      {r.notas && <div style={{ fontSize: 12, color: MUTED, marginTop: 3 }}>{r.notas}</div>}
-                    </div>
-                    <div style={{ fontSize: 13, color: MUTED }}>
-                      {fmtDate(r.check_in)} → {fmtDate(r.check_out)}
-                    </div>
-                    <div style={{ fontSize: 15, color: '#22c55e', fontFamily: 'Georgia,serif' }}>{r.monto_total ? fmt(r.monto_total) : '—'}</div>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                      <span style={{ fontSize: 11, padding: '3px 8px', borderRadius: 4, background: r.estado === 'confirmada' ? 'rgba(34,197,94,0.1)' : 'rgba(201,168,76,0.1)', color: r.estado === 'confirmada' ? '#86efac' : GOLD }}>
-                        {r.estado}
-                      </span>
-                      <button onClick={async () => { await api.delete(`/api/reservaciones/${r.id}`); loadData() }} style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', fontSize: 16 }}>×</button>
-                    </div>
-                  </div>
-                ))}
-            </div>
-          </div>
-        )}
+          {/* Nuevo Mantenimiento */}
+          {modal === 'mantenimiento' && pid && (
+            <FormMantenimiento pid={pid} onSaved={() => { setModal(null); loadAll() }} />
+          )}
 
-        {/* MANTENIMIENTO */}
-        {tab === 'mantenimiento' && (
-          <div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-              <div style={{ fontSize: 11, letterSpacing: '0.15em', color: MUTED, textTransform: 'uppercase' }}>
-                {mantenimientos.filter(m => m.estado !== 'completado').length} pendientes
-              </div>
-              <button onClick={() => { setFormType('mantenimiento'); setShowForm(true) }} style={{
-                background: GOLD, color: '#0a0a0a', border: 'none', padding: '8px 18px', borderRadius: 6, cursor: 'pointer', fontSize: 13, fontWeight: 600
-              }}>+ Nuevo</button>
-            </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-              {mantenimientos
-                .filter(m => !propiedadSel || m.propiedad_id === propiedadSel)
-                .map(m => (
-                  <div key={m.id} style={{ background: CARD, border: `1px solid ${BORDER}`, borderLeft: `3px solid ${prioColor(m.prioridad)}`, borderRadius: 8, padding: '16px 20px', display: 'grid', gridTemplateColumns: '1fr 140px 120px auto', gap: 16, alignItems: 'center' }}>
-                    <div>
-                      <div style={{ fontWeight: 600, fontSize: 15 }}>{m.titulo}</div>
-                      {m.proveedor && <div style={{ fontSize: 12, color: MUTED, marginTop: 3 }}>Proveedor: {m.proveedor}</div>}
-                      {m.recurrente && <div style={{ fontSize: 11, color: GOLD, marginTop: 3 }}>↻ recurrente</div>}
-                    </div>
-                    <div style={{ fontSize: 13, color: MUTED }}>{fmtDate(m.fecha_programada)}</div>
-                    <span style={{ fontSize: 11, color: estadoColor(m.estado) }}>{m.estado.replace('_', ' ')}</span>
-                    <div style={{ display: 'flex', gap: 8 }}>
-                      {m.estado !== 'completado' && (
-                        <button onClick={async () => { await api.patch(`/api/mantenimientos/${m.id}/completar`); loadData() }}
-                          style={{ background: 'rgba(34,197,94,0.1)', border: '1px solid rgba(34,197,94,0.3)', color: '#86efac', padding: '4px 10px', borderRadius: 4, cursor: 'pointer', fontSize: 12 }}>
-                          ✓
-                        </button>
-                      )}
-                      <button onClick={async () => { await api.delete(`/api/mantenimientos/${m.id}`); loadData() }}
-                        style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', fontSize: 16 }}>×</button>
-                    </div>
-                  </div>
-                ))}
-            </div>
-          </div>
-        )}
+          {/* Nuevo Ingreso */}
+          {modal === 'ingreso' && pid && (
+            <FormFinanza pid={pid} tipo="ingreso" onSaved={() => { setModal(null); loadAll() }} />
+          )}
 
-        {/* FINANZAS */}
-        {tab === 'finanzas' && (
-          <div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-              <div style={{ fontSize: 11, letterSpacing: '0.15em', color: MUTED, textTransform: 'uppercase' }}>
-                Movimientos
-              </div>
-              <button onClick={() => { setFormType('finanza'); setShowForm(true) }} style={{
-                background: GOLD, color: '#0a0a0a', border: 'none', padding: '8px 18px', borderRadius: 6, cursor: 'pointer', fontSize: 13, fontWeight: 600
-              }}>+ Registrar</button>
-            </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-              {finanzas
-                .filter(f => !propiedadSel || f.propiedad_id === propiedadSel)
-                .map(f => (
-                  <div key={f.id} style={{ background: CARD, border: `1px solid ${BORDER}`, borderRadius: 8, padding: '14px 20px', display: 'grid', gridTemplateColumns: '1fr 120px 140px 100px auto', gap: 16, alignItems: 'center' }}>
-                    <div>
-                      <div style={{ fontSize: 14, fontWeight: 500 }}>{f.descripcion}</div>
-                      <div style={{ fontSize: 12, color: MUTED, marginTop: 2 }}>{f.categoria}</div>
-                    </div>
-                    <div style={{ fontSize: 13, color: MUTED }}>{fmtDate(f.fecha)}</div>
-                    <div style={{ fontFamily: 'Georgia,serif', fontSize: 18, color: f.tipo === 'ingreso' ? '#22c55e' : '#ef4444' }}>
-                      {f.tipo === 'ingreso' ? '+' : '-'}{fmt(f.monto)}
-                    </div>
-                    <div style={{ fontSize: 12, color: MUTED }}>{f.comprobante_nombre ? '📎 ' + f.comprobante_nombre.slice(0, 12) + '...' : ''}</div>
-                    <button onClick={async () => { await api.delete(`/api/finanzas/${f.id}`); loadData() }}
-                      style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', fontSize: 16 }}>×</button>
-                  </div>
-                ))}
-            </div>
-          </div>
-        )}
-      </div>
+          {/* Nuevo Gasto Variable */}
+          {modal === 'gasto' && pid && (
+            <FormFinanza pid={pid} tipo="gasto" onSaved={() => { setModal(null); loadAll() }} />
+          )}
 
-      {/* MODAL FORMS */}
-      {showForm && <FormModal type={formType!} propiedades={propiedades} propiedadSel={propiedadSel} onClose={() => setShowForm(false)} onSaved={() => { setShowForm(false); loadData() }} />}
+          {/* Nuevo Gasto Fijo */}
+          {modal === 'gasto_fijo' && pid && (
+            <FormGastoFijo pid={pid} onSaved={() => { setModal(null); loadAll() }} />
+          )}
+        </Modal>
+      )}
     </div>
   )
 }
 
-function FormModal({ type, propiedades, propiedadSel, onClose, onSaved }: {
-  type: 'reservacion' | 'mantenimiento' | 'finanza'
-  propiedades: Propiedad[]
-  propiedadSel: number | null
-  onClose: () => void
-  onSaved: () => void
-}) {
-  const [pid, setPid] = useState(propiedadSel ?? propiedades[0]?.id ?? 1)
-  const [loading, setLoading] = useState(false)
-  const [file, setFile] = useState<File | null>(null)
+// ── SUBCOMPONENTS ─────────────────────────────────────────
+function Empty({ msg }: { msg: string }) {
+  return <div style={{ textAlign: 'center', color: MU, padding: '40px 0', fontSize: 14 }}>{msg}</div>
+}
 
-  const CARD = '#111111'; const BORDER = '#1e1e1e'; const TEXT = '#F8F4EF'; const MUTED = '#888'; const GOLD = '#C9A84C'
-  const input: React.CSSProperties = { width: '100%', background: '#0a0a0a', border: `1px solid ${BORDER}`, color: TEXT, padding: '10px 12px', borderRadius: 6, fontSize: 14, boxSizing: 'border-box' }
-  const label: React.CSSProperties = { fontSize: 11, letterSpacing: '0.12em', color: MUTED, textTransform: 'uppercase', display: 'block', marginBottom: 5 }
-
-  async function submit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault()
-    setLoading(true)
-    const fd = new FormData(e.currentTarget)
-    fd.set('propiedad_id', String(pid))
-    try {
-      if (type === 'reservacion') await api.post('/api/reservaciones', Object.fromEntries(fd))
-      else if (type === 'mantenimiento') await api.post('/api/mantenimientos', Object.fromEntries(fd))
-      else if (type === 'finanza') {
-        if (file) fd.set('comprobante', file)
-        await api.postForm('/api/finanzas', fd)
-      }
-      onSaved()
-    } finally {
-      setLoading(false)
-    }
-  }
-
+function FinanzaRow({ f, onDelete }: { f: Finanza; onDelete: () => void }) {
+  const isIngreso = f.tipo === 'ingreso'
   return (
-    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100, padding: 24 }}>
-      <div style={{ background: CARD, border: `1px solid ${BORDER}`, borderRadius: 10, padding: 28, width: '100%', maxWidth: 500, maxHeight: '90vh', overflowY: 'auto' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 24 }}>
-          <span style={{ fontSize: 16, fontWeight: 600 }}>
-            {type === 'reservacion' ? 'Nueva Reservación' : type === 'mantenimiento' ? 'Nuevo Mantenimiento' : 'Registrar Movimiento'}
-          </span>
-          <button onClick={onClose} style={{ background: 'none', border: 'none', color: MUTED, fontSize: 20, cursor: 'pointer' }}>×</button>
+    <div style={{ background: C1, border: `1px solid ${BD}`, borderRadius: 10, padding: '12px 14px', marginBottom: 8 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+        <div style={{ flex: 1 }}>
+          <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 2 }}>{f.descripcion}</div>
+          <div style={{ fontSize: 12, color: MU }}>{f.categoria} · {fDate(f.fecha)}</div>
+          {f.comprobante_nombre && <div style={{ fontSize: 11, color: '#60a5fa', marginTop: 2 }}>📎 {f.comprobante_nombre}</div>}
         </div>
-
-        <form onSubmit={submit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-          <div>
-            <label style={label}>Propiedad</label>
-            <select value={pid} onChange={e => setPid(Number(e.target.value))} style={input}>
-              {propiedades.map(p => <option key={p.id} value={p.id}>{p.nombre}</option>)}
-            </select>
-          </div>
-
-          {type === 'reservacion' && <>
-            <div><label style={label}>Nombre del huésped</label><input name="huesped_nombre" required style={input} /></div>
-            <div><label style={label}>Email</label><input name="huesped_email" type="email" style={input} /></div>
-            <div><label style={label}>Teléfono</label><input name="huesped_telefono" style={input} /></div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-              <div><label style={label}>Check-in</label><input name="check_in" type="datetime-local" required style={input} /></div>
-              <div><label style={label}>Check-out</label><input name="check_out" type="datetime-local" required style={input} /></div>
-            </div>
-            <div><label style={label}>Monto total (USD)</label><input name="monto_total" type="number" step="0.01" style={input} /></div>
-            <div><label style={label}>Estado</label>
-              <select name="estado" style={input}><option value="confirmada">Confirmada</option><option value="pendiente">Pendiente</option><option value="cancelada">Cancelada</option></select>
-            </div>
-            <div><label style={label}>Notas</label><textarea name="notas" style={{ ...input, minHeight: 80 }} /></div>
-          </>}
-
-          {type === 'mantenimiento' && <>
-            <div><label style={label}>Título</label><input name="titulo" required style={input} /></div>
-            <div><label style={label}>Descripción</label><textarea name="descripcion" style={{ ...input, minHeight: 80 }} /></div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-              <div><label style={label}>Prioridad</label>
-                <select name="prioridad" style={input}><option value="baja">Baja</option><option value="media">Media</option><option value="alta">Alta</option></select>
-              </div>
-              <div><label style={label}>Fecha programada</label><input name="fecha_programada" type="datetime-local" style={input} /></div>
-            </div>
-            <div><label style={label}>Proveedor</label><input name="proveedor" style={input} /></div>
-            <div><label style={label}>Costo estimado (USD)</label><input name="costo" type="number" step="0.01" style={input} /></div>
-            <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-              <input name="recurrente" type="checkbox" id="rec" />
-              <label htmlFor="rec" style={{ color: TEXT, fontSize: 14 }}>Es recurrente</label>
-            </div>
-            <div><label style={label}>Cada cuántos días (si es recurrente)</label><input name="frecuencia_dias" type="number" style={input} /></div>
-          </>}
-
-          {type === 'finanza' && <>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-              <div><label style={label}>Tipo</label>
-                <select name="tipo" style={input}><option value="ingreso">Ingreso</option><option value="gasto">Gasto</option></select>
-              </div>
-              <div><label style={label}>Fecha</label><input name="fecha" type="date" required style={input} defaultValue={new Date().toISOString().split('T')[0]} /></div>
-            </div>
-            <div><label style={label}>Categoría</label>
-              <select name="categoria" style={input}>
-                <option>Renta</option><option>Mantenimiento</option><option>Servicios</option><option>Personal</option><option>Impuestos</option><option>Seguros</option><option>Otro</option>
-              </select>
-            </div>
-            <div><label style={label}>Descripción</label><input name="descripcion" required style={input} /></div>
-            <div><label style={label}>Monto (USD)</label><input name="monto" type="number" step="0.01" required style={input} /></div>
-            <div>
-              <label style={label}>Comprobante (opcional)</label>
-              <input type="file" accept="image/*,.pdf" onChange={e => setFile(e.target.files?.[0] ?? null)}
-                style={{ ...input, padding: '8px 12px', color: MUTED }} />
-            </div>
-            <div><label style={label}>Notas</label><textarea name="notas" style={{ ...input, minHeight: 60 }} /></div>
-          </>}
-
-          <button type="submit" disabled={loading} style={{
-            background: GOLD, color: '#0a0a0a', border: 'none', padding: '12px', borderRadius: 6,
-            cursor: loading ? 'not-allowed' : 'pointer', fontSize: 14, fontWeight: 600, marginTop: 8
-          }}>
-            {loading ? 'Guardando...' : 'Guardar'}
-          </button>
-        </form>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <span style={{ fontFamily: 'Georgia,serif', fontSize: 17, color: isIngreso ? GR : '#f97316' }}>
+            {isIngreso ? '+' : '-'}{usd(f.monto)}
+          </span>
+          <button onClick={onDelete} style={{ background: 'none', border: 'none', color: RD + '60', cursor: 'pointer', fontSize: 16 }}>×</button>
+        </div>
       </div>
     </div>
+  )
+}
+
+function Modal({ children, onClose }: { children: React.ReactNode; onClose: () => void }) {
+  return (
+    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', display: 'flex', alignItems: 'flex-end', zIndex: 200 }}
+      onClick={e => e.target === e.currentTarget && onClose()}>
+      <div style={{ background: '#111', border: `1px solid ${BD}`, borderRadius: '16px 16px 0 0', width: '100%', maxHeight: '92vh', overflowY: 'auto', padding: '20px 20px 40px' }}>
+        <div style={{ width: 36, height: 4, background: BD, borderRadius: 2, margin: '0 auto 20px' }} />
+        {children}
+      </div>
+    </div>
+  )
+}
+
+function ModalTitle({ children }: { children: React.ReactNode }) {
+  return <div style={{ fontSize: 18, fontWeight: 700, marginBottom: 20, color: TX }}>{children}</div>
+}
+
+function FormReservacion({ pid, onSaved }: { pid: number; onSaved: () => void }) {
+  const [v, setV] = useState({ huesped_nombre: '', huesped_telefono: '', check_in: '', check_out: '', monto_total: '', estado: 'confirmada', notas: '' })
+  const [loading, setLoading] = useState(false)
+  const inp: React.CSSProperties = { width: '100%', background: '#0f0f0f', border: `1px solid ${BD}`, color: TX, padding: '10px 12px', borderRadius: 8, fontSize: 14, boxSizing: 'border-box', marginBottom: 12 }
+  const lbl: React.CSSProperties = { fontSize: 11, color: MU, display: 'block', marginBottom: 4, letterSpacing: '0.1em', textTransform: 'uppercase' }
+  async function submit(e: React.FormEvent) {
+    e.preventDefault(); setLoading(true)
+    try {
+      await api.post('/api/reservaciones', { ...v, propiedad_id: pid, monto_total: parseFloat(v.monto_total) || null, check_in: new Date(v.check_in).toISOString(), check_out: new Date(v.check_out).toISOString() })
+      onSaved()
+    } finally { setLoading(false) }
+  }
+  return (
+    <form onSubmit={submit}>
+      <ModalTitle>Nueva Reservación</ModalTitle>
+      <label style={lbl}>Nombre del huésped *</label>
+      <input required style={inp} value={v.huesped_nombre} onChange={e => setV({ ...v, huesped_nombre: e.target.value })} />
+      <label style={lbl}>Teléfono</label>
+      <input style={inp} value={v.huesped_telefono} onChange={e => setV({ ...v, huesped_telefono: e.target.value })} />
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+        <div><label style={lbl}>Check-in *</label><input required type="datetime-local" style={inp} value={v.check_in} onChange={e => setV({ ...v, check_in: e.target.value })} /></div>
+        <div><label style={lbl}>Check-out *</label><input required type="datetime-local" style={inp} value={v.check_out} onChange={e => setV({ ...v, check_out: e.target.value })} /></div>
+      </div>
+      <label style={lbl}>Monto total (USD)</label>
+      <input type="number" step="0.01" style={inp} value={v.monto_total} onChange={e => setV({ ...v, monto_total: e.target.value })} />
+      <label style={lbl}>Estado</label>
+      <select style={{ ...inp }} value={v.estado} onChange={e => setV({ ...v, estado: e.target.value })}>
+        <option value="confirmada">Confirmada</option><option value="pendiente">Pendiente</option><option value="cancelada">Cancelada</option>
+      </select>
+      <label style={lbl}>Notas</label>
+      <textarea style={{ ...inp, minHeight: 70 }} value={v.notas} onChange={e => setV({ ...v, notas: e.target.value })} />
+      <button type="submit" disabled={loading} style={{ background: G, color: BG, border: 'none', padding: 14, borderRadius: 10, width: '100%', fontSize: 15, fontWeight: 700, cursor: 'pointer' }}>
+        {loading ? 'Guardando...' : 'Guardar'}
+      </button>
+    </form>
+  )
+}
+
+function FormMantenimiento({ pid, onSaved }: { pid: number; onSaved: () => void }) {
+  const [v, setV] = useState({ titulo: '', descripcion: '', prioridad: 'media', fecha_programada: '', proveedor: '', costo: '', recurrente: false, frecuencia_dias: '' })
+  const [loading, setLoading] = useState(false)
+  const inp: React.CSSProperties = { width: '100%', background: '#0f0f0f', border: `1px solid ${BD}`, color: TX, padding: '10px 12px', borderRadius: 8, fontSize: 14, boxSizing: 'border-box', marginBottom: 12 }
+  const lbl: React.CSSProperties = { fontSize: 11, color: MU, display: 'block', marginBottom: 4, letterSpacing: '0.1em', textTransform: 'uppercase' }
+  async function submit(e: React.FormEvent) {
+    e.preventDefault(); setLoading(true)
+    try {
+      await api.post('/api/mantenimientos', {
+        ...v, propiedad_id: pid, costo: parseFloat(v.costo) || null,
+        frecuencia_dias: parseInt(v.frecuencia_dias) || null,
+        fecha_programada: v.fecha_programada ? new Date(v.fecha_programada).toISOString() : null
+      })
+      onSaved()
+    } finally { setLoading(false) }
+  }
+  return (
+    <form onSubmit={submit}>
+      <ModalTitle>Nuevo Mantenimiento</ModalTitle>
+      <label style={lbl}>Título *</label>
+      <input required style={inp} value={v.titulo} onChange={e => setV({ ...v, titulo: e.target.value })} />
+      <label style={lbl}>Descripción</label>
+      <textarea style={{ ...inp, minHeight: 60 }} value={v.descripcion} onChange={e => setV({ ...v, descripcion: e.target.value })} />
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+        <div>
+          <label style={lbl}>Prioridad</label>
+          <select style={inp} value={v.prioridad} onChange={e => setV({ ...v, prioridad: e.target.value })}>
+            <option value="baja">Baja</option><option value="media">Media</option><option value="alta">Alta ⚠</option>
+          </select>
+        </div>
+        <div>
+          <label style={lbl}>Fecha programada</label>
+          <input type="datetime-local" style={inp} value={v.fecha_programada} onChange={e => setV({ ...v, fecha_programada: e.target.value })} />
+        </div>
+      </div>
+      <label style={lbl}>Proveedor / Técnico</label>
+      <input style={inp} value={v.proveedor} onChange={e => setV({ ...v, proveedor: e.target.value })} />
+      <label style={lbl}>Costo estimado (USD)</label>
+      <input type="number" step="0.01" style={inp} value={v.costo} onChange={e => setV({ ...v, costo: e.target.value })} />
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
+        <input type="checkbox" id="rec" checked={v.recurrente} onChange={e => setV({ ...v, recurrente: e.target.checked })} />
+        <label htmlFor="rec" style={{ color: TX, fontSize: 14 }}>Es recurrente</label>
+      </div>
+      {v.recurrente && (
+        <><label style={lbl}>Repetir cada (días)</label><input type="number" style={inp} value={v.frecuencia_dias} onChange={e => setV({ ...v, frecuencia_dias: e.target.value })} /></>
+      )}
+      <button type="submit" disabled={loading} style={{ background: G, color: BG, border: 'none', padding: 14, borderRadius: 10, width: '100%', fontSize: 15, fontWeight: 700, cursor: 'pointer' }}>
+        {loading ? 'Guardando...' : 'Guardar'}
+      </button>
+    </form>
+  )
+}
+
+function FormFinanza({ pid, tipo, onSaved }: { pid: number; tipo: string; onSaved: () => void }) {
+  const [v, setV] = useState({ descripcion: '', categoria: tipo === 'ingreso' ? 'Renta' : 'Mantenimiento', monto: '', fecha: new Date().toISOString().split('T')[0], notas: '' })
+  const [file, setFile] = useState<File | null>(null)
+  const [loading, setLoading] = useState(false)
+  const inp: React.CSSProperties = { width: '100%', background: '#0f0f0f', border: `1px solid ${BD}`, color: TX, padding: '10px 12px', borderRadius: 8, fontSize: 14, boxSizing: 'border-box', marginBottom: 12 }
+  const lbl: React.CSSProperties = { fontSize: 11, color: MU, display: 'block', marginBottom: 4, letterSpacing: '0.1em', textTransform: 'uppercase' }
+  const cats = tipo === 'ingreso' ? ['Renta', 'Depósito', 'Otro'] : ['Mantenimiento', 'Limpieza', 'Servicios', 'Suministros', 'Personal', 'Impuestos', 'Seguros', 'Otro']
+  async function submit(e: React.FormEvent) {
+    e.preventDefault(); setLoading(true)
+    try {
+      const fd = new FormData()
+      fd.append('propiedad_id', String(pid)); fd.append('tipo', tipo)
+      fd.append('categoria', v.categoria); fd.append('descripcion', v.descripcion)
+      fd.append('monto', v.monto); fd.append('fecha', v.fecha)
+      if (v.notas) fd.append('notas', v.notas)
+      if (file) fd.append('comprobante', file)
+      await api.postForm('/api/finanzas', fd)
+      onSaved()
+    } finally { setLoading(false) }
+  }
+  return (
+    <form onSubmit={submit}>
+      <ModalTitle>{tipo === 'ingreso' ? 'Nuevo Ingreso' : 'Nuevo Gasto'}</ModalTitle>
+      <label style={lbl}>Descripción *</label>
+      <input required style={inp} value={v.descripcion} onChange={e => setV({ ...v, descripcion: e.target.value })} />
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+        <div>
+          <label style={lbl}>Monto (USD) *</label>
+          <input required type="number" step="0.01" style={inp} value={v.monto} onChange={e => setV({ ...v, monto: e.target.value })} />
+        </div>
+        <div>
+          <label style={lbl}>Fecha *</label>
+          <input required type="date" style={inp} value={v.fecha} onChange={e => setV({ ...v, fecha: e.target.value })} />
+        </div>
+      </div>
+      <label style={lbl}>Categoría</label>
+      <select style={inp} value={v.categoria} onChange={e => setV({ ...v, categoria: e.target.value })}>
+        {cats.map(c => <option key={c}>{c}</option>)}
+      </select>
+      <label style={lbl}>Comprobante (foto / PDF)</label>
+      <input type="file" accept="image/*,.pdf" onChange={e => setFile(e.target.files?.[0] ?? null)}
+        style={{ ...inp, padding: '8px', color: MU }} />
+      <label style={lbl}>Notas</label>
+      <textarea style={{ ...inp, minHeight: 60 }} value={v.notas} onChange={e => setV({ ...v, notas: e.target.value })} />
+      <button type="submit" disabled={loading} style={{ background: G, color: BG, border: 'none', padding: 14, borderRadius: 10, width: '100%', fontSize: 15, fontWeight: 700, cursor: 'pointer' }}>
+        {loading ? 'Guardando...' : 'Guardar'}
+      </button>
+    </form>
+  )
+}
+
+function FormGastoFijo({ pid, onSaved }: { pid: number; onSaved: () => void }) {
+  const [v, setV] = useState({ nombre: '', monto: '', categoria: 'Servicios', dia_cobro: '' })
+  const [loading, setLoading] = useState(false)
+  const inp: React.CSSProperties = { width: '100%', background: '#0f0f0f', border: `1px solid ${BD}`, color: TX, padding: '10px 12px', borderRadius: 8, fontSize: 14, boxSizing: 'border-box', marginBottom: 12 }
+  const lbl: React.CSSProperties = { fontSize: 11, color: MU, display: 'block', marginBottom: 4, letterSpacing: '0.1em', textTransform: 'uppercase' }
+  async function submit(e: React.FormEvent) {
+    e.preventDefault(); setLoading(true)
+    try {
+      await api.post('/api/gastos-fijos', { ...v, propiedad_id: pid, monto: parseFloat(v.monto), dia_cobro: parseInt(v.dia_cobro) || null })
+      onSaved()
+    } finally { setLoading(false) }
+  }
+  return (
+    <form onSubmit={submit}>
+      <ModalTitle>Nuevo Gasto Fijo</ModalTitle>
+      <p style={{ fontSize: 13, color: MU, marginBottom: 16 }}>Gastos que se repiten cada mes (internet, alberca, HOA, limpieza...).</p>
+      <label style={lbl}>Nombre *</label>
+      <input required style={inp} placeholder="Ej: Servicio de alberca" value={v.nombre} onChange={e => setV({ ...v, nombre: e.target.value })} />
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+        <div>
+          <label style={lbl}>Monto mensual (USD) *</label>
+          <input required type="number" step="0.01" style={inp} value={v.monto} onChange={e => setV({ ...v, monto: e.target.value })} />
+        </div>
+        <div>
+          <label style={lbl}>Día de cobro</label>
+          <input type="number" min="1" max="31" style={inp} placeholder="1–31" value={v.dia_cobro} onChange={e => setV({ ...v, dia_cobro: e.target.value })} />
+        </div>
+      </div>
+      <label style={lbl}>Categoría</label>
+      <select style={inp} value={v.categoria} onChange={e => setV({ ...v, categoria: e.target.value })}>
+        {['Servicios', 'HOA', 'Limpieza', 'Seguridad', 'Seguros', 'Impuestos', 'Otro'].map(c => <option key={c}>{c}</option>)}
+      </select>
+      <button type="submit" disabled={loading} style={{ background: G, color: BG, border: 'none', padding: 14, borderRadius: 10, width: '100%', fontSize: 15, fontWeight: 700, cursor: 'pointer' }}>
+        {loading ? 'Guardando...' : 'Guardar'}
+      </button>
+    </form>
   )
 }
