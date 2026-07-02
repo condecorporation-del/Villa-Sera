@@ -122,36 +122,56 @@ export default function GallerySection() {
           ))}
         </motion.div>
 
-        {/* Grid */}
-        <motion.div layout className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
-          <AnimatePresence>
-            {filtered.map((img, i) => (
-              <motion.div
-                key={img.src}
-                layout
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.95 }}
-                transition={{ duration: 0.4 }}
-                className={`relative cursor-pointer overflow-hidden group ${
-                  i === 0 ? 'col-span-2 row-span-2' : ''
-                }`}
-                style={{ aspectRatio: i === 0 ? '1/1' : '4/3' }}
-                onClick={() => setLightbox(i)}
-              >
-                <Image
-                  src={img.src}
-                  alt={img.alt}
-                  fill
-                  quality={75}
-                  className="object-cover group-hover:scale-105 transition-transform duration-700"
-                  sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                />
-                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300" />
-              </motion.div>
-            ))}
-          </AnimatePresence>
-        </motion.div>
+        {/* Grid (or the villa video, when "All" is selected) */}
+        {active === 'all' ? (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.97 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.4 }}
+            className="relative rounded-sm overflow-hidden mx-auto max-w-4xl"
+            style={{ aspectRatio: '16/9' }}
+          >
+            <video
+              controls
+              playsInline
+              preload="metadata"
+              poster="/images/CasaSergio233.jpg"
+              className="absolute inset-0 w-full h-full object-cover"
+            >
+              <source src="https://res.cloudinary.com/dt9iyiorn/video/upload/v1782976236/Some_places_dont_just_take_your_breath_away_they_give_it_back_to_you._Villa_Sera_is_a_priva_xy0u9m.mp4" type="video/mp4" />
+            </video>
+          </motion.div>
+        ) : (
+          <motion.div layout className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
+            <AnimatePresence>
+              {filtered.map((img, i) => (
+                <motion.div
+                  key={img.src}
+                  layout
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.95 }}
+                  transition={{ duration: 0.4 }}
+                  className={`relative cursor-pointer overflow-hidden group ${
+                    i === 0 ? 'col-span-2 row-span-2' : ''
+                  }`}
+                  style={{ aspectRatio: i === 0 ? '1/1' : '4/3' }}
+                  onClick={() => setLightbox(i)}
+                >
+                  <Image
+                    src={img.src}
+                    alt={img.alt}
+                    fill
+                    quality={75}
+                    className="object-cover group-hover:scale-105 transition-transform duration-700"
+                    sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                  />
+                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300" />
+                </motion.div>
+              ))}
+            </AnimatePresence>
+          </motion.div>
+        )}
       </div>
 
       {/* Lightbox */}

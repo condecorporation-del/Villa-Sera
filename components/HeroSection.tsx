@@ -1,6 +1,7 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
+import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { MessageCircle } from 'lucide-react';
 
@@ -9,18 +10,16 @@ export default function HeroSection() {
 
   return (
     <section className="relative h-screen min-h-[600px] flex items-center justify-center overflow-hidden">
-      {/* Background video - poster shows instantly, then the clip plays on loop */}
-      <video
-        autoPlay
-        muted
-        loop
-        playsInline
-        preload="auto"
-        poster="/images/CasaSergio233.jpg"
-        className="absolute inset-0 w-full h-full object-cover object-center"
-      >
-        <source src="https://res.cloudinary.com/dt9iyiorn/video/upload/v1782976236/Some_places_dont_just_take_your_breath_away_they_give_it_back_to_you._Villa_Sera_is_a_priva_xy0u9m.mp4" type="video/mp4" />
-      </video>
+      {/* Background image */}
+      <Image
+        src="/images/CasaSergio233.jpg"
+        alt="Villa Sera — Los Cabos sunset"
+        fill
+        priority
+        quality={90}
+        className="object-cover object-center"
+        sizes="100vw"
+      />
 
       {/* Dark overlay gradient */}
       <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/30 to-black/70 z-10" />
