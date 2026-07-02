@@ -1,0 +1,88 @@
+/* Villa Sera Admin — warm-dark console theme, built on the site's own brand tokens */
+
+@keyframes vs-fade-rise {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes vs-draw-bar {
+  from { transform: scaleY(0); }
+  to { transform: scaleY(1); }
+}
+
+@keyframes vs-shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes vs-pulse-dot {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(201, 168, 76, 0.35); }
+  50% { box-shadow: 0 0 0 5px rgba(201, 168, 76, 0); }
+}
+
+.vs-fade-item {
+  animation: vs-fade-rise 0.42s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.vs-bar {
+  transform-origin: bottom;
+  animation: vs-draw-bar 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.vs-btn {
+  transition: transform 0.15s cubic-bezier(0.16, 1, 0.3, 1), filter 0.15s ease, box-shadow 0.15s ease;
+}
+.vs-btn:active {
+  transform: scale(0.96);
+}
+.vs-btn:hover {
+  filter: brightness(1.08);
+}
+
+.vs-btn-gold {
+  background: linear-gradient(160deg, #DFC07A 0%, #C9A84C 55%, #A9853A 100%);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.25) inset, 0 4px 14px -4px rgba(201, 168, 76, 0.55);
+}
+.vs-btn-gold:hover {
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.3) inset, 0 6px 18px -4px rgba(201, 168, 76, 0.7);
+}
+
+.vs-card {
+  transition: transform 0.18s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.18s ease;
+}
+.vs-card:active {
+  transform: scale(0.985);
+}
+
+.vs-accordion {
+  overflow: hidden;
+  transition: grid-template-rows 0.32s cubic-bezier(0.16, 1, 0.3, 1);
+  display: grid;
+}
+.vs-accordion > div {
+  overflow: hidden;
+  min-height: 0;
+}
+
+.vs-live-dot {
+  animation: vs-pulse-dot 2.2s ease-out infinite;
+}
+
+.vs-skeleton {
+  background: linear-gradient(90deg, #211C17 25%, #2A241D 37%, #211C17 63%);
+  background-size: 400% 100%;
+  animation: vs-shimmer 1.4s ease infinite;
+}
+
+::selection {
+  background: rgba(201, 168, 76, 0.35);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vs-fade-item, .vs-bar, .vs-live-dot, .vs-skeleton {
+    animation: none !important;
+  }
+  .vs-btn, .vs-card {
+    transition: none !important;
+  }
+}

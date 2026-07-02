@@ -32,18 +32,26 @@ export default function AdminLogin() {
 
   return (
     <div style={{
-      minHeight: '100vh', background: '#0a0a0a',
+      minHeight: '100vh', background: 'radial-gradient(120% 100% at 50% 0%, #2A241D 0%, #171310 55%)',
       display: 'flex', alignItems: 'center', justifyContent: 'center',
-      fontFamily: "'Inter', system-ui, sans-serif"
+      fontFamily: "var(--font-inter), 'Inter', system-ui, sans-serif"
     }}>
-      <div style={{ width: '100%', maxWidth: 400, padding: '0 24px' }}>
+      <div className="vs-fade-item" style={{ width: '100%', maxWidth: 400, padding: '0 24px' }}>
         {/* Logo */}
-        <div style={{ textAlign: 'center', marginBottom: 48 }}>
-          <div style={{ fontSize: 11, letterSpacing: '0.3em', color: '#C9A84C', textTransform: 'uppercase', marginBottom: 8 }}>
-            Villa Sera
+        <div style={{ textAlign: 'center', marginBottom: 40 }}>
+          <div style={{
+            width: 64, height: 64, borderRadius: 14, overflow: 'hidden', margin: '0 auto 16px',
+            border: '1px solid #3A322A', background: '#0d0b09',
+            boxShadow: '0 8px 28px -8px rgba(201,168,76,0.35)',
+          }}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/logo.png" alt="Villa Sera" style={{ width: '100%', height: '230%', objectFit: 'cover', objectPosition: '50% 6%', display: 'block' }} />
           </div>
-          <div style={{ fontFamily: 'Georgia, serif', fontSize: 32, color: '#F8F4EF', fontWeight: 400 }}>
-            Admin
+          <div style={{ fontSize: 11, letterSpacing: '0.3em', color: '#C9A84C', textTransform: 'uppercase', marginBottom: 8 }}>
+            Villa Será · Los Cabos
+          </div>
+          <div style={{ fontFamily: "var(--font-cormorant), Georgia, serif", fontStyle: 'italic', fontSize: 34, color: '#F8F4EF', fontWeight: 500 }}>
+            Administración
           </div>
           <div style={{ height: 1, background: 'linear-gradient(90deg,transparent,#C9A84C,transparent)', marginTop: 16 }} />
         </div>
@@ -51,16 +59,15 @@ export default function AdminLogin() {
         {/* Estado de conexión */}
         <div style={{
           display: 'flex', alignItems: 'center', gap: 8, marginBottom: 32,
-          padding: '10px 16px', borderRadius: 6,
-          background: online === null ? '#1a1a1a' : online ? 'rgba(34,197,94,0.1)' : 'rgba(239,68,68,0.1)',
-          border: `1px solid ${online === null ? '#333' : online ? 'rgba(34,197,94,0.3)' : 'rgba(239,68,68,0.3)'}`,
+          padding: '10px 16px', borderRadius: 8,
+          background: online === null ? '#211C17' : online ? 'rgba(124,148,115,0.12)' : 'rgba(192,69,58,0.12)',
+          border: `1px solid ${online === null ? '#3A322A' : online ? 'rgba(124,148,115,0.35)' : 'rgba(192,69,58,0.35)'}`,
         }}>
-          <div style={{
+          <div className={online ? 'vs-live-dot' : ''} style={{
             width: 8, height: 8, borderRadius: '50%',
-            background: online === null ? '#666' : online ? '#22c55e' : '#ef4444',
-            boxShadow: online ? '0 0 6px #22c55e' : 'none'
+            background: online === null ? '#8A8074' : online ? '#7C9473' : '#C0453A',
           }} />
-          <span style={{ fontSize: 13, color: online === null ? '#888' : online ? '#86efac' : '#fca5a5' }}>
+          <span style={{ fontSize: 13, color: online === null ? '#8A8074' : online ? '#7C9473' : '#C0453A' }}>
             {online === null ? 'Verificando conexión...' : online ? 'Sistema online — Mac Sandbox activa' : 'Sistema offline — Mac Sandbox apagada'}
           </span>
         </div>
@@ -68,47 +75,47 @@ export default function AdminLogin() {
         {/* Form */}
         <form onSubmit={handleSubmit}>
           <div style={{ marginBottom: 16 }}>
-            <label style={{ display: 'block', fontSize: 11, letterSpacing: '0.15em', color: '#888', textTransform: 'uppercase', marginBottom: 6 }}>
+            <label style={{ display: 'block', fontSize: 11, letterSpacing: '0.15em', color: '#8A8074', textTransform: 'uppercase', marginBottom: 6 }}>
               Usuario
             </label>
             <input
               value={username} onChange={e => setUsername(e.target.value)}
               disabled={!online}
               style={{
-                width: '100%', padding: '12px 14px', borderRadius: 6, border: '1px solid #2a2a2a',
-                background: '#111', color: '#F8F4EF', fontSize: 15, outline: 'none',
+                width: '100%', padding: '12px 14px', borderRadius: 8, border: '1px solid #3A322A',
+                background: '#211C17', color: '#F8F4EF', fontSize: 15, outline: 'none',
                 boxSizing: 'border-box', opacity: online ? 1 : 0.5
               }}
             />
           </div>
           <div style={{ marginBottom: 24 }}>
-            <label style={{ display: 'block', fontSize: 11, letterSpacing: '0.15em', color: '#888', textTransform: 'uppercase', marginBottom: 6 }}>
+            <label style={{ display: 'block', fontSize: 11, letterSpacing: '0.15em', color: '#8A8074', textTransform: 'uppercase', marginBottom: 6 }}>
               Contraseña
             </label>
             <input
               type="password" value={password} onChange={e => setPassword(e.target.value)}
               disabled={!online}
               style={{
-                width: '100%', padding: '12px 14px', borderRadius: 6, border: '1px solid #2a2a2a',
-                background: '#111', color: '#F8F4EF', fontSize: 15, outline: 'none',
+                width: '100%', padding: '12px 14px', borderRadius: 8, border: '1px solid #3A322A',
+                background: '#211C17', color: '#F8F4EF', fontSize: 15, outline: 'none',
                 boxSizing: 'border-box', opacity: online ? 1 : 0.5
               }}
             />
           </div>
 
           {error && (
-            <div style={{ marginBottom: 16, padding: '10px 14px', background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)', borderRadius: 6, color: '#fca5a5', fontSize: 13 }}>
+            <div style={{ marginBottom: 16, padding: '10px 14px', background: 'rgba(192,69,58,0.12)', border: '1px solid rgba(192,69,58,0.35)', borderRadius: 8, color: '#E29088', fontSize: 13 }}>
               {error}
             </div>
           )}
 
           <button
             type="submit" disabled={loading || !online}
+            className={online ? 'vs-btn vs-btn-gold' : ''}
             style={{
-              width: '100%', padding: '13px', borderRadius: 6, border: 'none',
-              background: online ? '#C9A84C' : '#333', color: online ? '#0a0a0a' : '#666',
-              fontSize: 14, fontWeight: 600, letterSpacing: '0.05em', cursor: online ? 'pointer' : 'not-allowed',
-              transition: 'all 0.2s'
+              width: '100%', padding: '13px', borderRadius: 10, border: 'none',
+              background: online ? undefined : '#2A241D', color: online ? '#171310' : '#8A8074',
+              fontSize: 14, fontWeight: 700, letterSpacing: '0.05em', cursor: online ? 'pointer' : 'not-allowed',
             }}
           >
             {loading ? 'Entrando...' : online ? 'Entrar' : 'Sistema offline'}

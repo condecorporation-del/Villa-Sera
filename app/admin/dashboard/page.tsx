@@ -4,15 +4,21 @@ import { useRouter } from 'next/navigation'
 import { api, logout, checkHealth } from '@/lib/admin-api'
 
 // ── THEME ─────────────────────────────────────────────────
-const G = '#C9A84C'       // gold
-const BG = '#0a0a0a'      // background
-const C1 = '#111111'      // card
-const C2 = '#181818'      // card alt
-const BD = '#222222'      // border
-const TX = '#F8F4EF'      // text
-const MU = '#666666'      // muted
-const GR = '#22c55e'      // green
-const RD = '#ef4444'      // red
+// Villa Sera brand tokens, warmed for a dark console (echoes the public site's
+// cream/terracotta/gold/ocean palette instead of a generic dev-tool dark mode)
+const G = '#C9A84C'        // gold — brand accent, CTAs
+const GL = '#DFC07A'       // gold light — hover/highlight
+const BG = '#171310'       // ink — canvas, warmed black (not neutral #0a0a0a)
+const C1 = '#211C17'       // surface — card
+const C2 = '#2A241D'       // surface-2 — elevated / inputs
+const BD = '#3A322A'       // hairline — warm border
+const TX = '#F8F4EF'       // cream — primary text (site's brand cream)
+const MU = '#8A8074'       // muted — warm grey-brown secondary text
+const GR = '#7C9473'       // sage — positive figures (not a generic bright green)
+const RD = '#C0453A'       // terracotta — negative/expense (site's brand terracotta)
+const OC = '#4E96B8'       // ocean, lightened for dark bg — informational accent
+const AM = '#C08A3E'       // amber — variable-expense distinction from fixed (terracotta)
+const FONT_DISPLAY = "'Cormorant Garamond', Georgia, serif"
 
 // ── TYPES ─────────────────────────────────────────────────
 type Tab = 'dashboard' | 'reservas' | 'finanzas' | 'mantenimiento' | 'compras' | 'inventario'
@@ -72,6 +78,79 @@ const isPagadoEstePeriodo = (ultimoPago: string | null) => {
   const p = new Date(ultimoPago), n = new Date()
   return p.getFullYear() === n.getFullYear() && p.getMonth() === n.getMonth()
 }
+const monthKey = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
+const CURRENT_MONTH_KEY = monthKey(new Date())
+const monthLabel = (key: string) => {
+  const [y, m] = key.split('-').map(Number)
+  const s = new Date(y, m - 1, 1).toLocaleDateString('es-MX', { month: 'long', year: 'numeric' })
+  return s.charAt(0).toUpperCase() + s.slice(1)
+}
+function groupByMonth(reservaciones: Reservacion[]) {
+  const map = new Map<string, Reservacion[]>()
+  reservaciones.forEach(r => {
+    const key = monthKey(new Date(r.check_in))
+    if (!map.has(key)) map.set(key, [])
+    map.get(key)!.push(r)
+  })
+  return [...map.entries()].sort((a, b) => a[0].localeCompare(b[0]))
+}
+function monthlyNetSeries(finanzas: Finanza[], months = 6) {
+  const now = new Date()
+  const buckets = Array.from({ length: months }, (_, i) => {
+    const d = new Date(now.getFullYear(), now.getMonth() - (months - 1 - i), 1)
+    return { key: monthKey(d), label: d.toLocaleDateString('es-MX', { month: 'short' }).replace('.', ''), ingresos: 0, gastos: 0 }
+  })
+  const idx = new Map(buckets.map((b, i) => [b.key, i]))
+  finanzas.forEach(f => {
+    if (f.categoria === 'Caja Chica') return
+    const i = idx.get(monthKey(new Date(f.fecha)))
+    if (i === undefined) return
+    if (f.tipo === 'ingreso') buckets[i].ingresos += f.monto
+    else buckets[i].gastos += f.monto
+  })
+  return buckets
+}
+function useCountUp(target: number, durationMs = 900) {
+  const [value, setValue] = useState(target)
+  const first = useRef(true)
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) {
+      setValue(target); return
+    }
+    const from = first.current ? 0 : value
+    first.current = false
+    let raf = 0
+    const start = performance.now()
+    function tick(now: number) {
+      const t = Math.min(1, (now - start) / durationMs)
+      const eased = 1 - Math.pow(1 - t, 3)
+      setValue(from + (target - from) * eased)
+      if (t < 1) raf = requestAnimationFrame(tick)
+    }
+    raf = requestAnimationFrame(tick)
+    return () => cancelAnimationFrame(raf)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [target, durationMs])
+  return value
+}
+function TrendChart({ data, color }: { data: { key: string; label: string; ingresos: number; gastos: number }[]; color: (net: number) => string }) {
+  const nets = data.map(d => d.ingresos - d.gastos)
+  const max = Math.max(1, ...nets.map(n => Math.abs(n)))
+  return (
+    <div style={{ display: 'flex', alignItems: 'flex-end', gap: 8, height: 70, marginTop: 14 }}>
+      {data.map((d, i) => {
+        const h = Math.max(4, (Math.abs(nets[i]) / max) * 56)
+        const isLast = i === data.length - 1
+        return (
+          <div key={d.key} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 5, height: '100%', justifyContent: 'flex-end' }}>
+            <div className="vs-bar" style={{ width: '100%', maxWidth: 20, height: h, borderRadius: 4, background: color(nets[i]), opacity: isLast ? 1 : 0.5, animationDelay: `${i * 70}ms` }} />
+            <span style={{ fontSize: 9, color: isLast ? MU : MU, textTransform: 'capitalize', opacity: isLast ? 1 : 0.7, fontWeight: isLast ? 700 : 400 }}>{d.label}</span>
+          </div>
+        )
+      })}
+    </div>
+  )
+}
 
 // ── MAIN ──────────────────────────────────────────────────
 export default function Dashboard() {
@@ -91,6 +170,7 @@ export default function Dashboard() {
   const [inventario, setInventario] = useState<InventarioItem[]>([])
   const [modal, setModal] = useState<string | null>(null)
   const [pagandoGasto, setPagandoGasto] = useState<GastoFijo | null>(null)
+  const [expandedMonths, setExpandedMonths] = useState<Set<string>>(() => new Set([CURRENT_MONTH_KEY]))
   const [csvFile, setCsvFile] = useState<File | null>(null)
   const [csvLoading, setCsvLoading] = useState(false)
   const [csvResult, setCsvResult] = useState<string | null>(null)
@@ -140,6 +220,13 @@ export default function Dashboard() {
   }, [])
 
   function changeProp(id: number) { pidRef.current = id; setPid(id); loadAll(id) }
+  function toggleMonth(key: string) {
+    setExpandedMonths(prev => {
+      const next = new Set(prev)
+      if (next.has(key)) next.delete(key); else next.add(key)
+      return next
+    })
+  }
 
   async function importCSV() {
     if (!csvFile || !pid) return
@@ -162,6 +249,10 @@ export default function Dashboard() {
   const cajaChicaBalance = cajaChicaMovs.reduce((a, f) => a + (f.tipo === 'ingreso' ? f.monto : -f.monto), 0)
   const pendientes = mantenimientos.filter(m => m.estado !== 'completado')
   const completados = mantenimientos.filter(m => m.estado === 'completado')
+  const gananciaAnimada = useCountUp(resumen?.ganancia_neta ?? 0)
+  const gananciaAnualAnimada = useCountUp(resumenAnual?.ganancia_neta_anual ?? 0)
+  const trendData = monthlyNetSeries(finanzas, 6)
+  const reservasPorMes = groupByMonth(reservaciones)
 
   // ── STYLES ──────────────────────────────────────────────
   const s = {
@@ -181,18 +272,25 @@ export default function Dashboard() {
   return (
     <div style={s.wrap}>
       {/* Header */}
-      <div style={s.header}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <span style={{ fontFamily: 'Georgia,serif', fontSize: 20, color: G }}>VS</span>
+      <div style={{ ...s.header, background: `linear-gradient(180deg, ${BG} 0%, ${BG}ee 100%)`, backdropFilter: 'blur(6px)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
+          <div style={{ width: 34, height: 34, borderRadius: 8, overflow: 'hidden', flexShrink: 0, border: `1px solid ${BD}`, background: '#0d0b09' }}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/logo.png" alt="Villa Sera" style={{ width: '100%', height: '230%', objectFit: 'cover', objectPosition: '50% 6%', display: 'block' }} />
+          </div>
+          <div style={{ minWidth: 0 }}>
+            <div style={{ fontFamily: FONT_DISPLAY, fontSize: 16, letterSpacing: '0.02em', color: TX, lineHeight: 1.1, whiteSpace: 'nowrap' }}>Villa Será</div>
+            <div style={{ fontSize: 8.5, letterSpacing: '0.22em', color: G, textTransform: 'uppercase' }}>Administración</div>
+          </div>
           <select value={pid ?? ''} onChange={e => changeProp(Number(e.target.value))}
-            style={{ background: '#111', border: `1px solid ${BD}`, color: TX, padding: '4px 8px', borderRadius: 6, fontSize: 13 }}>
+            style={{ background: C2, border: `1px solid ${BD}`, color: TX, padding: '4px 8px', borderRadius: 6, fontSize: 12, marginLeft: 4 }}>
             {propiedades.map(p => <option key={p.id} value={p.id}>{p.nombre}</option>)}
           </select>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-            <div style={{ width: 7, height: 7, borderRadius: '50%', background: online ? GR : RD, boxShadow: online ? `0 0 5px ${GR}` : 'none' }} />
-            <span style={{ fontSize: 11, color: online ? '#86efac' : '#fca5a5' }}>{online ? 'online' : 'offline'}</span>
+            <div className={online ? 'vs-live-dot' : ''} style={{ width: 7, height: 7, borderRadius: '50%', background: online ? GR : RD }} />
+            <span style={{ fontSize: 11, color: online ? GR : RD }}>{online ? 'online' : 'offline'}</span>
           </div>
           <button onClick={() => { logout(); router.replace('/admin') }} style={s.btnGhost}>Salir</button>
         </div>
@@ -205,22 +303,24 @@ export default function Dashboard() {
         {tab === 'dashboard' && resumen && (
           <div style={s.section}>
             {/* Ganancia neta — headline */}
-            <div style={{ ...s.card, textAlign: 'center', marginBottom: 16, background: 'linear-gradient(135deg,#111,#1a1400)' }}>
+            <div className="vs-fade-item vs-card" style={{ ...s.card, textAlign: 'center', marginBottom: 16, background: `radial-gradient(120% 100% at 50% 0%, ${C2} 0%, ${C1} 60%)`, position: 'relative', overflow: 'hidden' }}>
+              <div style={{ position: 'absolute', top: -1, left: '50%', transform: 'translateX(-50%)', width: '60%', height: 2, background: `linear-gradient(90deg, transparent, ${G}, transparent)` }} />
               <div style={s.lbl}>Ganancia Neta del Mes</div>
-              <div style={{ fontFamily: 'Georgia,serif', fontSize: 48, color: resumen.ganancia_neta >= 0 ? G : RD, lineHeight: 1.1 }}>
-                {resumen.ganancia_neta < 0 ? '-' : ''}{usd(resumen.ganancia_neta)}
+              <div style={{ fontFamily: FONT_DISPLAY, fontStyle: 'italic', fontWeight: 600, fontSize: 46, color: gananciaAnimada >= 0 ? G : RD, lineHeight: 1.1 }}>
+                {gananciaAnimada < 0 ? '-' : ''}{usd(gananciaAnimada)}
               </div>
               <div style={{ fontSize: 12, color: MU, marginTop: 6 }}>
                 {usd(resumen.ingresos_mes)} ingresos − {usd(resumen.gastos_mes)} gastos
               </div>
+              <TrendChart data={trendData} color={net => net >= 0 ? G : RD} />
             </div>
 
             {/* Ganancia neta anual (YTD) */}
             {resumenAnual && (
-              <div style={{ ...s.card, textAlign: 'center', marginBottom: 16 }}>
+              <div className="vs-fade-item vs-card" style={{ ...s.card, textAlign: 'center', marginBottom: 16, animationDelay: '80ms' }}>
                 <div style={s.lbl}>Ganancia Neta {resumenAnual.year} (acumulado)</div>
-                <div style={{ fontFamily: 'Georgia,serif', fontSize: 32, color: resumenAnual.ganancia_neta_anual >= 0 ? G : RD, lineHeight: 1.1 }}>
-                  {resumenAnual.ganancia_neta_anual < 0 ? '-' : ''}{usd(resumenAnual.ganancia_neta_anual)}
+                <div style={{ fontFamily: FONT_DISPLAY, fontStyle: 'italic', fontWeight: 600, fontSize: 30, color: gananciaAnualAnimada >= 0 ? G : RD, lineHeight: 1.1 }}>
+                  {gananciaAnualAnimada < 0 ? '-' : ''}{usd(gananciaAnualAnimada)}
                 </div>
                 <div style={{ fontSize: 12, color: MU, marginTop: 6 }}>
                   {usd(resumenAnual.ingresos_anual)} ingresos − {usd(resumenAnual.gastos_variables_anual + resumenAnual.gastos_fijos_anual)} gastos · {resumenAnual.meses_transcurridos} meses
@@ -233,12 +333,12 @@ export default function Dashboard() {
               {[
                 { lbl: 'Ingresos', val: usd(resumen.ingresos_mes), color: GR },
                 { lbl: 'Gastos Fijos', val: usd(resumen.gastos_fijos_mes), color: RD },
-                { lbl: 'Gastos Variables', val: usd(resumen.gastos_variables_mes), color: '#f97316' },
-                { lbl: 'Ocupación', val: `${resumen.ocupacion_porcentaje}%`, color: '#60a5fa' },
+                { lbl: 'Gastos Variables', val: usd(resumen.gastos_variables_mes), color: AM },
+                { lbl: 'Ocupación', val: `${resumen.ocupacion_porcentaje}%`, color: OC },
               ].map(({ lbl, val, color }) => (
                 <div key={lbl} style={{ ...s.card, textAlign: 'center' }}>
                   <div style={s.lbl}>{lbl}</div>
-                  <div style={{ fontSize: 22, color, fontFamily: 'Georgia,serif' }}>{val}</div>
+                  <div style={{ fontSize: 22, color, fontFamily: FONT_DISPLAY }}>{val}</div>
                 </div>
               ))}
             </div>
@@ -248,7 +348,7 @@ export default function Dashboard() {
               style={{ ...s.card, marginBottom: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }}>
               <div>
                 <div style={s.lbl}>Caja Chica</div>
-                <div style={{ fontFamily: 'Georgia,serif', fontSize: 24, color: cajaChicaBalance >= 0 ? G : RD }}>{usd(cajaChicaBalance)}</div>
+                <div style={{ fontFamily: FONT_DISPLAY, fontSize: 24, color: cajaChicaBalance >= 0 ? G : RD }}>{usd(cajaChicaBalance)}</div>
               </div>
               <span style={{ color: MU, fontSize: 20 }}>›</span>
             </div>
@@ -269,7 +369,7 @@ export default function Dashboard() {
                         )}
                       </div>
                       <button onClick={async () => { await api.patch(`/api/mantenimientos/${m.id}/completar`); loadAll() }}
-                        style={{ ...s.btnSm(GR, '#000'), fontSize: 18, padding: '4px 10px' }}>✓</button>
+                        className="vs-btn" style={{ ...s.btnSm(GR, '#000'), fontSize: 18, padding: '4px 10px' }}>✓</button>
                     </div>
                   </div>
                 ))}
@@ -284,7 +384,7 @@ export default function Dashboard() {
                   <div style={{ fontSize: 15, fontWeight: 600 }}>{r.huesped_nombre}</div>
                   <div style={{ fontSize: 12, color: MU }}>{fDate(r.check_in)} · {r.noches} noches</div>
                 </div>
-                <div style={{ fontFamily: 'Georgia,serif', fontSize: 20, color: GR }}>{r.monto_total ? usd(r.monto_total) : '—'}</div>
+                <div style={{ fontFamily: FONT_DISPLAY, fontSize: 20, color: GR }}>{r.monto_total ? usd(r.monto_total) : '—'}</div>
               </div>
             ))}
           </div>
@@ -296,32 +396,61 @@ export default function Dashboard() {
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
               <span style={{ ...s.lbl, marginBottom: 0 }}>{reservaciones.length} reservaciones</span>
               <div style={{ display: 'flex', gap: 8 }}>
-                <button onClick={() => setModal('csv')} style={s.btnSm('#1a1a1a', G)}>↑ Airbnb CSV</button>
-                <button onClick={() => setModal('reservacion')} style={s.btn()}>+ Nueva</button>
+                <button onClick={() => setModal('csv')} className="vs-btn" style={s.btnSm('#1a1a1a', G)}>↑ Airbnb CSV</button>
+                <button onClick={() => setModal('reservacion')} className="vs-btn vs-btn-gold" style={s.btn()}>+ Nueva</button>
               </div>
             </div>
-            {reservaciones.map(r => (
-              <div key={r.id} style={{ ...s.card, marginBottom: 10 }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                  <div style={{ flex: 1 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-                      <span style={{ fontSize: 15, fontWeight: 600 }}>{r.huesped_nombre}</span>
-                      {r.fuente === 'airbnb' && <span style={s.badge('#ff5a5f')}>Airbnb</span>}
+            {reservasPorMes.map(([key, items], gi) => {
+              const isCurrent = key === CURRENT_MONTH_KEY
+              const isPast = key < CURRENT_MONTH_KEY
+              const expanded = expandedMonths.has(key)
+              const subtotal = items.reduce((a, r) => a + (r.monto_total || 0), 0)
+              return (
+                <div key={key} className="vs-fade-item" style={{ marginBottom: 6, animationDelay: `${gi * 50}ms` }}>
+                  <button onClick={() => toggleMonth(key)} className="vs-btn" style={{
+                    width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                    background: isCurrent ? `${G}12` : 'none', border: `1px solid ${isCurrent ? G + '40' : BD}`,
+                    borderRadius: 10, padding: '12px 14px', cursor: 'pointer', marginBottom: 8,
+                  }}>
+                    <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <span style={{ fontFamily: FONT_DISPLAY, fontSize: 18, color: isCurrent ? G : TX, textTransform: 'capitalize' }}>{monthLabel(key)}</span>
+                      {isCurrent && <span style={s.badge(G)}>ESTE MES</span>}
+                      {isPast && <span style={{ fontSize: 10, color: MU }}>· cerrado</span>}
+                    </span>
+                    <span style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                      <span style={{ fontFamily: FONT_DISPLAY, fontSize: 16, color: GR }}>{usd(subtotal)}</span>
+                      <span style={{ color: MU, fontSize: 13, display: 'inline-block', transition: 'transform 0.25s', transform: expanded ? 'rotate(90deg)' : 'none' }}>›</span>
+                    </span>
+                  </button>
+                  <div className="vs-accordion" style={{ gridTemplateRows: expanded ? '1fr' : '0fr' }}>
+                    <div>
+                      {items.map(r => (
+                        <div key={r.id} className="vs-card" style={{ ...s.card, marginBottom: 10 }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                            <div style={{ flex: 1 }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+                                <span style={{ fontSize: 15, fontWeight: 600 }}>{r.huesped_nombre}</span>
+                                {r.fuente === 'airbnb' && <span style={s.badge('#ff5a5f')}>Airbnb</span>}
+                              </div>
+                              <div style={{ fontSize: 13, color: MU }}>{fDate(r.check_in)} → {fDate(r.check_out)} · {r.noches} noches</div>
+                              {r.notas && <div style={{ fontSize: 12, color: MU, marginTop: 4 }}>{r.notas}</div>}
+                            </div>
+                            <div style={{ textAlign: 'right' }}>
+                              <div style={{ fontFamily: FONT_DISPLAY, fontSize: 18, color: GR }}>{r.monto_total ? usd(r.monto_total) : '—'}</div>
+                              <div style={s.badge(r.estado === 'confirmada' ? GR : r.estado === 'completada' ? OC : MU)}>{r.estado}</div>
+                            </div>
+                          </div>
+                          <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 10 }}>
+                            <button onClick={async () => { await api.delete(`/api/reservaciones/${r.id}`); loadAll() }}
+                              style={{ ...s.btnGhost, color: RD, borderColor: RD + '40' }}>Eliminar</button>
+                          </div>
+                        </div>
+                      ))}
                     </div>
-                    <div style={{ fontSize: 13, color: MU }}>{fDate(r.check_in)} → {fDate(r.check_out)} · {r.noches} noches</div>
-                    {r.notas && <div style={{ fontSize: 12, color: MU, marginTop: 4 }}>{r.notas}</div>}
-                  </div>
-                  <div style={{ textAlign: 'right' }}>
-                    <div style={{ fontFamily: 'Georgia,serif', fontSize: 18, color: GR }}>{r.monto_total ? usd(r.monto_total) : '—'}</div>
-                    <div style={s.badge(r.estado === 'confirmada' ? GR : r.estado === 'completada' ? '#60a5fa' : MU)}>{r.estado}</div>
                   </div>
                 </div>
-                <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 10 }}>
-                  <button onClick={async () => { await api.delete(`/api/reservaciones/${r.id}`); loadAll() }}
-                    style={{ ...s.btnGhost, color: RD, borderColor: RD + '40' }}>Eliminar</button>
-                </div>
-              </div>
-            ))}
+              )
+            })}
             {reservaciones.length === 0 && <Empty msg="No hay reservaciones" />}
           </div>
         )}
@@ -344,10 +473,10 @@ export default function Dashboard() {
               {finTab === 'ingresos' && (
                 <>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
-                    <div style={{ fontFamily: 'Georgia,serif', fontSize: 22, color: GR }}>{usd(ingresos.reduce((a, f) => a + f.monto, 0))}</div>
+                    <div style={{ fontFamily: FONT_DISPLAY, fontSize: 22, color: GR }}>{usd(ingresos.reduce((a, f) => a + f.monto, 0))}</div>
                     <div style={{ display: 'flex', gap: 8 }}>
-                      <button onClick={() => setModal('csv')} style={s.btnSm('#1a1a1a', G)}>↑ Airbnb</button>
-                      <button onClick={() => setModal('ingreso')} style={s.btn()}>+ Agregar</button>
+                      <button onClick={() => setModal('csv')} className="vs-btn" style={s.btnSm('#1a1a1a', G)}>↑ Airbnb</button>
+                      <button onClick={() => setModal('ingreso')} className="vs-btn vs-btn-gold" style={s.btn()}>+ Agregar</button>
                     </div>
                   </div>
                   {ingresos.map(f => <FinanzaRow key={f.id} f={f} onDelete={() => { api.delete(`/api/finanzas/${f.id}`).then(() => loadAll()) }} />)}
@@ -361,9 +490,9 @@ export default function Dashboard() {
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
                     <div>
                       <div style={s.lbl}>Total mensual</div>
-                      <div style={{ fontFamily: 'Georgia,serif', fontSize: 22, color: RD }}>{usd(gastosFijos.reduce((a, g) => a + g.monto, 0))}</div>
+                      <div style={{ fontFamily: FONT_DISPLAY, fontSize: 22, color: RD }}>{usd(gastosFijos.reduce((a, g) => a + g.monto, 0))}</div>
                     </div>
-                    <button onClick={() => setModal('gasto_fijo')} style={s.btn()}>+ Agregar</button>
+                    <button onClick={() => setModal('gasto_fijo')} className="vs-btn vs-btn-gold" style={s.btn()}>+ Agregar</button>
                   </div>
                   {gastosFijos.filter(g => !isPagadoEstePeriodo(g.ultimo_pago)).length > 0 && (
                     <div style={{ ...s.lbl, color: RD, marginBottom: 8 }}>
@@ -384,7 +513,7 @@ export default function Dashboard() {
                           </div>
                           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                             <div style={{ textAlign: 'right' }}>
-                              <div style={{ fontFamily: 'Georgia,serif', fontSize: 18, color: RD }}>{usd(pagado && g.ultimo_monto_pagado ? g.ultimo_monto_pagado : g.monto)}</div>
+                              <div style={{ fontFamily: FONT_DISPLAY, fontSize: 18, color: RD }}>{usd(pagado && g.ultimo_monto_pagado ? g.ultimo_monto_pagado : g.monto)}</div>
                               {pagado && g.ultimo_monto_pagado != null && g.ultimo_monto_pagado !== g.monto && (
                                 <div style={{ fontSize: 11, color: MU }}>Est: {usd(g.monto)}</div>
                               )}
@@ -397,7 +526,7 @@ export default function Dashboard() {
                           if (pagado) { await api.patch(`/api/gastos-fijos/${g.id}/despagar`); loadAll() }
                           else { setPagandoGasto(g); setModal('pagar_gasto_fijo') }
                         }}
-                          style={{ ...s.btnSm(pagado ? '#1a1a1a' : GR, pagado ? MU : '#000'), width: '100%', marginTop: 10 }}>
+                          className="vs-btn" style={{ ...s.btnSm(pagado ? '#1a1a1a' : GR, pagado ? MU : '#000'), width: '100%', marginTop: 10 }}>
                           {pagado ? 'Marcar como pendiente' : '✓ Marcar como pagado'}
                         </button>
                       </div>
@@ -411,8 +540,8 @@ export default function Dashboard() {
               {finTab === 'gastos' && (
                 <>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
-                    <div style={{ fontFamily: 'Georgia,serif', fontSize: 22, color: '#f97316' }}>{usd(gastos.reduce((a, f) => a + f.monto, 0))}</div>
-                    <button onClick={() => setModal('gasto')} style={s.btn()}>+ Agregar</button>
+                    <div style={{ fontFamily: FONT_DISPLAY, fontSize: 22, color: AM }}>{usd(gastos.reduce((a, f) => a + f.monto, 0))}</div>
+                    <button onClick={() => setModal('gasto')} className="vs-btn vs-btn-gold" style={s.btn()}>+ Agregar</button>
                   </div>
                   {gastos.map(f => <FinanzaRow key={f.id} f={f} onDelete={() => { api.delete(`/api/finanzas/${f.id}`).then(() => loadAll()) }} />)}
                   {gastos.length === 0 && <Empty msg="Sin gastos variables" />}
@@ -424,13 +553,13 @@ export default function Dashboard() {
                 <>
                   <div style={{ ...s.card, textAlign: 'center', marginBottom: 16, background: 'linear-gradient(135deg,#111,#1a1400)' }}>
                     <div style={s.lbl}>Saldo de Caja Chica</div>
-                    <div style={{ fontFamily: 'Georgia,serif', fontSize: 40, color: cajaChicaBalance >= 0 ? G : RD, lineHeight: 1.1 }}>
+                    <div style={{ fontFamily: FONT_DISPLAY, fontSize: 40, color: cajaChicaBalance >= 0 ? G : RD, lineHeight: 1.1 }}>
                       {usd(cajaChicaBalance)}
                     </div>
                   </div>
                   <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
-                    <button onClick={() => setModal('caja_ingreso')} style={{ ...s.btn(GR, '#000'), flex: 1 }}>+ Agregar fondos</button>
-                    <button onClick={() => setModal('caja_gasto')} style={{ ...s.btn('#f97316', '#000'), flex: 1 }}>− Registrar gasto</button>
+                    <button onClick={() => setModal('caja_ingreso')} className="vs-btn" style={{ ...s.btn(GR, '#000'), flex: 1 }}>+ Agregar fondos</button>
+                    <button onClick={() => setModal('caja_gasto')} className="vs-btn" style={{ ...s.btn(AM, '#000'), flex: 1 }}>− Registrar gasto</button>
                   </div>
                   <div style={s.lbl}>Movimientos</div>
                   {cajaChicaMovs.map(f => <FinanzaRow key={f.id} f={f} onDelete={() => { api.delete(`/api/finanzas/${f.id}`).then(() => loadAll()) }} />)}
@@ -451,11 +580,11 @@ export default function Dashboard() {
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 12 }}>
                     <span style={{ color: MU, fontSize: 13 }}>Gastos Variables</span>
-                    <span style={{ color: '#f97316', fontSize: 13 }}>−{usd(resumen.gastos_variables_mes)}</span>
+                    <span style={{ color: AM, fontSize: 13 }}>−{usd(resumen.gastos_variables_mes)}</span>
                   </div>
                   <div style={{ borderTop: `1px solid ${BD}`, paddingTop: 12, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <span style={{ fontWeight: 700, fontSize: 15 }}>Ganancia Neta</span>
-                    <span style={{ fontFamily: 'Georgia,serif', fontSize: 24, color: resumen.ganancia_neta >= 0 ? G : RD, fontWeight: 600 }}>
+                    <span style={{ fontFamily: FONT_DISPLAY, fontSize: 24, color: resumen.ganancia_neta >= 0 ? G : RD, fontWeight: 600 }}>
                       {resumen.ganancia_neta < 0 ? '-' : ''}{usd(resumen.ganancia_neta)}
                     </span>
                   </div>
@@ -470,7 +599,7 @@ export default function Dashboard() {
           <div style={s.section}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
               <span style={{ ...s.lbl, marginBottom: 0 }}>{pendientes.length} pendientes</span>
-              <button onClick={() => setModal('mantenimiento')} style={s.btn()}>+ Nuevo</button>
+              <button onClick={() => setModal('mantenimiento')} className="vs-btn vs-btn-gold" style={s.btn()}>+ Nuevo</button>
             </div>
 
             {pendientes.length > 0 && (
@@ -493,7 +622,7 @@ export default function Dashboard() {
                       </div>
                       <div style={{ display: 'flex', flexDirection: 'column', gap: 6, alignItems: 'flex-end' }}>
                         <button onClick={async () => { await api.patch(`/api/mantenimientos/${m.id}/completar`); loadAll() }}
-                          style={{ ...s.btn(GR, '#000'), padding: '8px 14px', fontSize: 18 }}>✓</button>
+                          className="vs-btn" style={{ ...s.btn(GR, '#000'), padding: '8px 14px', fontSize: 18 }}>✓</button>
                         <button onClick={async () => { await api.delete(`/api/mantenimientos/${m.id}`); loadAll() }}
                           style={{ ...s.btnGhost, color: RD + '80', borderColor: RD + '30', padding: '4px 10px' }}>×</button>
                       </div>
@@ -525,7 +654,7 @@ export default function Dashboard() {
           <div style={s.section}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
               <span style={{ ...s.lbl, marginBottom: 0 }}>{compras.filter(c => c.estado !== 'comprado').length} pendientes</span>
-              <button onClick={() => setModal('compra')} style={s.btn()}>+ Agregar</button>
+              <button onClick={() => setModal('compra')} className="vs-btn vs-btn-gold" style={s.btn()}>+ Agregar</button>
             </div>
 
             {compras.filter(c => c.estado !== 'comprado').length > 0 && (
@@ -548,7 +677,7 @@ export default function Dashboard() {
                       </div>
                       <div style={{ display: 'flex', flexDirection: 'column', gap: 6, alignItems: 'flex-end' }}>
                         <button onClick={async () => { await api.patch(`/api/compras/${c.id}/comprar`); loadAll() }}
-                          style={{ ...s.btn(GR, '#000'), padding: '8px 14px', fontSize: 18 }}>✓</button>
+                          className="vs-btn" style={{ ...s.btn(GR, '#000'), padding: '8px 14px', fontSize: 18 }}>✓</button>
                         <button onClick={async () => { await api.delete(`/api/compras/${c.id}`); loadAll() }}
                           style={{ ...s.btnGhost, color: RD + '80', borderColor: RD + '30', padding: '4px 10px' }}>×</button>
                       </div>
@@ -580,7 +709,7 @@ export default function Dashboard() {
           <div style={s.section}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
               <span style={{ ...s.lbl, marginBottom: 0 }}>{inventario.length} artículos</span>
-              <button onClick={() => setModal('inventario')} style={s.btn()}>+ Agregar</button>
+              <button onClick={() => setModal('inventario')} className="vs-btn vs-btn-gold" style={s.btn()}>+ Agregar</button>
             </div>
 
             {inventario.filter(i => i.estado === 'faltante').length > 0 && (
@@ -649,7 +778,7 @@ export default function Dashboard() {
               <input ref={csvRef} type="file" accept=".csv" onChange={e => setCsvFile(e.target.files?.[0] ?? null)}
                 style={{ ...s.inp, padding: '8px', color: MU, marginBottom: 12 }} />
               {csvResult && <div style={{ padding: '10px 12px', background: csvResult.startsWith('✓') ? GR + '15' : RD + '15', borderRadius: 8, fontSize: 13, color: csvResult.startsWith('✓') ? GR : RD, marginBottom: 12 }}>{csvResult}</div>}
-              <button onClick={importCSV} disabled={!csvFile || csvLoading} style={{ ...s.btn(), width: '100%', opacity: csvFile ? 1 : 0.5 }}>
+              <button onClick={importCSV} disabled={!csvFile || csvLoading} className="vs-btn vs-btn-gold" style={{ ...s.btn(), width: '100%', opacity: csvFile ? 1 : 0.5 }}>
                 {csvLoading ? 'Importando...' : 'Importar'}
               </button>
             </div>
@@ -721,10 +850,10 @@ function FinanzaRow({ f, onDelete }: { f: Finanza; onDelete: () => void }) {
         <div style={{ flex: 1 }}>
           <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 2 }}>{f.descripcion}</div>
           <div style={{ fontSize: 12, color: MU }}>{f.categoria} · {fDate(f.fecha)}</div>
-          {f.comprobante_nombre && <div style={{ fontSize: 11, color: '#60a5fa', marginTop: 2 }}>📎 {f.comprobante_nombre}</div>}
+          {f.comprobante_nombre && <div style={{ fontSize: 11, color: OC, marginTop: 2 }}>📎 {f.comprobante_nombre}</div>}
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <span style={{ fontFamily: 'Georgia,serif', fontSize: 17, color: isIngreso ? GR : '#f97316' }}>
+          <span style={{ fontFamily: FONT_DISPLAY, fontSize: 17, color: isIngreso ? GR : AM }}>
             {isIngreso ? '+' : '-'}{usd(f.monto)}
           </span>
           <button onClick={onDelete} style={{ background: 'none', border: 'none', color: RD + '60', cursor: 'pointer', fontSize: 16 }}>×</button>
@@ -994,7 +1123,7 @@ function FormCompra({ pid, onSaved }: { pid: number; onSaved: () => void }) {
 }
 
 function InventarioRow({ i, onEstado, onDelete }: { i: InventarioItem; onEstado: (estado: string) => void; onDelete: () => void }) {
-  const color = i.estado === 'faltante' ? RD : i.estado === 'dañado' ? '#f97316' : GR
+  const color = i.estado === 'faltante' ? RD : i.estado === 'dañado' ? AM : GR
   return (
     <div style={{ background: C1, border: `1px solid ${BD}`, borderRadius: 10, padding: '12px 14px', marginBottom: 8, borderLeft: `3px solid ${color}` }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
