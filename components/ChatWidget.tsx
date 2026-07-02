@@ -104,14 +104,22 @@ const kb = {
 
 type Message = { from: 'bot' | 'user'; text: string };
 
-function findAnswer(input: string, keywords: Record<string, string[]>, answers: Record<string, string>): string | null {
-  const lower = input.toLowerCase();
-  for (const [topic, words] of Object.entries(keywords)) {
-    if (words.some((w) => lower.includes(w))) {
-      return answers[topic] ?? null;
-    }
+async function askConcierge(history: Message[], locale: string): Promise<string | null> {
+  try {
+    const res = await fetch('/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        locale,
+        messages: history.map((m) => ({ role: m.from === 'user' ? 'user' : 'assistant', content: m.text })),
+      }),
+    });
+    if (!res.ok) return null;
+    const data = await res.json();
+    return typeof data.reply === 'string' ? data.reply : null;
+  } catch {
+    return null;
   }
-  return null;
 }
 
 export default function ChatWidget() {
@@ -123,6 +131,7 @@ export default function ChatWidget() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [bookingOpen, setBookingOpen] = useState(false);
+  const [typing, setTyping] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -142,17 +151,18 @@ export default function ChatWidget() {
     setBookingOpen(false);
   };
 
-  const sendMessage = (text: string) => {
-    if (!text.trim()) return;
+  const sendMessage = async (text: string) => {
+    if (!text.trim() || typing) return;
     const userMsg: Message = { from: 'user', text: text.trim() };
-    setMessages((p) => [...p, userMsg]);
+    const history = [...messages, userMsg];
+    setMessages(history);
     setInput('');
     setFaqOpen(false);
+    setTyping(true);
 
-    setTimeout(() => {
-      const answer = findAnswer(text, lang.keywords, lang.answers);
-      setMessages((p) => [...p, { from: 'bot', text: answer ?? lang.fallback }]);
-    }, 400);
+    const reply = await askConcierge(history, locale);
+    setTyping(false);
+    setMessages((p) => [...p, { from: 'bot', text: reply ?? lang.fallback }]);
   };
 
   const openTopic = (value: string) => {
@@ -246,6 +256,24 @@ export default function ChatWidget() {
                   </div>
                 </div>
               ))}
+              {typing && (
+                <div className="flex justify-start">
+                  <div
+                    className="px-4 py-2.5 text-sm font-sans flex items-center gap-1"
+                    style={{ background: 'rgba(255,255,255,0.06)', borderRadius: '4px 16px 16px 16px' }}
+                  >
+                    {[0, 1, 2].map((i) => (
+                      <motion.span
+                        key={i}
+                        className="w-1.5 h-1.5 rounded-full inline-block"
+                        style={{ background: 'rgba(255,255,255,0.5)' }}
+                        animate={{ opacity: [0.3, 1, 0.3] }}
+                        transition={{ duration: 1, repeat: Infinity, delay: i * 0.15 }}
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
               <div ref={bottomRef} />
             </div>
 
@@ -322,12 +350,13 @@ export default function ChatWidget() {
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   onKeyDown={handleKey}
+                  disabled={typing}
                   placeholder={lang.placeholder}
-                  className="flex-1 bg-transparent text-white/90 text-sm font-sans px-4 py-3 outline-none placeholder:text-white/25"
+                  className="flex-1 bg-transparent text-white/90 text-sm font-sans px-4 py-3 outline-none placeholder:text-white/25 disabled:opacity-50"
                 />
                 <button
                   onClick={() => sendMessage(input)}
-                  disabled={!input.trim()}
+                  disabled={!input.trim() || typing}
                   className="mr-2 p-1.5 transition-all duration-150 disabled:opacity-20"
                   style={{ color: '#C9A84C' }}
                 >
