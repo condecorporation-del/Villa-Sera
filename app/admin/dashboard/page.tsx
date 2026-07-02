@@ -15,7 +15,7 @@ const GR = '#22c55e'      // green
 const RD = '#ef4444'      // red
 
 // ── TYPES ─────────────────────────────────────────────────
-type Tab = 'dashboard' | 'reservas' | 'finanzas' | 'mantenimiento'
+type Tab = 'dashboard' | 'reservas' | 'finanzas' | 'mantenimiento' | 'compras'
 type FinTab = 'ingresos' | 'fijos' | 'gastos'
 
 interface Resumen {
@@ -44,6 +44,11 @@ interface GastoFijo {
   id: number; nombre: string; monto: number; categoria: string
   dia_cobro: number | null; propiedad_id: number
 }
+interface Compra {
+  id: number; articulo: string; descripcion: string | null; cantidad: string | null
+  prioridad: string; estado: string; costo_estimado: number | null
+  costo_real: number | null; categoria: string; propiedad_id: number
+}
 
 // ── HELPERS ───────────────────────────────────────────────
 const usd = (n: number) => '$' + Math.abs(n).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })
@@ -64,6 +69,7 @@ export default function Dashboard() {
   const [mantenimientos, setMantenimientos] = useState<Mantenimiento[]>([])
   const [finanzas, setFinanzas] = useState<Finanza[]>([])
   const [gastosFijos, setGastosFijos] = useState<GastoFijo[]>([])
+  const [compras, setCompras] = useState<Compra[]>([])
   const [modal, setModal] = useState<string | null>(null)
   const [csvFile, setCsvFile] = useState<File | null>(null)
   const [csvLoading, setCsvLoading] = useState(false)
@@ -75,13 +81,14 @@ export default function Dashboard() {
     const p = propId ?? pidRef.current
     try {
       const suffix = p ? `?propiedad_id=${p}` : ''
-      const [props, res, mant, fin, gf, sum] = await Promise.all([
+      const [props, res, mant, fin, gf, sum, cmp] = await Promise.all([
         api.get('/api/propiedades'),
         api.get(`/api/reservaciones${suffix}`),
         api.get(`/api/mantenimientos${suffix}`),
         api.get(`/api/finanzas${suffix}`),
         api.get(`/api/gastos-fijos${suffix}`),
         api.get(`/api/resumen${suffix}`),
+        api.get(`/api/compras${suffix}`),
       ])
       setPropiedades(props)
       setReservaciones(res)
@@ -89,6 +96,7 @@ export default function Dashboard() {
       setFinanzas(fin)
       setGastosFijos(gf)
       setResumen(sum)
+      setCompras(cmp)
       if (!pidRef.current && props.length) {
         pidRef.current = props[0].id
         setPid(props[0].id)
@@ -415,6 +423,61 @@ export default function Dashboard() {
             {mantenimientos.length === 0 && <Empty msg="Sin tareas de mantenimiento" />}
           </div>
         )}
+
+        {/* ── COMPRAS TAB ── */}
+        {tab === 'compras' && (
+          <div style={s.section}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+              <span style={{ ...s.lbl, marginBottom: 0 }}>{compras.filter(c => c.estado !== 'comprado').length} pendientes</span>
+              <button onClick={() => setModal('compra')} style={s.btn()}>+ Agregar</button>
+            </div>
+
+            {compras.filter(c => c.estado !== 'comprado').length > 0 && (
+              <>
+                <div style={s.lbl}>Por comprar</div>
+                {compras.filter(c => c.estado !== 'comprado').map(c => (
+                  <div key={c.id} style={{ ...s.card, marginBottom: 10, borderLeft: `3px solid ${c.prioridad === 'alta' ? RD : c.prioridad === 'media' ? G : GR}` }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                      <div style={{ flex: 1, marginRight: 12 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4, flexWrap: 'wrap' }}>
+                          <span style={{ fontSize: 15, fontWeight: 600 }}>{c.articulo}</span>
+                          <span style={s.badge(c.prioridad === 'alta' ? RD : c.prioridad === 'media' ? G : GR)}>{c.prioridad}</span>
+                          {c.categoria && <span style={s.badge(MU)}>{c.categoria}</span>}
+                        </div>
+                        {c.descripcion && <div style={{ fontSize: 12, color: MU, marginBottom: 4 }}>{c.descripcion}</div>}
+                        <div style={{ fontSize: 12, color: MU }}>
+                          {c.cantidad ? `Cantidad: ${c.cantidad}` : ''}
+                          {c.costo_estimado ? ` · Est: $${c.costo_estimado.toLocaleString()}` : ''}
+                        </div>
+                      </div>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 6, alignItems: 'flex-end' }}>
+                        <button onClick={async () => { await api.patch(`/api/compras/${c.id}/comprar`); loadAll() }}
+                          style={{ ...s.btn(GR, '#000'), padding: '8px 14px', fontSize: 18 }}>✓</button>
+                        <button onClick={async () => { await api.delete(`/api/compras/${c.id}`); loadAll() }}
+                          style={{ ...s.btnGhost, color: RD + '80', borderColor: RD + '30', padding: '4px 10px' }}>×</button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </>
+            )}
+
+            {compras.filter(c => c.estado === 'comprado').length > 0 && (
+              <>
+                <div style={{ ...s.lbl, marginTop: 20 }}>Comprado ({compras.filter(c => c.estado === 'comprado').length})</div>
+                {compras.filter(c => c.estado === 'comprado').slice(0, 5).map(c => (
+                  <div key={c.id} style={{ ...s.card, marginBottom: 8, opacity: 0.5 }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <span style={{ fontSize: 14, textDecoration: 'line-through', color: MU }}>{c.articulo}</span>
+                      <span style={{ fontSize: 12, color: GR }}>✓</span>
+                    </div>
+                  </div>
+                ))}
+              </>
+            )}
+            {compras.length === 0 && <Empty msg="Sin artículos por comprar" />}
+          </div>
+        )}
       </div>
 
       {/* ── BOTTOM NAV ── */}
@@ -428,6 +491,7 @@ export default function Dashboard() {
           ['reservas', '⌂', 'Reservas'],
           ['finanzas', '$', 'Finanzas'],
           ['mantenimiento', '⚙', 'Manten.'],
+          ['compras', '◎', 'Compras'],
         ] as [Tab, string, string][]).map(([key, icon, lbl]) => (
           <button key={key} onClick={() => setTab(key)} style={{
             flex: 1, background: 'none', border: 'none', cursor: 'pointer',
@@ -479,6 +543,11 @@ export default function Dashboard() {
           {/* Nuevo Gasto Fijo */}
           {modal === 'gasto_fijo' && pid && (
             <FormGastoFijo pid={pid} onSaved={() => { setModal(null); loadAll() }} />
+          )}
+
+          {/* Nueva Compra */}
+          {modal === 'compra' && pid && (
+            <FormCompra pid={pid} onSaved={() => { setModal(null); loadAll() }} />
           )}
         </Modal>
       )}
@@ -704,6 +773,64 @@ function FormGastoFijo({ pid, onSaved }: { pid: number; onSaved: () => void }) {
       </select>
       <button type="submit" disabled={loading} style={{ background: G, color: BG, border: 'none', padding: 14, borderRadius: 10, width: '100%', fontSize: 15, fontWeight: 700, cursor: 'pointer' }}>
         {loading ? 'Guardando...' : 'Guardar'}
+      </button>
+    </form>
+  )
+}
+
+function FormCompra({ pid, onSaved }: { pid: number; onSaved: () => void }) {
+  const [v, setV] = useState({ articulo: '', descripcion: '', cantidad: '', prioridad: 'media', categoria: 'General', costo_estimado: '' })
+  const [loading, setLoading] = useState(false)
+  const inp: React.CSSProperties = { width: '100%', background: '#0f0f0f', border: `1px solid ${BD}`, color: TX, padding: '10px 12px', borderRadius: 8, fontSize: 14, boxSizing: 'border-box', marginBottom: 12 }
+  const lbl: React.CSSProperties = { fontSize: 11, color: MU, display: 'block', marginBottom: 4, letterSpacing: '0.1em', textTransform: 'uppercase' }
+  async function submit(e: React.FormEvent) {
+    e.preventDefault(); setLoading(true)
+    try {
+      await api.post('/api/compras', {
+        propiedad_id: pid,
+        articulo: v.articulo,
+        descripcion: v.descripcion || null,
+        cantidad: v.cantidad || null,
+        prioridad: v.prioridad,
+        categoria: v.categoria,
+        costo_estimado: v.costo_estimado ? parseFloat(v.costo_estimado) : null,
+      })
+      onSaved()
+    } finally { setLoading(false) }
+  }
+  return (
+    <form onSubmit={submit}>
+      <ModalTitle>Nueva Compra</ModalTitle>
+      <label style={lbl}>Artículo *</label>
+      <input required style={inp} placeholder="Ej: Almohadas King" value={v.articulo} onChange={e => setV({ ...v, articulo: e.target.value })} />
+      <label style={lbl}>Descripción</label>
+      <input style={inp} placeholder="Notas adicionales..." value={v.descripcion} onChange={e => setV({ ...v, descripcion: e.target.value })} />
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+        <div>
+          <label style={lbl}>Cantidad</label>
+          <input style={inp} placeholder="Ej: 4 piezas" value={v.cantidad} onChange={e => setV({ ...v, cantidad: e.target.value })} />
+        </div>
+        <div>
+          <label style={lbl}>Costo estimado (USD)</label>
+          <input type="number" step="0.01" style={inp} placeholder="0.00" value={v.costo_estimado} onChange={e => setV({ ...v, costo_estimado: e.target.value })} />
+        </div>
+      </div>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+        <div>
+          <label style={lbl}>Prioridad</label>
+          <select style={inp} value={v.prioridad} onChange={e => setV({ ...v, prioridad: e.target.value })}>
+            {['alta', 'media', 'baja'].map(p => <option key={p}>{p}</option>)}
+          </select>
+        </div>
+        <div>
+          <label style={lbl}>Categoría</label>
+          <select style={inp} value={v.categoria} onChange={e => setV({ ...v, categoria: e.target.value })}>
+            {['General', 'Cocina', 'Baño', 'Habitación', 'Alberca', 'Limpieza', 'Mantenimiento', 'Decoración', 'Otro'].map(c => <option key={c}>{c}</option>)}
+          </select>
+        </div>
+      </div>
+      <button type="submit" disabled={loading} style={{ background: G, color: BG, border: 'none', padding: 14, borderRadius: 10, width: '100%', fontSize: 15, fontWeight: 700, cursor: 'pointer' }}>
+        {loading ? 'Guardando...' : 'Agregar a lista'}
       </button>
     </form>
   )
