@@ -101,7 +101,10 @@ export default function Dashboard() {
         pidRef.current = props[0].id
         setPid(props[0].id)
       }
-    } catch { router.replace('/admin') }
+    } catch {
+      localStorage.removeItem('admin_token')
+      router.replace('/admin')
+    }
   }, [router])
 
   useEffect(() => {
