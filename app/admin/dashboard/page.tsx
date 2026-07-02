@@ -11,14 +11,14 @@ const GL = '#E8C874'       // gold light — hover/highlight/gradient top
 const BG = '#FAF6EE'       // cream canvas
 const C1 = '#FFFFFF'       // card surface (white, elevated via shadow not border)
 const C2 = '#F4ECDD'       // surface-2 — inputs / chips / recessed areas
-const BD = '#E8DCC6'       // hairline border
-const TX = '#2A211A'       // espresso ink — primary text
-const MU = '#6E6055'       // warm grey-brown — secondary text (darkened for legibility/contrast)
-const GR = '#2E9E5B'       // vivid meadow green — positive figures
-const RD = '#E2543F'       // vivid coral-terracotta — negative/expense
-const OC = '#1CA7C7'       // vivid turquoise-ocean — informational accent
-const AM = '#E0932E'       // vivid amber — variable-expense distinction
-const SH = '0 1px 2px rgba(42,33,26,0.05), 0 10px 28px -14px rgba(42,33,26,0.18)'
+const BD = '#D9C9AA'       // hairline border — stronger so cards read as distinct objects
+const TX = '#211A14'       // espresso ink — primary text
+const MU = '#5B4D42'       // warm grey-brown — secondary text (darkened further for visibility)
+const GR = '#278049'       // vivid meadow green — positive figures (deepened to hold up at small sizes)
+const RD = '#D03F2C'       // vivid coral-terracotta — negative/expense
+const OC = '#0F8AA8'       // vivid turquoise-ocean — informational accent
+const AM = '#C97A0F'       // vivid amber — variable-expense distinction
+const SH = '0 1px 3px rgba(33,26,20,0.07), 0 14px 32px -14px rgba(33,26,20,0.26)'
 const FONT_DISPLAY = "'Cormorant Garamond', Georgia, serif"
 
 // ── ICONS ─────────────────────────────────────────────────
@@ -26,7 +26,7 @@ const FONT_DISPLAY = "'Cormorant Garamond', Georgia, serif"
 // glyphs/emoji, which render inconsistently across devices and read as
 // pasted-on "stickers" rather than a designed interface.
 type IconName = 'home' | 'calendar' | 'wallet' | 'wrench' | 'bag' | 'archive' | 'alert' | 'paperclip' | 'check' | 'close' | 'chevron'
-function Icon({ name, size = 18, color = 'currentColor', strokeWidth = 1.8 }: { name: IconName; size?: number; color?: string; strokeWidth?: number }) {
+function Icon({ name, size = 18, color = 'currentColor', strokeWidth = 2.2 }: { name: IconName; size?: number; color?: string; strokeWidth?: number }) {
   const common = { width: size, height: size, viewBox: '0 0 24 24', fill: 'none', stroke: color, strokeWidth, strokeLinecap: 'round' as const, strokeLinejoin: 'round' as const }
   switch (name) {
     case 'home':
@@ -362,9 +362,9 @@ export default function Dashboard() {
     card: { background: C1, border: `1px solid ${BD}`, borderRadius: 14, padding: '16px', boxShadow: SH } as React.CSSProperties,
     row: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '13px 0', borderBottom: `1px solid ${BD}` } as React.CSSProperties,
     btn: (color = G, text = '#231A10') => ({ background: color, color: text, border: 'none', padding: '10px 18px', borderRadius: 10, cursor: 'pointer', fontSize: 14, fontWeight: 700 } as React.CSSProperties),
-    btnSm: (color = G, text = '#231A10') => ({ background: color, color: text, border: 'none', padding: '6px 12px', borderRadius: 8, cursor: 'pointer', fontSize: 12, fontWeight: 700 } as React.CSSProperties),
-    btnGhost: { background: C2, border: `1px solid ${BD}`, color: MU, padding: '6px 12px', borderRadius: 8, cursor: 'pointer', fontSize: 12, fontWeight: 600 } as React.CSSProperties,
-    lbl: { fontSize: 10.5, letterSpacing: '0.14em', textTransform: 'uppercase' as const, color: MU, marginBottom: 4, display: 'block', fontWeight: 700 },
+    btnSm: (color = G, text = '#231A10') => ({ background: color, color: text, border: 'none', padding: '6px 12px', borderRadius: 8, cursor: 'pointer', fontSize: 13, fontWeight: 700 } as React.CSSProperties),
+    btnGhost: { background: C2, border: `1px solid ${BD}`, color: MU, padding: '6px 12px', borderRadius: 8, cursor: 'pointer', fontSize: 13, fontWeight: 600 } as React.CSSProperties,
+    lbl: { fontSize: 11.5, letterSpacing: '0.1em', textTransform: 'uppercase' as const, color: MU, marginBottom: 5, display: 'block', fontWeight: 700 },
     inp: { width: '100%', background: C2, border: `1px solid ${BD}`, color: TX, padding: '10px 12px', borderRadius: 8, fontSize: 15, fontWeight: 500, boxSizing: 'border-box' as const },
     section: { padding: '0 16px' } as React.CSSProperties,
     badge: (c: string) => ({ fontSize: 11, padding: '3px 8px', borderRadius: 20, background: c + '20', color: c, fontWeight: 600 }) as React.CSSProperties,
@@ -384,7 +384,7 @@ export default function Dashboard() {
             <div className="vs-hide-xs" style={{ fontSize: 8.5, letterSpacing: '0.22em', color: G, textTransform: 'uppercase' }}>Administración</div>
           </div>
           <select value={pid ?? ''} onChange={e => changeProp(Number(e.target.value))}
-            style={{ background: C2, border: `1px solid ${BD}`, color: TX, padding: '4px 8px', borderRadius: 6, fontSize: 12, marginLeft: 4, maxWidth: 96, textOverflow: 'ellipsis' }}>
+            style={{ background: C2, border: `1px solid ${BD}`, color: TX, padding: '4px 8px', borderRadius: 6, fontSize: 13, marginLeft: 4, maxWidth: 96, textOverflow: 'ellipsis' }}>
             {propiedades.map(p => <option key={p.id} value={p.id}>{p.nombre}</option>)}
           </select>
         </div>
@@ -427,7 +427,7 @@ export default function Dashboard() {
               <div style={{ fontFamily: FONT_DISPLAY, fontStyle: 'italic', fontWeight: 600, fontSize: 'clamp(34px, 8vw, 56px)', color: gananciaAnimada >= 0 ? G : RD, lineHeight: 1.1 }}>
                 {gananciaAnimada < 0 ? '-' : ''}{usd(gananciaAnimada)}
               </div>
-              <div style={{ fontSize: 13, color: MU, marginTop: 6, fontWeight: 600 }}>
+              <div style={{ fontSize: 14, color: MU, marginTop: 6, fontWeight: 600 }}>
                 {usd(resumen.ingresos_mes)} ingresos − {usd(resumen.gastos_mes)} gastos
               </div>
               <TrendChart data={trendData} positiveColor={GR} negativeColor={RD} mutedColor={MU} />
@@ -440,7 +440,7 @@ export default function Dashboard() {
                 <div style={{ fontFamily: FONT_DISPLAY, fontStyle: 'italic', fontWeight: 600, fontSize: 'clamp(26px, 6vw, 38px)', color: gananciaAnualAnimada >= 0 ? G : RD, lineHeight: 1.1 }}>
                   {gananciaAnualAnimada < 0 ? '-' : ''}{usd(gananciaAnualAnimada)}
                 </div>
-                <div style={{ fontSize: 13, color: MU, marginTop: 6, fontWeight: 600 }}>
+                <div style={{ fontSize: 14, color: MU, marginTop: 6, fontWeight: 600 }}>
                   {usd(resumenAnual.ingresos_anual)} ingresos − {usd(resumenAnual.gastos_variables_anual + resumenAnual.gastos_fijos_anual)} gastos · {resumenAnual.meses_transcurridos} meses
                 </div>
               </div>
@@ -485,7 +485,7 @@ export default function Dashboard() {
                       <div>
                         <div style={{ fontSize: 14, fontWeight: 600 }}>{m.titulo}</div>
                         {m.fecha_programada && (
-                          <div style={{ fontSize: 12, color: isOverdue(m.fecha_programada) ? RD : MU, marginTop: 2 }}>
+                          <div style={{ fontSize: 13, color: isOverdue(m.fecha_programada) ? RD : MU, marginTop: 2 }}>
                             {isOverdue(m.fecha_programada) ? 'Vencido — ' : ''}{fDateLong(m.fecha_programada)}
                           </div>
                         )}
@@ -503,7 +503,7 @@ export default function Dashboard() {
               <div style={{ marginBottom: 16 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
                   <div style={{ ...s.lbl, marginBottom: 0 }}>Próximas Reservas</div>
-                  <button onClick={() => setTab('reservas')} className="vs-btn" style={{ background: 'none', border: 'none', color: G, fontSize: 12, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 2 }}>
+                  <button onClick={() => setTab('reservas')} className="vs-btn" style={{ background: 'none', border: 'none', color: G, fontSize: 13, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 2 }}>
                     Ver todas <Icon name="chevron" size={13} color={G} />
                   </button>
                 </div>
@@ -574,8 +574,8 @@ export default function Dashboard() {
                                 <span style={{ fontSize: 15, fontWeight: 600 }}>{r.huesped_nombre}</span>
                                 {r.fuente === 'airbnb' && <span style={s.badge('#ff5a5f')}>Airbnb</span>}
                               </div>
-                              <div style={{ fontSize: 13, color: MU }}>{fDate(r.check_in)} → {fDate(r.check_out)} · {r.noches} noches</div>
-                              {r.notas && <div style={{ fontSize: 12, color: MU, marginTop: 4 }}>{r.notas}</div>}
+                              <div style={{ fontSize: 14, color: MU }}>{fDate(r.check_in)} → {fDate(r.check_out)} · {r.noches} noches</div>
+                              {r.notas && <div style={{ fontSize: 13, color: MU, marginTop: 4 }}>{r.notas}</div>}
                             </div>
                             <div style={{ textAlign: 'right' }}>
                               <div style={{ fontFamily: FONT_DISPLAY, fontSize: 18, color: GR }}>{r.monto_total ? usd(r.monto_total) : '—'}</div>
@@ -604,7 +604,7 @@ export default function Dashboard() {
             <div style={{ display: 'flex', borderBottom: `1px solid ${BD}`, marginBottom: 16, padding: '0 16px' }}>
               {([['ingresos', 'Ingresos'], ['fijos', 'Gastos Fijos'], ['gastos', 'Variables'], ['caja', 'Caja Chica']] as [FinTab, string][]).map(([key, lbl]) => (
                 <button key={key} onClick={() => setFinTab(key)} style={{
-                  flex: 1, padding: '11px 4px', background: 'none', border: 'none', cursor: 'pointer', fontSize: 13,
+                  flex: 1, padding: '11px 4px', background: 'none', border: 'none', cursor: 'pointer', fontSize: 14,
                   color: finTab === key ? G : MU, borderBottom: finTab === key ? `2px solid ${G}` : '2px solid transparent', fontWeight: finTab === key ? 600 : 400
                 }}>{lbl}</button>
               ))}
@@ -651,7 +651,7 @@ export default function Dashboard() {
                               <span style={{ fontSize: 15, fontWeight: 600 }}>{g.nombre}</span>
                               <span style={s.badge(pagado ? GR : G)}>{pagado ? 'Pagado' : 'Pendiente'}</span>
                             </div>
-                            <div style={{ fontSize: 12, color: MU }}>{g.categoria}{g.dia_cobro ? ` · día ${g.dia_cobro}` : ''}</div>
+                            <div style={{ fontSize: 13, color: MU }}>{g.categoria}{g.dia_cobro ? ` · día ${g.dia_cobro}` : ''}</div>
                           </div>
                           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                             <div style={{ textAlign: 'right' }}>
@@ -714,7 +714,7 @@ export default function Dashboard() {
                 <div className="vs-card-hover" style={{ ...s.card, marginTop: 20, background: C2 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
                     <span style={{ color: MU, fontSize: 13 }}>Ingresos</span>
-                    <span style={{ color: GR, fontSize: 13, fontWeight: 600 }}>+{usd(resumen.ingresos_mes)}</span>
+                    <span style={{ color: GR, fontSize: 14, fontWeight: 600 }}>+{usd(resumen.ingresos_mes)}</span>
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
                     <span style={{ color: MU, fontSize: 13 }}>Gastos Fijos</span>
@@ -755,8 +755,8 @@ export default function Dashboard() {
                           <span style={{ fontSize: 15, fontWeight: 600 }}>{m.titulo}</span>
                           <span style={s.badge(m.prioridad === 'alta' ? RD : m.prioridad === 'media' ? G : GR)}>{m.prioridad}</span>
                         </div>
-                        {m.descripcion && <div style={{ fontSize: 12, color: MU, marginBottom: 4 }}>{m.descripcion}</div>}
-                        <div style={{ fontSize: 12, color: isOverdue(m.fecha_programada) ? RD : MU }}>
+                        {m.descripcion && <div style={{ fontSize: 13, color: MU, marginBottom: 4 }}>{m.descripcion}</div>}
+                        <div style={{ fontSize: 13, color: isOverdue(m.fecha_programada) ? RD : MU }}>
                           {m.fecha_programada ? (isOverdue(m.fecha_programada) ? 'Vencido: ' : 'Para: ') + fDateLong(m.fecha_programada) : ''}
                           {m.proveedor ? ` · ${m.proveedor}` : ''}
                           {m.recurrente ? ' · ↻ recurrente' : ''}
@@ -811,8 +811,8 @@ export default function Dashboard() {
                           <span style={s.badge(c.prioridad === 'alta' ? RD : c.prioridad === 'media' ? G : GR)}>{c.prioridad}</span>
                           {c.categoria && <span style={s.badge(MU)}>{c.categoria}</span>}
                         </div>
-                        {c.descripcion && <div style={{ fontSize: 12, color: MU, marginBottom: 4 }}>{c.descripcion}</div>}
-                        <div style={{ fontSize: 12, color: MU }}>
+                        {c.descripcion && <div style={{ fontSize: 13, color: MU, marginBottom: 4 }}>{c.descripcion}</div>}
+                        <div style={{ fontSize: 13, color: MU }}>
                           {c.cantidad ? `Cantidad: ${c.cantidad}` : ''}
                           {c.costo_estimado ? ` · Est: $${c.costo_estimado.toLocaleString()}` : ''}
                         </div>
@@ -916,10 +916,10 @@ export default function Dashboard() {
           {modal === 'csv' && (
             <div>
               <ModalTitle>Importar Airbnb CSV</ModalTitle>
-              <p style={{ fontSize: 13, color: MU, marginBottom: 16 }}>Descarga el reporte de Airbnb en formato CSV desde Reservaciones → Historial de transacciones → Exportar.</p>
+              <p style={{ fontSize: 14, color: MU, marginBottom: 16 }}>Descarga el reporte de Airbnb en formato CSV desde Reservaciones → Historial de transacciones → Exportar.</p>
               <input ref={csvRef} type="file" accept=".csv" onChange={e => setCsvFile(e.target.files?.[0] ?? null)}
                 style={{ ...s.inp, padding: '8px', color: MU, marginBottom: 12 }} />
-              {csvResult && <div style={{ padding: '10px 12px', background: csvResult.startsWith('✓') ? GR + '15' : RD + '15', borderRadius: 8, fontSize: 13, color: csvResult.startsWith('✓') ? GR : RD, marginBottom: 12 }}>{csvResult}</div>}
+              {csvResult && <div style={{ padding: '10px 12px', background: csvResult.startsWith('✓') ? GR + '15' : RD + '15', borderRadius: 8, fontSize: 14, color: csvResult.startsWith('✓') ? GR : RD, marginBottom: 12 }}>{csvResult}</div>}
               <button onClick={importCSV} disabled={!csvFile || csvLoading} className="vs-btn vs-btn-gold" style={{ ...s.btn(), width: '100%', opacity: csvFile ? 1 : 0.5 }}>
                 {csvLoading ? 'Importando...' : 'Importar'}
               </button>
@@ -991,7 +991,7 @@ function FinanzaRow({ f, onDelete }: { f: Finanza; onDelete: () => void }) {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
         <div style={{ flex: 1 }}>
           <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 2 }}>{f.descripcion}</div>
-          <div style={{ fontSize: 12, color: MU }}>{f.categoria} · {fDate(f.fecha)}</div>
+          <div style={{ fontSize: 13, color: MU }}>{f.categoria} · {fDate(f.fecha)}</div>
           {f.comprobante_nombre && <div style={{ fontSize: 11, color: OC, marginTop: 2, display: 'flex', alignItems: 'center', gap: 4 }}><Icon name="paperclip" size={11} color={OC} /> {f.comprobante_nombre}</div>}
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -1182,7 +1182,7 @@ function FormGastoFijo({ pid, onSaved }: { pid: number; onSaved: () => void }) {
   return (
     <form onSubmit={submit}>
       <ModalTitle>Nuevo Gasto Fijo</ModalTitle>
-      <p style={{ fontSize: 13, color: MU, marginBottom: 16 }}>Gastos que se repiten cada mes (internet, alberca, HOA, limpieza...).</p>
+      <p style={{ fontSize: 14, color: MU, marginBottom: 16 }}>Gastos que se repiten cada mes (internet, alberca, HOA, limpieza...).</p>
       <label style={lbl}>Nombre *</label>
       <input required style={inp} placeholder="Ej: Servicio de alberca" value={v.nombre} onChange={e => setV({ ...v, nombre: e.target.value })} />
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
@@ -1272,10 +1272,10 @@ function InventarioRow({ i, onEstado, onDelete }: { i: InventarioItem; onEstado:
         <div style={{ flex: 1, marginRight: 12 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 2, flexWrap: 'wrap' }}>
             <span style={{ fontSize: 14, fontWeight: 600 }}>{i.articulo}</span>
-            {i.cantidad > 1 && <span style={{ fontSize: 12, color: MU }}>×{i.cantidad}</span>}
+            {i.cantidad > 1 && <span style={{ fontSize: 13, color: MU }}>×{i.cantidad}</span>}
           </div>
-          {i.notas && <div style={{ fontSize: 12, color: MU }}>{i.notas}</div>}
-          <div style={{ fontSize: 12, color: MU, marginTop: 2 }}>
+          {i.notas && <div style={{ fontSize: 13, color: MU }}>{i.notas}</div>}
+          <div style={{ fontSize: 13, color: MU, marginTop: 2 }}>
             {i.costo ? `$${i.costo.toLocaleString()}` : ''}
             {i.ubicacion ? ` · ${i.ubicacion}` : ''}
           </div>
@@ -1378,11 +1378,11 @@ function FormPagarGastoFijo({ gasto, onSaved }: { gasto: GastoFijo; onSaved: () 
   return (
     <form onSubmit={submit}>
       <ModalTitle>Marcar como Pagado</ModalTitle>
-      <p style={{ fontSize: 13, color: MU, marginBottom: 16 }}>{gasto.nombre} — confirma cuánto llegó realmente (puede diferir del estimado, como agua, luz o limpieza).</p>
+      <p style={{ fontSize: 14, color: MU, marginBottom: 16 }}>{gasto.nombre} — confirma cuánto llegó realmente (puede diferir del estimado, como agua, luz o limpieza).</p>
 
       <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
-        <button type="button" onClick={() => setPorVeces(false)} style={{ flex: 1, padding: '8px', borderRadius: 8, border: `1px solid ${!porVeces ? G : BD}`, background: !porVeces ? G + '15' : 'none', color: !porVeces ? G : MU, fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>Monto único</button>
-        <button type="button" onClick={() => setPorVeces(true)} style={{ flex: 1, padding: '8px', borderRadius: 8, border: `1px solid ${porVeces ? G : BD}`, background: porVeces ? G + '15' : 'none', color: porVeces ? G : MU, fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>Por veces pagado</button>
+        <button type="button" onClick={() => setPorVeces(false)} style={{ flex: 1, padding: '8px', borderRadius: 8, border: `1px solid ${!porVeces ? G : BD}`, background: !porVeces ? G + '15' : 'none', color: !porVeces ? G : MU, fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>Monto único</button>
+        <button type="button" onClick={() => setPorVeces(true)} style={{ flex: 1, padding: '8px', borderRadius: 8, border: `1px solid ${porVeces ? G : BD}`, background: porVeces ? G + '15' : 'none', color: porVeces ? G : MU, fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>Por veces pagado</button>
       </div>
 
       {!porVeces ? (
