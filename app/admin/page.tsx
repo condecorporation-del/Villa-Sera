@@ -36,7 +36,7 @@ export default function AdminLogin() {
       display: 'flex', alignItems: 'center', justifyContent: 'center',
       fontFamily: "var(--font-inter), 'Inter', system-ui, sans-serif"
     }}>
-      <div className="vs-fade-item" style={{ width: '100%', maxWidth: 400, padding: '0 24px' }}>
+      <div className="vs-root vs-fade-item" style={{ width: '100%', maxWidth: 400, padding: '0 24px' }}>
         {/* Logo */}
         <div style={{ textAlign: 'center', marginBottom: 40 }}>
           <div style={{

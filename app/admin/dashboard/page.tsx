@@ -13,7 +13,7 @@ const C1 = '#FFFFFF'       // card surface (white, elevated via shadow not borde
 const C2 = '#F4ECDD'       // surface-2 — inputs / chips / recessed areas
 const BD = '#E8DCC6'       // hairline border
 const TX = '#2A211A'       // espresso ink — primary text
-const MU = '#93857A'       // warm grey-brown — secondary text
+const MU = '#6E6055'       // warm grey-brown — secondary text (darkened for legibility/contrast)
 const GR = '#2E9E5B'       // vivid meadow green — positive figures
 const RD = '#E2543F'       // vivid coral-terracotta — negative/expense
 const OC = '#1CA7C7'       // vivid turquoise-ocean — informational accent
@@ -57,6 +57,14 @@ function Icon({ name, size = 18, color = 'currentColor', strokeWidth = 1.8 }: { 
 // ── TYPES ─────────────────────────────────────────────────
 type Tab = 'dashboard' | 'reservas' | 'finanzas' | 'mantenimiento' | 'compras' | 'inventario'
 type FinTab = 'ingresos' | 'fijos' | 'gastos' | 'caja'
+const NAV_ITEMS: [Tab, IconName, string][] = [
+  ['dashboard', 'home', 'Inicio'],
+  ['reservas', 'calendar', 'Reservas'],
+  ['finanzas', 'wallet', 'Finanzas'],
+  ['mantenimiento', 'wrench', 'Manten.'],
+  ['compras', 'bag', 'Compras'],
+  ['inventario', 'archive', 'Inventario'],
+]
 
 interface Resumen {
   ganancia_neta: number; ingresos_mes: number; gastos_mes: number
@@ -345,21 +353,21 @@ export default function Dashboard() {
 
   // ── STYLES ──────────────────────────────────────────────
   const s = {
-    wrap: { minHeight: '100vh', background: BG, color: TX, fontFamily: "'Inter',system-ui,sans-serif", paddingBottom: 80 } as React.CSSProperties,
+    wrap: { minHeight: '100vh', background: BG, color: TX, fontFamily: "var(--font-inter), 'Inter', system-ui, sans-serif", paddingBottom: 80 } as React.CSSProperties,
     header: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 16px', borderBottom: `1px solid ${BD}`, position: 'sticky' as const, top: 0, background: BG, zIndex: 50 },
     card: { background: C1, border: `1px solid ${BD}`, borderRadius: 14, padding: '16px', boxShadow: SH } as React.CSSProperties,
     row: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '13px 0', borderBottom: `1px solid ${BD}` } as React.CSSProperties,
     btn: (color = G, text = '#231A10') => ({ background: color, color: text, border: 'none', padding: '10px 18px', borderRadius: 10, cursor: 'pointer', fontSize: 14, fontWeight: 700 } as React.CSSProperties),
     btnSm: (color = G, text = '#231A10') => ({ background: color, color: text, border: 'none', padding: '6px 12px', borderRadius: 8, cursor: 'pointer', fontSize: 12, fontWeight: 700 } as React.CSSProperties),
-    btnGhost: { background: C2, border: `1px solid ${BD}`, color: MU, padding: '6px 12px', borderRadius: 8, cursor: 'pointer', fontSize: 12 } as React.CSSProperties,
-    lbl: { fontSize: 10, letterSpacing: '0.15em', textTransform: 'uppercase' as const, color: MU, marginBottom: 4, display: 'block' },
-    inp: { width: '100%', background: C2, border: `1px solid ${BD}`, color: TX, padding: '10px 12px', borderRadius: 8, fontSize: 14, boxSizing: 'border-box' as const },
+    btnGhost: { background: C2, border: `1px solid ${BD}`, color: MU, padding: '6px 12px', borderRadius: 8, cursor: 'pointer', fontSize: 12, fontWeight: 600 } as React.CSSProperties,
+    lbl: { fontSize: 10.5, letterSpacing: '0.14em', textTransform: 'uppercase' as const, color: MU, marginBottom: 4, display: 'block', fontWeight: 700 },
+    inp: { width: '100%', background: C2, border: `1px solid ${BD}`, color: TX, padding: '10px 12px', borderRadius: 8, fontSize: 15, fontWeight: 500, boxSizing: 'border-box' as const },
     section: { padding: '0 16px' } as React.CSSProperties,
     badge: (c: string) => ({ fontSize: 11, padding: '3px 8px', borderRadius: 20, background: c + '20', color: c, fontWeight: 600 }) as React.CSSProperties,
   }
 
   return (
-    <div style={s.wrap}>
+    <div className="vs-root vs-wrap-pad" style={s.wrap}>
       {/* Header */}
       <div className="vs-container" style={{ ...s.header, background: `linear-gradient(180deg, ${BG} 0%, ${BG}ee 100%)`, backdropFilter: 'blur(6px)' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
@@ -385,20 +393,37 @@ export default function Dashboard() {
         </div>
       </div>
 
+      {/* ── DESKTOP TOP NAV (tablet/desktop only — see .vs-desktop-nav) ── */}
+      <div className="vs-desktop-nav" style={{ borderBottom: `1px solid ${BD}`, background: BG }}>
+        <div className="vs-container" style={{ display: 'flex', gap: 28, paddingTop: 2 }}>
+          {NAV_ITEMS.map(([key, icon, lbl]) => (
+            <button key={key} onClick={() => setTab(key)} className="vs-btn vs-desktop-nav-item" data-active={tab === key}
+              style={{
+                background: 'none', border: 'none', cursor: 'pointer', padding: '13px 2px',
+                display: 'flex', alignItems: 'center', gap: 8,
+              }}>
+              <Icon name={icon} size={17} color={tab === key ? G : MU} />
+              <span style={{ fontSize: 14, color: tab === key ? TX : MU, fontWeight: tab === key ? 700 : 600 }}>{lbl}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
       {/* Content */}
       <div className="vs-container" style={{ paddingTop: 16 }}>
 
         {/* ── DASHBOARD TAB ── */}
         {tab === 'dashboard' && resumen && (
-          <div style={s.section}>
+          <div className="vs-fade-item" style={s.section}>
+            <div className="vs-hero-grid">
             {/* Ganancia neta — headline */}
-            <div className="vs-fade-item vs-card" style={{ ...s.card, textAlign: 'center', marginBottom: 16, background: `radial-gradient(120% 100% at 50% 0%, ${C2} 0%, ${C1} 60%)`, position: 'relative', overflow: 'hidden' }}>
+            <div className="vs-fade-item vs-card vs-card-hover" style={{ ...s.card, textAlign: 'center', marginBottom: 16, background: `radial-gradient(120% 100% at 50% 0%, ${C2} 0%, ${C1} 60%)`, position: 'relative', overflow: 'hidden' }}>
               <div style={{ position: 'absolute', top: -1, left: '50%', transform: 'translateX(-50%)', width: '60%', height: 2, background: `linear-gradient(90deg, transparent, ${G}, transparent)` }} />
               <div style={s.lbl}>Ganancia Neta del Mes</div>
-              <div style={{ fontFamily: FONT_DISPLAY, fontStyle: 'italic', fontWeight: 600, fontSize: 'clamp(32px, 10vw, 46px)', color: gananciaAnimada >= 0 ? G : RD, lineHeight: 1.1 }}>
+              <div style={{ fontFamily: FONT_DISPLAY, fontStyle: 'italic', fontWeight: 600, fontSize: 'clamp(34px, 8vw, 56px)', color: gananciaAnimada >= 0 ? G : RD, lineHeight: 1.1 }}>
                 {gananciaAnimada < 0 ? '-' : ''}{usd(gananciaAnimada)}
               </div>
-              <div style={{ fontSize: 12, color: MU, marginTop: 6 }}>
+              <div style={{ fontSize: 13, color: MU, marginTop: 6, fontWeight: 600 }}>
                 {usd(resumen.ingresos_mes)} ingresos − {usd(resumen.gastos_mes)} gastos
               </div>
               <TrendChart data={trendData} positiveColor={GR} negativeColor={RD} mutedColor={MU} />
@@ -406,27 +431,28 @@ export default function Dashboard() {
 
             {/* Ganancia neta anual (YTD) */}
             {resumenAnual && (
-              <div className="vs-fade-item vs-card" style={{ ...s.card, textAlign: 'center', marginBottom: 16, animationDelay: '80ms' }}>
+              <div className="vs-fade-item vs-card vs-card-hover" style={{ ...s.card, textAlign: 'center', marginBottom: 16, animationDelay: '80ms', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
                 <div style={s.lbl}>Ganancia Neta {resumenAnual.year} (acumulado)</div>
-                <div style={{ fontFamily: FONT_DISPLAY, fontStyle: 'italic', fontWeight: 600, fontSize: 'clamp(24px, 7vw, 30px)', color: gananciaAnualAnimada >= 0 ? G : RD, lineHeight: 1.1 }}>
+                <div style={{ fontFamily: FONT_DISPLAY, fontStyle: 'italic', fontWeight: 600, fontSize: 'clamp(26px, 6vw, 38px)', color: gananciaAnualAnimada >= 0 ? G : RD, lineHeight: 1.1 }}>
                   {gananciaAnualAnimada < 0 ? '-' : ''}{usd(gananciaAnualAnimada)}
                 </div>
-                <div style={{ fontSize: 12, color: MU, marginTop: 6 }}>
+                <div style={{ fontSize: 13, color: MU, marginTop: 6, fontWeight: 600 }}>
                   {usd(resumenAnual.ingresos_anual)} ingresos − {usd(resumenAnual.gastos_variables_anual + resumenAnual.gastos_fijos_anual)} gastos · {resumenAnual.meses_transcurridos} meses
                 </div>
               </div>
             )}
+            </div>
 
             {/* KPI grid */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 16 }}>
+            <div className="vs-kpi-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 16 }}>
               {[
                 { lbl: 'Ingresos', val: usd(resumen.ingresos_mes), color: GR },
                 { lbl: 'Gastos Fijos', val: usd(resumen.gastos_fijos_mes), color: RD },
                 { lbl: 'Gastos Variables', val: usd(resumen.gastos_variables_mes), color: AM },
               ].map(({ lbl, val, color }, i) => (
-                <div key={lbl} className="vs-fade-item vs-card" style={{ ...s.card, textAlign: 'center', animationDelay: `${i * 60}ms` }}>
+                <div key={lbl} className="vs-fade-item vs-card vs-card-hover" style={{ ...s.card, textAlign: 'center', animationDelay: `${i * 60}ms` }}>
                   <div style={s.lbl}>{lbl}</div>
-                  <div style={{ fontSize: 22, color, fontFamily: FONT_DISPLAY }}>{val}</div>
+                  <div style={{ fontSize: 24, color, fontFamily: FONT_DISPLAY, fontWeight: 600 }}>{val}</div>
                 </div>
               ))}
               <div className="vs-fade-item vs-card" style={{ ...s.card, textAlign: 'center', animationDelay: '180ms', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
@@ -437,7 +463,7 @@ export default function Dashboard() {
 
             {/* Caja Chica quick view */}
             <div onClick={() => { setTab('finanzas'); setFinTab('caja') }}
-              style={{ ...s.card, marginBottom: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }}>
+              className="vs-card-hover" style={{ ...s.card, marginBottom: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }}>
               <div>
                 <div style={s.lbl}>Caja Chica</div>
                 <div style={{ fontFamily: FONT_DISPLAY, fontSize: 24, color: cajaChicaBalance >= 0 ? G : RD }}>{usd(cajaChicaBalance)}</div>
@@ -450,7 +476,7 @@ export default function Dashboard() {
               <div style={{ marginBottom: 16 }}>
                 <div style={{ ...s.lbl, marginBottom: 8 }}>Mantenimientos Pendientes</div>
                 {pendientes.slice(0, 3).map(m => (
-                  <div key={m.id} style={{ ...s.card, marginBottom: 8, borderLeft: `3px solid ${m.prioridad === 'alta' ? RD : m.prioridad === 'media' ? G : GR}` }}>
+                  <div key={m.id} className="vs-card-hover" style={{ ...s.card, marginBottom: 8, borderLeft: `3px solid ${m.prioridad === 'alta' ? RD : m.prioridad === 'media' ? G : GR}` }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                       <div>
                         <div style={{ fontSize: 14, fontWeight: 600 }}>{m.titulo}</div>
@@ -470,7 +496,7 @@ export default function Dashboard() {
 
             {/* Next check-ins */}
             {reservaciones.filter(r => new Date(r.check_in) > new Date()).slice(0, 2).map(r => (
-              <div key={r.id} style={{ ...s.card, marginBottom: 8, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div key={r.id} className="vs-card-hover" style={{ ...s.card, marginBottom: 8, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div>
                   <div style={{ fontSize: 13, color: MU, marginBottom: 2 }}>Próximo check-in</div>
                   <div style={{ fontSize: 15, fontWeight: 600 }}>{r.huesped_nombre}</div>
@@ -484,7 +510,7 @@ export default function Dashboard() {
 
         {/* ── RESERVAS TAB ── */}
         {tab === 'reservas' && (
-          <div style={s.section}>
+          <div className="vs-fade-item" style={s.section}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
               <span style={{ ...s.lbl, marginBottom: 0 }}>{reservaciones.length} reservaciones</span>
               <div style={{ display: 'flex', gap: 8 }}>
@@ -560,7 +586,7 @@ export default function Dashboard() {
               ))}
             </div>
 
-            <div style={s.section}>
+            <div className="vs-fade-item" style={s.section}>
               {/* INGRESOS */}
               {finTab === 'ingresos' && (
                 <>
@@ -594,7 +620,7 @@ export default function Dashboard() {
                   {[...gastosFijos].sort((a, b) => (a.dia_cobro ?? 99) - (b.dia_cobro ?? 99)).map(g => {
                     const pagado = isPagadoEstePeriodo(g.ultimo_pago)
                     return (
-                      <div key={g.id} style={{ ...s.card, marginBottom: 10, borderLeft: `3px solid ${pagado ? GR : G}` }}>
+                      <div key={g.id} className="vs-card-hover" style={{ ...s.card, marginBottom: 10, borderLeft: `3px solid ${pagado ? GR : G}` }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                           <div>
                             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -643,7 +669,7 @@ export default function Dashboard() {
               {/* CAJA CHICA */}
               {finTab === 'caja' && (
                 <>
-                  <div style={{ ...s.card, textAlign: 'center', marginBottom: 16, background: 'linear-gradient(135deg,#111,#1a1400)' }}>
+                  <div className="vs-card-hover" style={{ ...s.card, textAlign: 'center', marginBottom: 16, background: `radial-gradient(120% 100% at 50% 0%, ${C2} 0%, ${C1} 60%)` }}>
                     <div style={s.lbl}>Saldo de Caja Chica</div>
                     <div style={{ fontFamily: FONT_DISPLAY, fontSize: 40, color: cajaChicaBalance >= 0 ? G : RD, lineHeight: 1.1 }}>
                       {usd(cajaChicaBalance)}
@@ -661,7 +687,7 @@ export default function Dashboard() {
 
               {/* Resumen footer */}
               {resumen && (
-                <div style={{ ...s.card, marginTop: 20, background: C2 }}>
+                <div className="vs-card-hover" style={{ ...s.card, marginTop: 20, background: C2 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
                     <span style={{ color: MU, fontSize: 13 }}>Ingresos</span>
                     <span style={{ color: GR, fontSize: 13, fontWeight: 600 }}>+{usd(resumen.ingresos_mes)}</span>
@@ -688,7 +714,7 @@ export default function Dashboard() {
 
         {/* ── MANTENIMIENTO TAB ── */}
         {tab === 'mantenimiento' && (
-          <div style={s.section}>
+          <div className="vs-fade-item" style={s.section}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
               <span style={{ ...s.lbl, marginBottom: 0 }}>{pendientes.length} pendientes</span>
               <button onClick={() => setModal('mantenimiento')} className="vs-btn vs-btn-gold" style={s.btn()}>+ Nuevo</button>
@@ -698,7 +724,7 @@ export default function Dashboard() {
               <>
                 <div style={s.lbl}>Pendientes</div>
                 {pendientes.map(m => (
-                  <div key={m.id} style={{ ...s.card, marginBottom: 10, borderLeft: `3px solid ${m.prioridad === 'alta' ? RD : m.prioridad === 'media' ? G : GR}` }}>
+                  <div key={m.id} className="vs-card-hover" style={{ ...s.card, marginBottom: 10, borderLeft: `3px solid ${m.prioridad === 'alta' ? RD : m.prioridad === 'media' ? G : GR}` }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                       <div style={{ flex: 1, marginRight: 12 }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
@@ -743,7 +769,7 @@ export default function Dashboard() {
 
         {/* ── COMPRAS TAB ── */}
         {tab === 'compras' && (
-          <div style={s.section}>
+          <div className="vs-fade-item" style={s.section}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
               <span style={{ ...s.lbl, marginBottom: 0 }}>{compras.filter(c => c.estado !== 'comprado').length} pendientes</span>
               <button onClick={() => setModal('compra')} className="vs-btn vs-btn-gold" style={s.btn()}>+ Agregar</button>
@@ -753,7 +779,7 @@ export default function Dashboard() {
               <>
                 <div style={s.lbl}>Por comprar</div>
                 {compras.filter(c => c.estado !== 'comprado').map(c => (
-                  <div key={c.id} style={{ ...s.card, marginBottom: 10, borderLeft: `3px solid ${c.prioridad === 'alta' ? RD : c.prioridad === 'media' ? G : GR}` }}>
+                  <div key={c.id} className="vs-card-hover" style={{ ...s.card, marginBottom: 10, borderLeft: `3px solid ${c.prioridad === 'alta' ? RD : c.prioridad === 'media' ? G : GR}` }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                       <div style={{ flex: 1, marginRight: 12 }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4, flexWrap: 'wrap' }}>
@@ -798,7 +824,7 @@ export default function Dashboard() {
 
         {/* ── INVENTARIO TAB ── */}
         {tab === 'inventario' && (
-          <div style={s.section}>
+          <div className="vs-fade-item" style={s.section}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
               <span style={{ ...s.lbl, marginBottom: 0 }}>{inventario.length} artículos</span>
               <button onClick={() => setModal('inventario')} className="vs-btn vs-btn-gold" style={s.btn()}>+ Agregar</button>
@@ -835,21 +861,14 @@ export default function Dashboard() {
         )}
       </div>
 
-      {/* ── BOTTOM NAV ── */}
-      <div style={{
+      {/* ── MOBILE BOTTOM NAV (phones only — see .vs-mobile-nav / .vs-desktop-nav) ── */}
+      <div className="vs-mobile-nav" style={{
         position: 'fixed', bottom: 0, left: 0, right: 0, background: C1,
-        borderTop: `1px solid ${BD}`, display: 'flex', zIndex: 100, boxShadow: '0 -6px 20px -10px rgba(42,33,26,0.15)',
+        borderTop: `1px solid ${BD}`, zIndex: 100, boxShadow: '0 -6px 20px -10px rgba(42,33,26,0.15)',
         paddingBottom: 'env(safe-area-inset-bottom, 0px)'
       }}>
         <div className="vs-container" style={{ display: 'flex', width: '100%' }}>
-          {([
-            ['dashboard', 'home', 'Inicio'],
-            ['reservas', 'calendar', 'Reservas'],
-            ['finanzas', 'wallet', 'Finanzas'],
-            ['mantenimiento', 'wrench', 'Manten.'],
-            ['compras', 'bag', 'Compras'],
-            ['inventario', 'archive', 'Inventario'],
-          ] as [Tab, IconName, string][]).map(([key, icon, lbl]) => (
+          {NAV_ITEMS.map(([key, icon, lbl]) => (
             <button key={key} onClick={() => setTab(key)} className="vs-btn" style={{
               flex: 1, background: 'none', border: 'none', cursor: 'pointer',
               padding: '9px 2px 8px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3

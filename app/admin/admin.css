@@ -78,19 +78,81 @@
   background: rgba(207, 162, 59, 0.28);
 }
 
+/* Legibility: Inter reads thin at small sizes on some displays -
+   set a slightly heavier baseline weight and real antialiasing. */
+.vs-root {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  font-weight: 500;
+}
+.vs-root input, .vs-root select, .vs-root textarea, .vs-root button {
+  font-weight: 500;
+}
+
 @media (max-width: 380px) {
   .vs-hide-xs { display: none !important; }
 }
 
-@media (min-width: 640px) {
-  .vs-container { max-width: 640px; margin: 0 auto; }
+/* ── Mobile app-shell pattern: bottom tab bar, tight gutters ── */
+.vs-mobile-nav { display: flex; }
+.vs-desktop-nav { display: none; }
+
+/* ── Desktop: a real desktop layout, not a stretched phone view ── */
+@media (min-width: 900px) {
+  .vs-container {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding-left: 28px;
+    padding-right: 28px;
+  }
+  .vs-mobile-nav { display: none !important; }
+  .vs-desktop-nav { display: flex !important; }
+  .vs-wrap-pad { padding-bottom: 32px !important; }
+  .vs-kpi-grid {
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 16px !important;
+  }
+  .vs-hero-grid {
+    display: grid !important;
+    grid-template-columns: 1.4fr 1fr !important;
+    align-items: stretch !important;
+    gap: 16px !important;
+  }
+  .vs-hero-grid > * { margin-bottom: 0 !important; }
+  .vs-card-hover {
+    transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.22s ease;
+  }
+  .vs-card-hover:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 10px rgba(42, 33, 26, 0.07), 0 22px 44px -18px rgba(42, 33, 26, 0.28) !important;
+  }
+  .vs-root { font-size: 15.5px; }
+}
+
+.vs-desktop-nav-item {
+  position: relative;
+  transition: color 0.2s ease;
+}
+.vs-desktop-nav-item::after {
+  content: '';
+  position: absolute;
+  left: 0; right: 0; bottom: -1px;
+  height: 2px;
+  background: #CFA23B;
+  transform: scaleX(0);
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  transform-origin: left;
+}
+.vs-desktop-nav-item[data-active="true"]::after {
+  transform: scaleX(1);
 }
 
 @media (prefers-reduced-motion: reduce) {
   .vs-fade-item, .vs-bar, .vs-live-dot, .vs-skeleton {
     animation: none !important;
   }
-  .vs-btn, .vs-card {
+  .vs-btn, .vs-card, .vs-card-hover, .vs-desktop-nav-item, .vs-desktop-nav-item::after {
     transition: none !important;
   }
 }
