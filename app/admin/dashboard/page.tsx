@@ -516,7 +516,7 @@ export default function Dashboard() {
                       <div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 2 }}>
                           <span style={{ fontSize: 15, fontWeight: 700 }}>{r.huesped_nombre}</span>
-                          {r.fuente === 'airbnb' && <span style={s.badge('#ff5a5f')}>Airbnb</span>}
+                          {(r.fuente === 'airbnb' || r.fuente === 'airbnb_ical') && <span style={s.badge('#ff5a5f')}>Airbnb{r.fuente === 'airbnb_ical' ? ' · sin CSV' : ''}</span>}
                         </div>
                         <div style={{ fontSize: 12.5, color: MU, fontWeight: 600 }}>
                           {fDate(r.check_in)} → {fDate(r.check_out)} · {r.noches} noches
@@ -574,7 +574,7 @@ export default function Dashboard() {
                             <div style={{ flex: 1 }}>
                               <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
                                 <span style={{ fontSize: 15, fontWeight: 600 }}>{r.huesped_nombre}</span>
-                                {r.fuente === 'airbnb' && <span style={s.badge('#ff5a5f')}>Airbnb</span>}
+                                {(r.fuente === 'airbnb' || r.fuente === 'airbnb_ical') && <span style={s.badge('#ff5a5f')}>Airbnb{r.fuente === 'airbnb_ical' ? ' · sin CSV' : ''}</span>}
                               </div>
                               <div style={{ fontSize: 14, color: MU }}>{fDate(r.check_in)} → {fDate(r.check_out)} · {r.noches} noches</div>
                               {r.notas && <div style={{ fontSize: 13, color: MU, marginTop: 4 }}>{r.notas}</div>}
