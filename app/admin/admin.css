@@ -75,7 +75,15 @@
 }
 
 ::selection {
-  background: rgba(201, 168, 76, 0.35);
+  background: rgba(207, 162, 59, 0.28);
+}
+
+@media (max-width: 380px) {
+  .vs-hide-xs { display: none !important; }
+}
+
+@media (min-width: 640px) {
+  .vs-container { max-width: 640px; margin: 0 auto; }
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -4,21 +4,55 @@ import { useRouter } from 'next/navigation'
 import { api, logout, checkHealth } from '@/lib/admin-api'
 
 // ── THEME ─────────────────────────────────────────────────
-// Villa Sera brand tokens, warmed for a dark console (echoes the public site's
-// cream/terracotta/gold/ocean palette instead of a generic dev-tool dark mode)
-const G = '#C9A84C'        // gold — brand accent, CTAs
-const GL = '#DFC07A'       // gold light — hover/highlight
-const BG = '#171310'       // ink — canvas, warmed black (not neutral #0a0a0a)
-const C1 = '#211C17'       // surface — card
-const C2 = '#2A241D'       // surface-2 — elevated / inputs
-const BD = '#3A322A'       // hairline — warm border
-const TX = '#F8F4EF'       // cream — primary text (site's brand cream)
-const MU = '#8A8074'       // muted — warm grey-brown secondary text
-const GR = '#7C9473'       // sage — positive figures (not a generic bright green)
-const RD = '#C0453A'       // terracotta — negative/expense (site's brand terracotta)
-const OC = '#4E96B8'       // ocean, lightened for dark bg — informational accent
-const AM = '#C08A3E'       // amber — variable-expense distinction from fixed (terracotta)
+// Villa Sera brand tokens — light, vivid console matching the public site's
+// actual cream canvas, with saturated accent colors instead of muted/dark ones
+const G = '#CFA23B'        // gold — brand accent, CTAs
+const GL = '#E8C874'       // gold light — hover/highlight/gradient top
+const BG = '#FAF6EE'       // cream canvas
+const C1 = '#FFFFFF'       // card surface (white, elevated via shadow not border)
+const C2 = '#F4ECDD'       // surface-2 — inputs / chips / recessed areas
+const BD = '#E8DCC6'       // hairline border
+const TX = '#2A211A'       // espresso ink — primary text
+const MU = '#93857A'       // warm grey-brown — secondary text
+const GR = '#2E9E5B'       // vivid meadow green — positive figures
+const RD = '#E2543F'       // vivid coral-terracotta — negative/expense
+const OC = '#1CA7C7'       // vivid turquoise-ocean — informational accent
+const AM = '#E0932E'       // vivid amber — variable-expense distinction
+const SH = '0 1px 2px rgba(42,33,26,0.05), 0 10px 28px -14px rgba(42,33,26,0.18)'
 const FONT_DISPLAY = "'Cormorant Garamond', Georgia, serif"
+
+// ── ICONS ─────────────────────────────────────────────────
+// A small hand-picked line-icon set (stroke=currentColor) instead of unicode
+// glyphs/emoji, which render inconsistently across devices and read as
+// pasted-on "stickers" rather than a designed interface.
+type IconName = 'home' | 'calendar' | 'wallet' | 'wrench' | 'bag' | 'archive' | 'alert' | 'paperclip' | 'check' | 'close' | 'chevron'
+function Icon({ name, size = 18, color = 'currentColor', strokeWidth = 1.8 }: { name: IconName; size?: number; color?: string; strokeWidth?: number }) {
+  const common = { width: size, height: size, viewBox: '0 0 24 24', fill: 'none', stroke: color, strokeWidth, strokeLinecap: 'round' as const, strokeLinejoin: 'round' as const }
+  switch (name) {
+    case 'home':
+      return <svg {...common}><path d="M3 11.5 12 4l9 7.5" /><path d="M5.5 10v9a1 1 0 0 0 1 1H9a1 1 0 0 0 1-1v-4a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v4a1 1 0 0 0 1 1h2.5a1 1 0 0 0 1-1v-9" /></svg>
+    case 'calendar':
+      return <svg {...common}><rect x="3.5" y="5" width="17" height="16" rx="2.2" /><path d="M8 3v4M16 3v4M3.5 10h17" /></svg>
+    case 'wallet':
+      return <svg {...common}><path d="M3.5 7.5A2.5 2.5 0 0 1 6 5h11a1.5 1.5 0 0 1 1.5 1.5V8" /><rect x="3.5" y="8" width="17" height="12" rx="2" /><circle cx="15.5" cy="14" r="1.3" fill={color} stroke="none" /></svg>
+    case 'wrench':
+      return <svg {...common}><path d="M14.7 6.3a4 4 0 0 0-5.4 4.6L4 16.2V20h3.8l5.3-5.3a4 4 0 0 0 4.6-5.4l-2.6 2.6-2-2Z" /></svg>
+    case 'bag':
+      return <svg {...common}><path d="M6 8h12l1 12.5a1.5 1.5 0 0 1-1.5 1.5H6.5A1.5 1.5 0 0 1 5 20.5L6 8Z" /><path d="M9 8V6.5a3 3 0 0 1 6 0V8" /></svg>
+    case 'archive':
+      return <svg {...common}><rect x="3.5" y="4.5" width="17" height="4.5" rx="1.2" /><path d="M4.5 9v9a1.5 1.5 0 0 0 1.5 1.5h12a1.5 1.5 0 0 0 1.5-1.5V9" /><path d="M10 13h4" /></svg>
+    case 'alert':
+      return <svg {...common}><path d="M12 3.5 2.5 20h19L12 3.5Z" /><path d="M12 10v4.2" /><circle cx="12" cy="17" r="0.6" fill={color} stroke="none" /></svg>
+    case 'paperclip':
+      return <svg {...common}><path d="M17 8.5 9.3 16.2a2.7 2.7 0 1 1-3.8-3.8l7.9-7.9a4.2 4.2 0 1 1 6 6L11 19" /></svg>
+    case 'check':
+      return <svg {...common}><path d="M4.5 12.5 9.5 17.5 19.5 6.5" /></svg>
+    case 'close':
+      return <svg {...common}><path d="M5 5l14 14M19 5 5 19" /></svg>
+    case 'chevron':
+      return <svg {...common}><path d="M9 5.5 15.5 12 9 18.5" /></svg>
+  }
+}
 
 // ── TYPES ─────────────────────────────────────────────────
 type Tab = 'dashboard' | 'reservas' | 'finanzas' | 'mantenimiento' | 'compras' | 'inventario'
@@ -133,21 +167,76 @@ function useCountUp(target: number, durationMs = 900) {
   }, [target, durationMs])
   return value
 }
-function TrendChart({ data, color }: { data: { key: string; label: string; ingresos: number; gastos: number }[]; color: (net: number) => string }) {
+function smoothPath(pts: { x: number; y: number }[]) {
+  if (pts.length < 2) return ''
+  let d = `M ${pts[0].x},${pts[0].y}`
+  for (let i = 0; i < pts.length - 1; i++) {
+    const p0 = pts[i - 1] || pts[i]
+    const p1 = pts[i]
+    const p2 = pts[i + 1]
+    const p3 = pts[i + 2] || p2
+    const c1x = p1.x + (p2.x - p0.x) / 6, c1y = p1.y + (p2.y - p0.y) / 6
+    const c2x = p2.x - (p3.x - p1.x) / 6, c2y = p2.y - (p3.y - p1.y) / 6
+    d += ` C ${c1x},${c1y} ${c2x},${c2y} ${p2.x},${p2.y}`
+  }
+  return d
+}
+function TrendChart({ data, positiveColor, negativeColor, mutedColor }: { data: { key: string; label: string; ingresos: number; gastos: number }[]; positiveColor: string; negativeColor: string; mutedColor: string }) {
   const nets = data.map(d => d.ingresos - d.gastos)
   const max = Math.max(1, ...nets.map(n => Math.abs(n)))
+  const W = 300, H = 74, PADX = 6, PADY = 14
+  const stepX = data.length > 1 ? (W - PADX * 2) / (data.length - 1) : 0
+  const pts = nets.map((n, i) => ({
+    x: PADX + i * stepX,
+    y: PADY + (1 - (n / max + 1) / 2) * (H - PADY * 2),
+  }))
+  const lineColor = nets[nets.length - 1] >= 0 ? positiveColor : negativeColor
+  const gid = 'vsGrad'
+  const linePath = smoothPath(pts)
+  const areaPath = `${linePath} L ${pts[pts.length - 1].x},${H} L ${pts[0].x},${H} Z`
   return (
-    <div style={{ display: 'flex', alignItems: 'flex-end', gap: 8, height: 70, marginTop: 14 }}>
-      {data.map((d, i) => {
-        const h = Math.max(4, (Math.abs(nets[i]) / max) * 56)
-        const isLast = i === data.length - 1
-        return (
-          <div key={d.key} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 5, height: '100%', justifyContent: 'flex-end' }}>
-            <div className="vs-bar" style={{ width: '100%', maxWidth: 20, height: h, borderRadius: 4, background: color(nets[i]), opacity: isLast ? 1 : 0.5, animationDelay: `${i * 70}ms` }} />
-            <span style={{ fontSize: 9, color: isLast ? MU : MU, textTransform: 'capitalize', opacity: isLast ? 1 : 0.7, fontWeight: isLast ? 700 : 400 }}>{d.label}</span>
-          </div>
-        )
-      })}
+    <div style={{ marginTop: 14 }}>
+      <svg viewBox={`0 0 ${W} ${H}`} width="100%" height={84} preserveAspectRatio="none" style={{ overflow: 'visible' }}>
+        <defs>
+          <linearGradient id={gid} x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor={lineColor} stopOpacity="0.32" />
+            <stop offset="100%" stopColor={lineColor} stopOpacity="0" />
+          </linearGradient>
+        </defs>
+        <line x1={PADX} y1={H / 2} x2={W - PADX} y2={H / 2} stroke={mutedColor} strokeOpacity="0.25" strokeDasharray="3 4" />
+        <path d={areaPath} fill={`url(#${gid})`} className="vs-fade-item" style={{ animationDelay: '120ms' }} />
+        <path d={linePath} fill="none" stroke={lineColor} strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" className="vs-fade-item" style={{ animationDelay: '60ms' }} />
+        {pts.map((p, i) => {
+          const isLast = i === pts.length - 1
+          return (
+            <circle key={data[i].key} cx={p.x} cy={p.y} r={isLast ? 4 : 2.5}
+              fill={isLast ? lineColor : C1} stroke={lineColor} strokeWidth={isLast ? 0 : 1.6}
+              className={isLast ? 'vs-live-dot' : ''} />
+          )
+        })}
+      </svg>
+      <div style={{ display: 'flex', marginTop: 4 }}>
+        {data.map((d, i) => (
+          <span key={d.key} style={{ flex: 1, textAlign: 'center', fontSize: 9, color: mutedColor, textTransform: 'capitalize', opacity: i === data.length - 1 ? 1 : 0.65, fontWeight: i === data.length - 1 ? 700 : 500 }}>{d.label}</span>
+        ))}
+      </div>
+    </div>
+  )
+}
+function OccupancyRing({ pct, color, trackColor }: { pct: number; color: string; trackColor: string }) {
+  const size = 76, stroke = 7, r = (size - stroke) / 2, c = 2 * Math.PI * r
+  const clamped = Math.max(0, Math.min(100, pct))
+  return (
+    <div style={{ position: 'relative', width: size, height: size, margin: '0 auto' }}>
+      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} style={{ transform: 'rotate(-90deg)' }}>
+        <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke={trackColor} strokeWidth={stroke} />
+        <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke={color} strokeWidth={stroke} strokeLinecap="round"
+          strokeDasharray={c} strokeDashoffset={c - (clamped / 100) * c}
+          style={{ transition: 'stroke-dashoffset 0.9s cubic-bezier(0.16,1,0.3,1)' }} />
+      </svg>
+      <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: FONT_DISPLAY, fontSize: 20, color }}>
+        {Math.round(clamped)}%
+      </div>
     </div>
   )
 }
@@ -258,13 +347,13 @@ export default function Dashboard() {
   const s = {
     wrap: { minHeight: '100vh', background: BG, color: TX, fontFamily: "'Inter',system-ui,sans-serif", paddingBottom: 80 } as React.CSSProperties,
     header: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 16px', borderBottom: `1px solid ${BD}`, position: 'sticky' as const, top: 0, background: BG, zIndex: 50 },
-    card: { background: C1, border: `1px solid ${BD}`, borderRadius: 12, padding: '16px' } as React.CSSProperties,
+    card: { background: C1, border: `1px solid ${BD}`, borderRadius: 14, padding: '16px', boxShadow: SH } as React.CSSProperties,
     row: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '13px 0', borderBottom: `1px solid ${BD}` } as React.CSSProperties,
-    btn: (color = G, text = BG) => ({ background: color, color: text, border: 'none', padding: '10px 18px', borderRadius: 8, cursor: 'pointer', fontSize: 14, fontWeight: 600 } as React.CSSProperties),
-    btnSm: (color = G, text = BG) => ({ background: color, color: text, border: 'none', padding: '6px 12px', borderRadius: 6, cursor: 'pointer', fontSize: 12, fontWeight: 600 } as React.CSSProperties),
-    btnGhost: { background: 'none', border: `1px solid ${BD}`, color: MU, padding: '6px 12px', borderRadius: 6, cursor: 'pointer', fontSize: 12 } as React.CSSProperties,
+    btn: (color = G, text = '#231A10') => ({ background: color, color: text, border: 'none', padding: '10px 18px', borderRadius: 10, cursor: 'pointer', fontSize: 14, fontWeight: 700 } as React.CSSProperties),
+    btnSm: (color = G, text = '#231A10') => ({ background: color, color: text, border: 'none', padding: '6px 12px', borderRadius: 8, cursor: 'pointer', fontSize: 12, fontWeight: 700 } as React.CSSProperties),
+    btnGhost: { background: C2, border: `1px solid ${BD}`, color: MU, padding: '6px 12px', borderRadius: 8, cursor: 'pointer', fontSize: 12 } as React.CSSProperties,
     lbl: { fontSize: 10, letterSpacing: '0.15em', textTransform: 'uppercase' as const, color: MU, marginBottom: 4, display: 'block' },
-    inp: { width: '100%', background: '#0f0f0f', border: `1px solid ${BD}`, color: TX, padding: '10px 12px', borderRadius: 8, fontSize: 14, boxSizing: 'border-box' as const },
+    inp: { width: '100%', background: C2, border: `1px solid ${BD}`, color: TX, padding: '10px 12px', borderRadius: 8, fontSize: 14, boxSizing: 'border-box' as const },
     section: { padding: '0 16px' } as React.CSSProperties,
     badge: (c: string) => ({ fontSize: 11, padding: '3px 8px', borderRadius: 20, background: c + '20', color: c, fontWeight: 600 }) as React.CSSProperties,
   }
@@ -272,7 +361,7 @@ export default function Dashboard() {
   return (
     <div style={s.wrap}>
       {/* Header */}
-      <div style={{ ...s.header, background: `linear-gradient(180deg, ${BG} 0%, ${BG}ee 100%)`, backdropFilter: 'blur(6px)' }}>
+      <div className="vs-container" style={{ ...s.header, background: `linear-gradient(180deg, ${BG} 0%, ${BG}ee 100%)`, backdropFilter: 'blur(6px)' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
           <div style={{ width: 34, height: 34, borderRadius: 8, overflow: 'hidden', flexShrink: 0, border: `1px solid ${BD}`, background: '#0d0b09' }}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -280,24 +369,24 @@ export default function Dashboard() {
           </div>
           <div style={{ minWidth: 0 }}>
             <div style={{ fontFamily: FONT_DISPLAY, fontSize: 16, letterSpacing: '0.02em', color: TX, lineHeight: 1.1, whiteSpace: 'nowrap' }}>Villa Será</div>
-            <div style={{ fontSize: 8.5, letterSpacing: '0.22em', color: G, textTransform: 'uppercase' }}>Administración</div>
+            <div className="vs-hide-xs" style={{ fontSize: 8.5, letterSpacing: '0.22em', color: G, textTransform: 'uppercase' }}>Administración</div>
           </div>
           <select value={pid ?? ''} onChange={e => changeProp(Number(e.target.value))}
-            style={{ background: C2, border: `1px solid ${BD}`, color: TX, padding: '4px 8px', borderRadius: 6, fontSize: 12, marginLeft: 4 }}>
+            style={{ background: C2, border: `1px solid ${BD}`, color: TX, padding: '4px 8px', borderRadius: 6, fontSize: 12, marginLeft: 4, maxWidth: 96, textOverflow: 'ellipsis' }}>
             {propiedades.map(p => <option key={p.id} value={p.id}>{p.nombre}</option>)}
           </select>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
             <div className={online ? 'vs-live-dot' : ''} style={{ width: 7, height: 7, borderRadius: '50%', background: online ? GR : RD }} />
-            <span style={{ fontSize: 11, color: online ? GR : RD }}>{online ? 'online' : 'offline'}</span>
+            <span className="vs-hide-xs" style={{ fontSize: 11, color: online ? GR : RD }}>{online ? 'online' : 'offline'}</span>
           </div>
           <button onClick={() => { logout(); router.replace('/admin') }} style={s.btnGhost}>Salir</button>
         </div>
       </div>
 
       {/* Content */}
-      <div style={{ paddingTop: 16 }}>
+      <div className="vs-container" style={{ paddingTop: 16 }}>
 
         {/* ── DASHBOARD TAB ── */}
         {tab === 'dashboard' && resumen && (
@@ -306,20 +395,20 @@ export default function Dashboard() {
             <div className="vs-fade-item vs-card" style={{ ...s.card, textAlign: 'center', marginBottom: 16, background: `radial-gradient(120% 100% at 50% 0%, ${C2} 0%, ${C1} 60%)`, position: 'relative', overflow: 'hidden' }}>
               <div style={{ position: 'absolute', top: -1, left: '50%', transform: 'translateX(-50%)', width: '60%', height: 2, background: `linear-gradient(90deg, transparent, ${G}, transparent)` }} />
               <div style={s.lbl}>Ganancia Neta del Mes</div>
-              <div style={{ fontFamily: FONT_DISPLAY, fontStyle: 'italic', fontWeight: 600, fontSize: 46, color: gananciaAnimada >= 0 ? G : RD, lineHeight: 1.1 }}>
+              <div style={{ fontFamily: FONT_DISPLAY, fontStyle: 'italic', fontWeight: 600, fontSize: 'clamp(32px, 10vw, 46px)', color: gananciaAnimada >= 0 ? G : RD, lineHeight: 1.1 }}>
                 {gananciaAnimada < 0 ? '-' : ''}{usd(gananciaAnimada)}
               </div>
               <div style={{ fontSize: 12, color: MU, marginTop: 6 }}>
                 {usd(resumen.ingresos_mes)} ingresos − {usd(resumen.gastos_mes)} gastos
               </div>
-              <TrendChart data={trendData} color={net => net >= 0 ? G : RD} />
+              <TrendChart data={trendData} positiveColor={GR} negativeColor={RD} mutedColor={MU} />
             </div>
 
             {/* Ganancia neta anual (YTD) */}
             {resumenAnual && (
               <div className="vs-fade-item vs-card" style={{ ...s.card, textAlign: 'center', marginBottom: 16, animationDelay: '80ms' }}>
                 <div style={s.lbl}>Ganancia Neta {resumenAnual.year} (acumulado)</div>
-                <div style={{ fontFamily: FONT_DISPLAY, fontStyle: 'italic', fontWeight: 600, fontSize: 30, color: gananciaAnualAnimada >= 0 ? G : RD, lineHeight: 1.1 }}>
+                <div style={{ fontFamily: FONT_DISPLAY, fontStyle: 'italic', fontWeight: 600, fontSize: 'clamp(24px, 7vw, 30px)', color: gananciaAnualAnimada >= 0 ? G : RD, lineHeight: 1.1 }}>
                   {gananciaAnualAnimada < 0 ? '-' : ''}{usd(gananciaAnualAnimada)}
                 </div>
                 <div style={{ fontSize: 12, color: MU, marginTop: 6 }}>
@@ -334,13 +423,16 @@ export default function Dashboard() {
                 { lbl: 'Ingresos', val: usd(resumen.ingresos_mes), color: GR },
                 { lbl: 'Gastos Fijos', val: usd(resumen.gastos_fijos_mes), color: RD },
                 { lbl: 'Gastos Variables', val: usd(resumen.gastos_variables_mes), color: AM },
-                { lbl: 'Ocupación', val: `${resumen.ocupacion_porcentaje}%`, color: OC },
-              ].map(({ lbl, val, color }) => (
-                <div key={lbl} style={{ ...s.card, textAlign: 'center' }}>
+              ].map(({ lbl, val, color }, i) => (
+                <div key={lbl} className="vs-fade-item vs-card" style={{ ...s.card, textAlign: 'center', animationDelay: `${i * 60}ms` }}>
                   <div style={s.lbl}>{lbl}</div>
                   <div style={{ fontSize: 22, color, fontFamily: FONT_DISPLAY }}>{val}</div>
                 </div>
               ))}
+              <div className="vs-fade-item vs-card" style={{ ...s.card, textAlign: 'center', animationDelay: '180ms', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                <div style={s.lbl}>Ocupación</div>
+                <OccupancyRing pct={resumen.ocupacion_porcentaje} color={OC} trackColor={BD} />
+              </div>
             </div>
 
             {/* Caja Chica quick view */}
@@ -350,7 +442,7 @@ export default function Dashboard() {
                 <div style={s.lbl}>Caja Chica</div>
                 <div style={{ fontFamily: FONT_DISPLAY, fontSize: 24, color: cajaChicaBalance >= 0 ? G : RD }}>{usd(cajaChicaBalance)}</div>
               </div>
-              <span style={{ color: MU, fontSize: 20 }}>›</span>
+              <Icon name="chevron" size={16} color={MU} />
             </div>
 
             {/* Upcoming maintenance alerts */}
@@ -364,12 +456,12 @@ export default function Dashboard() {
                         <div style={{ fontSize: 14, fontWeight: 600 }}>{m.titulo}</div>
                         {m.fecha_programada && (
                           <div style={{ fontSize: 12, color: isOverdue(m.fecha_programada) ? RD : MU, marginTop: 2 }}>
-                            {isOverdue(m.fecha_programada) ? '⚠ Vencido — ' : ''}{fDateLong(m.fecha_programada)}
+                            {isOverdue(m.fecha_programada) ? 'Vencido — ' : ''}{fDateLong(m.fecha_programada)}
                           </div>
                         )}
                       </div>
                       <button onClick={async () => { await api.patch(`/api/mantenimientos/${m.id}/completar`); loadAll() }}
-                        className="vs-btn" style={{ ...s.btnSm(GR, '#000'), fontSize: 18, padding: '4px 10px' }}>✓</button>
+                        className="vs-btn" style={{ ...s.btnSm(GR, '#000'), padding: '4px 10px', display: 'flex' }}><Icon name="check" size={14} color="#000" /></button>
                     </div>
                   </div>
                 ))}
@@ -396,7 +488,7 @@ export default function Dashboard() {
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
               <span style={{ ...s.lbl, marginBottom: 0 }}>{reservaciones.length} reservaciones</span>
               <div style={{ display: 'flex', gap: 8 }}>
-                <button onClick={() => setModal('csv')} className="vs-btn" style={s.btnSm('#1a1a1a', G)}>↑ Airbnb CSV</button>
+                <button onClick={() => setModal('csv')} className="vs-btn" style={s.btnSm(C2, G)}>↑ Airbnb CSV</button>
                 <button onClick={() => setModal('reservacion')} className="vs-btn vs-btn-gold" style={s.btn()}>+ Nueva</button>
               </div>
             </div>
@@ -419,7 +511,7 @@ export default function Dashboard() {
                     </span>
                     <span style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                       <span style={{ fontFamily: FONT_DISPLAY, fontSize: 16, color: GR }}>{usd(subtotal)}</span>
-                      <span style={{ color: MU, fontSize: 13, display: 'inline-block', transition: 'transform 0.25s', transform: expanded ? 'rotate(90deg)' : 'none' }}>›</span>
+                      <span style={{ display: 'inline-flex', transition: 'transform 0.25s', transform: expanded ? 'rotate(90deg)' : 'none' }}><Icon name="chevron" size={14} color={MU} /></span>
                     </span>
                   </button>
                   <div className="vs-accordion" style={{ gridTemplateRows: expanded ? '1fr' : '0fr' }}>
@@ -475,7 +567,7 @@ export default function Dashboard() {
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
                     <div style={{ fontFamily: FONT_DISPLAY, fontSize: 22, color: GR }}>{usd(ingresos.reduce((a, f) => a + f.monto, 0))}</div>
                     <div style={{ display: 'flex', gap: 8 }}>
-                      <button onClick={() => setModal('csv')} className="vs-btn" style={s.btnSm('#1a1a1a', G)}>↑ Airbnb</button>
+                      <button onClick={() => setModal('csv')} className="vs-btn" style={s.btnSm(C2, G)}>↑ Airbnb</button>
                       <button onClick={() => setModal('ingreso')} className="vs-btn vs-btn-gold" style={s.btn()}>+ Agregar</button>
                     </div>
                   </div>
@@ -519,14 +611,14 @@ export default function Dashboard() {
                               )}
                             </div>
                             <button onClick={async () => { await api.delete(`/api/gastos-fijos/${g.id}`); loadAll() }}
-                              style={{ background: 'none', border: 'none', color: RD + '80', cursor: 'pointer', fontSize: 18 }}>×</button>
+                              style={{ background: 'none', border: 'none', color: RD + '80', cursor: 'pointer', display: 'flex' }}><Icon name="close" size={16} color={RD + '80'} /></button>
                           </div>
                         </div>
                         <button onClick={async () => {
                           if (pagado) { await api.patch(`/api/gastos-fijos/${g.id}/despagar`); loadAll() }
                           else { setPagandoGasto(g); setModal('pagar_gasto_fijo') }
                         }}
-                          className="vs-btn" style={{ ...s.btnSm(pagado ? '#1a1a1a' : GR, pagado ? MU : '#000'), width: '100%', marginTop: 10 }}>
+                          className="vs-btn" style={{ ...s.btnSm(pagado ? C2 : GR, pagado ? MU : '#000'), width: '100%', marginTop: 10 }}>
                           {pagado ? 'Marcar como pendiente' : '✓ Marcar como pagado'}
                         </button>
                       </div>
@@ -569,7 +661,7 @@ export default function Dashboard() {
 
               {/* Resumen footer */}
               {resumen && (
-                <div style={{ ...s.card, marginTop: 20, background: '#0d0d0d' }}>
+                <div style={{ ...s.card, marginTop: 20, background: C2 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
                     <span style={{ color: MU, fontSize: 13 }}>Ingresos</span>
                     <span style={{ color: GR, fontSize: 13, fontWeight: 600 }}>+{usd(resumen.ingresos_mes)}</span>
@@ -615,16 +707,16 @@ export default function Dashboard() {
                         </div>
                         {m.descripcion && <div style={{ fontSize: 12, color: MU, marginBottom: 4 }}>{m.descripcion}</div>}
                         <div style={{ fontSize: 12, color: isOverdue(m.fecha_programada) ? RD : MU }}>
-                          {m.fecha_programada ? (isOverdue(m.fecha_programada) ? '⚠ Vencido: ' : 'Para: ') + fDateLong(m.fecha_programada) : ''}
+                          {m.fecha_programada ? (isOverdue(m.fecha_programada) ? 'Vencido: ' : 'Para: ') + fDateLong(m.fecha_programada) : ''}
                           {m.proveedor ? ` · ${m.proveedor}` : ''}
                           {m.recurrente ? ' · ↻ recurrente' : ''}
                         </div>
                       </div>
                       <div style={{ display: 'flex', flexDirection: 'column', gap: 6, alignItems: 'flex-end' }}>
                         <button onClick={async () => { await api.patch(`/api/mantenimientos/${m.id}/completar`); loadAll() }}
-                          className="vs-btn" style={{ ...s.btn(GR, '#000'), padding: '8px 14px', fontSize: 18 }}>✓</button>
+                          className="vs-btn" style={{ ...s.btn(GR, '#000'), padding: '8px 14px', display: 'flex' }}><Icon name="check" size={16} color="#000" /></button>
                         <button onClick={async () => { await api.delete(`/api/mantenimientos/${m.id}`); loadAll() }}
-                          style={{ ...s.btnGhost, color: RD + '80', borderColor: RD + '30', padding: '4px 10px' }}>×</button>
+                          style={{ ...s.btnGhost, color: RD + '80', borderColor: RD + '30', padding: '4px 10px', display: 'flex' }}><Icon name="close" size={14} color={RD + '80'} /></button>
                       </div>
                     </div>
                   </div>
@@ -639,7 +731,7 @@ export default function Dashboard() {
                   <div key={m.id} style={{ ...s.card, marginBottom: 8, opacity: 0.6 }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                       <span style={{ fontSize: 14, textDecoration: 'line-through', color: MU }}>{m.titulo}</span>
-                      <span style={{ fontSize: 12, color: GR }}>✓</span>
+                      <Icon name="check" size={12} color={GR} />
                     </div>
                   </div>
                 ))}
@@ -677,9 +769,9 @@ export default function Dashboard() {
                       </div>
                       <div style={{ display: 'flex', flexDirection: 'column', gap: 6, alignItems: 'flex-end' }}>
                         <button onClick={async () => { await api.patch(`/api/compras/${c.id}/comprar`); loadAll() }}
-                          className="vs-btn" style={{ ...s.btn(GR, '#000'), padding: '8px 14px', fontSize: 18 }}>✓</button>
+                          className="vs-btn" style={{ ...s.btn(GR, '#000'), padding: '8px 14px', display: 'flex' }}><Icon name="check" size={16} color="#000" /></button>
                         <button onClick={async () => { await api.delete(`/api/compras/${c.id}`); loadAll() }}
-                          style={{ ...s.btnGhost, color: RD + '80', borderColor: RD + '30', padding: '4px 10px' }}>×</button>
+                          style={{ ...s.btnGhost, color: RD + '80', borderColor: RD + '30', padding: '4px 10px', display: 'flex' }}><Icon name="close" size={14} color={RD + '80'} /></button>
                       </div>
                     </div>
                   </div>
@@ -694,7 +786,7 @@ export default function Dashboard() {
                   <div key={c.id} style={{ ...s.card, marginBottom: 8, opacity: 0.5 }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                       <span style={{ fontSize: 14, textDecoration: 'line-through', color: MU }}>{c.articulo}</span>
-                      <span style={{ fontSize: 12, color: GR }}>✓</span>
+                      <Icon name="check" size={12} color={GR} />
                     </div>
                   </div>
                 ))}
@@ -714,7 +806,7 @@ export default function Dashboard() {
 
             {inventario.filter(i => i.estado === 'faltante').length > 0 && (
               <div style={{ marginBottom: 20 }}>
-                <div style={{ ...s.lbl, color: RD }}>⚠ Faltantes</div>
+                <div style={{ ...s.lbl, color: RD, display: 'flex', alignItems: 'center', gap: 5 }}><Icon name="alert" size={12} color={RD} /> Faltantes</div>
                 {inventario.filter(i => i.estado === 'faltante').map(i => (
                   <InventarioRow key={i.id} i={i}
                     onEstado={async e => { await api.patch(`/api/inventario/${i.id}/estado?estado=${e}`); loadAll() }}
@@ -745,26 +837,33 @@ export default function Dashboard() {
 
       {/* ── BOTTOM NAV ── */}
       <div style={{
-        position: 'fixed', bottom: 0, left: 0, right: 0, background: '#0d0d0d',
-        borderTop: `1px solid ${BD}`, display: 'flex', zIndex: 100,
+        position: 'fixed', bottom: 0, left: 0, right: 0, background: C1,
+        borderTop: `1px solid ${BD}`, display: 'flex', zIndex: 100, boxShadow: '0 -6px 20px -10px rgba(42,33,26,0.15)',
         paddingBottom: 'env(safe-area-inset-bottom, 0px)'
       }}>
-        {([
-          ['dashboard', '◈', 'Inicio'],
-          ['reservas', '⌂', 'Reservas'],
-          ['finanzas', '$', 'Finanzas'],
-          ['mantenimiento', '⚙', 'Manten.'],
-          ['compras', '◎', 'Compras'],
-          ['inventario', '▤', 'Inventario'],
-        ] as [Tab, string, string][]).map(([key, icon, lbl]) => (
-          <button key={key} onClick={() => setTab(key)} style={{
-            flex: 1, background: 'none', border: 'none', cursor: 'pointer',
-            padding: '10px 4px 8px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3
-          }}>
-            <span style={{ fontSize: 20, color: tab === key ? G : MU }}>{icon}</span>
-            <span style={{ fontSize: 10, color: tab === key ? G : MU, fontWeight: tab === key ? 700 : 400 }}>{lbl}</span>
-          </button>
-        ))}
+        <div className="vs-container" style={{ display: 'flex', width: '100%' }}>
+          {([
+            ['dashboard', 'home', 'Inicio'],
+            ['reservas', 'calendar', 'Reservas'],
+            ['finanzas', 'wallet', 'Finanzas'],
+            ['mantenimiento', 'wrench', 'Manten.'],
+            ['compras', 'bag', 'Compras'],
+            ['inventario', 'archive', 'Inventario'],
+          ] as [Tab, IconName, string][]).map(([key, icon, lbl]) => (
+            <button key={key} onClick={() => setTab(key)} className="vs-btn" style={{
+              flex: 1, background: 'none', border: 'none', cursor: 'pointer',
+              padding: '9px 2px 8px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3
+            }}>
+              <span style={{
+                display: 'flex', alignItems: 'center', justifyContent: 'center', width: 30, height: 22, borderRadius: 8,
+                background: tab === key ? `${G}1f` : 'transparent', transition: 'background 0.2s',
+              }}>
+                <Icon name={icon} size={17} color={tab === key ? G : MU} />
+              </span>
+              <span style={{ fontSize: 9.5, color: tab === key ? G : MU, fontWeight: tab === key ? 700 : 500 }}>{lbl}</span>
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* ── MODALS ── */}
@@ -850,13 +949,13 @@ function FinanzaRow({ f, onDelete }: { f: Finanza; onDelete: () => void }) {
         <div style={{ flex: 1 }}>
           <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 2 }}>{f.descripcion}</div>
           <div style={{ fontSize: 12, color: MU }}>{f.categoria} · {fDate(f.fecha)}</div>
-          {f.comprobante_nombre && <div style={{ fontSize: 11, color: OC, marginTop: 2 }}>📎 {f.comprobante_nombre}</div>}
+          {f.comprobante_nombre && <div style={{ fontSize: 11, color: OC, marginTop: 2, display: 'flex', alignItems: 'center', gap: 4 }}><Icon name="paperclip" size={11} color={OC} /> {f.comprobante_nombre}</div>}
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           <span style={{ fontFamily: FONT_DISPLAY, fontSize: 17, color: isIngreso ? GR : AM }}>
             {isIngreso ? '+' : '-'}{usd(f.monto)}
           </span>
-          <button onClick={onDelete} style={{ background: 'none', border: 'none', color: RD + '60', cursor: 'pointer', fontSize: 16 }}>×</button>
+          <button onClick={onDelete} style={{ background: 'none', border: 'none', color: RD + '60', cursor: 'pointer', display: 'flex' }}><Icon name="close" size={15} color={RD + '60'} /></button>
         </div>
       </div>
     </div>
@@ -867,7 +966,7 @@ function Modal({ children, onClose }: { children: React.ReactNode; onClose: () =
   return (
     <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', display: 'flex', alignItems: 'flex-end', zIndex: 200 }}
       onClick={e => e.target === e.currentTarget && onClose()}>
-      <div style={{ background: '#111', border: `1px solid ${BD}`, borderRadius: '16px 16px 0 0', width: '100%', maxHeight: '92vh', overflowY: 'auto', padding: '20px 20px 40px' }}>
+      <div style={{ background: C1, border: `1px solid ${BD}`, borderRadius: '16px 16px 0 0', boxShadow: '0 -8px 32px -12px rgba(42,33,26,0.25)', width: '100%', maxHeight: '92vh', overflowY: 'auto', padding: '20px 20px 40px' }}>
         <div style={{ width: 36, height: 4, background: BD, borderRadius: 2, margin: '0 auto 20px' }} />
         {children}
       </div>
@@ -882,7 +981,7 @@ function ModalTitle({ children }: { children: React.ReactNode }) {
 function FormReservacion({ pid, onSaved }: { pid: number; onSaved: () => void }) {
   const [v, setV] = useState({ huesped_nombre: '', huesped_telefono: '', check_in: '', check_out: '', monto_total: '', estado: 'confirmada', notas: '' })
   const [loading, setLoading] = useState(false)
-  const inp: React.CSSProperties = { width: '100%', background: '#0f0f0f', border: `1px solid ${BD}`, color: TX, padding: '10px 12px', borderRadius: 8, fontSize: 14, boxSizing: 'border-box', marginBottom: 12 }
+  const inp: React.CSSProperties = { width: '100%', background: C2, border: `1px solid ${BD}`, color: TX, padding: '10px 12px', borderRadius: 8, fontSize: 14, boxSizing: 'border-box', marginBottom: 12 }
   const lbl: React.CSSProperties = { fontSize: 11, color: MU, display: 'block', marginBottom: 4, letterSpacing: '0.1em', textTransform: 'uppercase' }
   async function submit(e: React.FormEvent) {
     e.preventDefault(); setLoading(true)
@@ -920,7 +1019,7 @@ function FormReservacion({ pid, onSaved }: { pid: number; onSaved: () => void })
 function FormMantenimiento({ pid, onSaved }: { pid: number; onSaved: () => void }) {
   const [v, setV] = useState({ titulo: '', descripcion: '', prioridad: 'media', fecha_programada: '', proveedor: '', costo: '', recurrente: false, frecuencia_dias: '' })
   const [loading, setLoading] = useState(false)
-  const inp: React.CSSProperties = { width: '100%', background: '#0f0f0f', border: `1px solid ${BD}`, color: TX, padding: '10px 12px', borderRadius: 8, fontSize: 14, boxSizing: 'border-box', marginBottom: 12 }
+  const inp: React.CSSProperties = { width: '100%', background: C2, border: `1px solid ${BD}`, color: TX, padding: '10px 12px', borderRadius: 8, fontSize: 14, boxSizing: 'border-box', marginBottom: 12 }
   const lbl: React.CSSProperties = { fontSize: 11, color: MU, display: 'block', marginBottom: 4, letterSpacing: '0.1em', textTransform: 'uppercase' }
   async function submit(e: React.FormEvent) {
     e.preventDefault(); setLoading(true)
@@ -944,7 +1043,7 @@ function FormMantenimiento({ pid, onSaved }: { pid: number; onSaved: () => void 
         <div>
           <label style={lbl}>Prioridad</label>
           <select style={inp} value={v.prioridad} onChange={e => setV({ ...v, prioridad: e.target.value })}>
-            <option value="baja">Baja</option><option value="media">Media</option><option value="alta">Alta ⚠</option>
+            <option value="baja">Baja</option><option value="media">Media</option><option value="alta">Alta</option>
           </select>
         </div>
         <div>
@@ -974,7 +1073,7 @@ function FormFinanza({ pid, tipo, categoriaFija, onSaved }: { pid: number; tipo:
   const [v, setV] = useState({ descripcion: '', categoria: categoriaFija ?? (tipo === 'ingreso' ? 'Renta' : 'Mantenimiento'), monto: '', fecha: new Date().toISOString().split('T')[0], notas: '' })
   const [file, setFile] = useState<File | null>(null)
   const [loading, setLoading] = useState(false)
-  const inp: React.CSSProperties = { width: '100%', background: '#0f0f0f', border: `1px solid ${BD}`, color: TX, padding: '10px 12px', borderRadius: 8, fontSize: 14, boxSizing: 'border-box', marginBottom: 12 }
+  const inp: React.CSSProperties = { width: '100%', background: C2, border: `1px solid ${BD}`, color: TX, padding: '10px 12px', borderRadius: 8, fontSize: 14, boxSizing: 'border-box', marginBottom: 12 }
   const lbl: React.CSSProperties = { fontSize: 11, color: MU, display: 'block', marginBottom: 4, letterSpacing: '0.1em', textTransform: 'uppercase' }
   const cats = tipo === 'ingreso' ? ['Renta', 'Depósito', 'Otro'] : ['Mantenimiento', 'Limpieza', 'Servicios', 'Suministros', 'Personal', 'Impuestos', 'Seguros', 'Otro']
   async function submit(e: React.FormEvent) {
@@ -1028,7 +1127,7 @@ function FormFinanza({ pid, tipo, categoriaFija, onSaved }: { pid: number; tipo:
 function FormGastoFijo({ pid, onSaved }: { pid: number; onSaved: () => void }) {
   const [v, setV] = useState({ nombre: '', monto: '', categoria: 'Servicios', dia_cobro: '' })
   const [loading, setLoading] = useState(false)
-  const inp: React.CSSProperties = { width: '100%', background: '#0f0f0f', border: `1px solid ${BD}`, color: TX, padding: '10px 12px', borderRadius: 8, fontSize: 14, boxSizing: 'border-box', marginBottom: 12 }
+  const inp: React.CSSProperties = { width: '100%', background: C2, border: `1px solid ${BD}`, color: TX, padding: '10px 12px', borderRadius: 8, fontSize: 14, boxSizing: 'border-box', marginBottom: 12 }
   const lbl: React.CSSProperties = { fontSize: 11, color: MU, display: 'block', marginBottom: 4, letterSpacing: '0.1em', textTransform: 'uppercase' }
   async function submit(e: React.FormEvent) {
     e.preventDefault(); setLoading(true)
@@ -1067,7 +1166,7 @@ function FormGastoFijo({ pid, onSaved }: { pid: number; onSaved: () => void }) {
 function FormCompra({ pid, onSaved }: { pid: number; onSaved: () => void }) {
   const [v, setV] = useState({ articulo: '', descripcion: '', cantidad: '', prioridad: 'media', categoria: 'General', costo_estimado: '' })
   const [loading, setLoading] = useState(false)
-  const inp: React.CSSProperties = { width: '100%', background: '#0f0f0f', border: `1px solid ${BD}`, color: TX, padding: '10px 12px', borderRadius: 8, fontSize: 14, boxSizing: 'border-box', marginBottom: 12 }
+  const inp: React.CSSProperties = { width: '100%', background: C2, border: `1px solid ${BD}`, color: TX, padding: '10px 12px', borderRadius: 8, fontSize: 14, boxSizing: 'border-box', marginBottom: 12 }
   const lbl: React.CSSProperties = { fontSize: 11, color: MU, display: 'block', marginBottom: 4, letterSpacing: '0.1em', textTransform: 'uppercase' }
   async function submit(e: React.FormEvent) {
     e.preventDefault(); setLoading(true)
@@ -1145,7 +1244,7 @@ function InventarioRow({ i, onEstado, onDelete }: { i: InventarioItem; onEstado:
             <option value="faltante">Faltante</option>
             <option value="dañado">Dañado</option>
           </select>
-          <button onClick={onDelete} style={{ background: 'none', border: 'none', color: RD + '60', cursor: 'pointer', fontSize: 16 }}>×</button>
+          <button onClick={onDelete} style={{ background: 'none', border: 'none', color: RD + '60', cursor: 'pointer', display: 'flex' }}><Icon name="close" size={15} color={RD + '60'} /></button>
         </div>
       </div>
     </div>
@@ -1155,7 +1254,7 @@ function InventarioRow({ i, onEstado, onDelete }: { i: InventarioItem; onEstado:
 function FormInventario({ pid, onSaved }: { pid: number; onSaved: () => void }) {
   const [v, setV] = useState({ articulo: '', categoria: 'Herramientas', cantidad: '1', estado: 'disponible', costo: '', ubicacion: '', notas: '' })
   const [loading, setLoading] = useState(false)
-  const inp: React.CSSProperties = { width: '100%', background: '#0f0f0f', border: `1px solid ${BD}`, color: TX, padding: '10px 12px', borderRadius: 8, fontSize: 14, boxSizing: 'border-box', marginBottom: 12 }
+  const inp: React.CSSProperties = { width: '100%', background: C2, border: `1px solid ${BD}`, color: TX, padding: '10px 12px', borderRadius: 8, fontSize: 14, boxSizing: 'border-box', marginBottom: 12 }
   const lbl: React.CSSProperties = { fontSize: 11, color: MU, display: 'block', marginBottom: 4, letterSpacing: '0.1em', textTransform: 'uppercase' }
   async function submit(e: React.FormEvent) {
     e.preventDefault(); setLoading(true)
@@ -1221,7 +1320,7 @@ function FormPagarGastoFijo({ gasto, onSaved }: { gasto: GastoFijo; onSaved: () 
   const [costoUnitario, setCostoUnitario] = useState(String(gasto.monto))
   const [veces, setVeces] = useState('1')
   const [loading, setLoading] = useState(false)
-  const inp: React.CSSProperties = { width: '100%', background: '#0f0f0f', border: `1px solid ${BD}`, color: TX, padding: '10px 12px', borderRadius: 8, fontSize: 14, boxSizing: 'border-box', marginBottom: 12 }
+  const inp: React.CSSProperties = { width: '100%', background: C2, border: `1px solid ${BD}`, color: TX, padding: '10px 12px', borderRadius: 8, fontSize: 14, boxSizing: 'border-box', marginBottom: 12 }
   const lbl: React.CSSProperties = { fontSize: 11, color: MU, display: 'block', marginBottom: 4, letterSpacing: '0.1em', textTransform: 'uppercase' }
   const total = porVeces ? (parseFloat(costoUnitario) || 0) * (parseInt(veces) || 0) : (parseFloat(monto) || 0)
   async function submit(e: React.FormEvent) {
@@ -1260,7 +1359,7 @@ function FormPagarGastoFijo({ gasto, onSaved }: { gasto: GastoFijo; onSaved: () 
               <input required type="number" min="1" style={inp} value={veces} onChange={e => setVeces(e.target.value)} />
             </div>
           </div>
-          <div style={{ ...inp, background: '#0d0d0d', color: MU, marginBottom: 16, textAlign: 'center' }}>
+          <div style={{ ...inp, background: C2, color: MU, marginBottom: 16, textAlign: 'center' }}>
             Total: <span style={{ color: G, fontWeight: 700 }}>{usd(total)}</span>
           </div>
         </>
