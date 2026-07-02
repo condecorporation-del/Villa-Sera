@@ -14,7 +14,7 @@ const experiences = [
   },
   {
     key: 'yacht',
-    image: '/images/CasaSergio182.jpg',
+    image: '/images/yacht neptuno.jpg',
     alt: 'Private yacht charter',
   },
   {
