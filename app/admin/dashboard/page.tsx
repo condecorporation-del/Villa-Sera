@@ -1087,23 +1087,56 @@ function FormInventario({ pid, onSaved }: { pid: number; onSaved: () => void }) 
 }
 
 function FormPagarGastoFijo({ gasto, onSaved }: { gasto: GastoFijo; onSaved: () => void }) {
+  const [porVeces, setPorVeces] = useState(false)
   const [monto, setMonto] = useState(String(gasto.monto))
+  const [costoUnitario, setCostoUnitario] = useState(String(gasto.monto))
+  const [veces, setVeces] = useState('1')
   const [loading, setLoading] = useState(false)
   const inp: React.CSSProperties = { width: '100%', background: '#0f0f0f', border: `1px solid ${BD}`, color: TX, padding: '10px 12px', borderRadius: 8, fontSize: 14, boxSizing: 'border-box', marginBottom: 12 }
   const lbl: React.CSSProperties = { fontSize: 11, color: MU, display: 'block', marginBottom: 4, letterSpacing: '0.1em', textTransform: 'uppercase' }
+  const total = porVeces ? (parseFloat(costoUnitario) || 0) * (parseInt(veces) || 0) : (parseFloat(monto) || 0)
   async function submit(e: React.FormEvent) {
     e.preventDefault(); setLoading(true)
     try {
-      await api.patch(`/api/gastos-fijos/${gasto.id}/pagar?monto_real=${parseFloat(monto)}`)
+      let url = `/api/gastos-fijos/${gasto.id}/pagar?monto_real=${total}`
+      if (porVeces) url += `&detalle=${encodeURIComponent(`${veces}x $${costoUnitario}`)}`
+      await api.patch(url)
       onSaved()
     } finally { setLoading(false) }
   }
   return (
     <form onSubmit={submit}>
       <ModalTitle>Marcar como Pagado</ModalTitle>
-      <p style={{ fontSize: 13, color: MU, marginBottom: 16 }}>{gasto.nombre} — confirma cuánto llegó realmente (puede diferir del estimado, como agua o luz).</p>
-      <label style={lbl}>Monto pagado (MXN) *</label>
-      <input required autoFocus type="number" step="0.01" style={inp} value={monto} onChange={e => setMonto(e.target.value)} />
+      <p style={{ fontSize: 13, color: MU, marginBottom: 16 }}>{gasto.nombre} — confirma cuánto llegó realmente (puede diferir del estimado, como agua, luz o limpieza).</p>
+
+      <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
+        <button type="button" onClick={() => setPorVeces(false)} style={{ flex: 1, padding: '8px', borderRadius: 8, border: `1px solid ${!porVeces ? G : BD}`, background: !porVeces ? G + '15' : 'none', color: !porVeces ? G : MU, fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>Monto único</button>
+        <button type="button" onClick={() => setPorVeces(true)} style={{ flex: 1, padding: '8px', borderRadius: 8, border: `1px solid ${porVeces ? G : BD}`, background: porVeces ? G + '15' : 'none', color: porVeces ? G : MU, fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>Por veces pagado</button>
+      </div>
+
+      {!porVeces ? (
+        <>
+          <label style={lbl}>Monto pagado (MXN) *</label>
+          <input required autoFocus type="number" step="0.01" style={inp} value={monto} onChange={e => setMonto(e.target.value)} />
+        </>
+      ) : (
+        <>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+            <div>
+              <label style={lbl}>Costo por servicio *</label>
+              <input required autoFocus type="number" step="0.01" style={inp} value={costoUnitario} onChange={e => setCostoUnitario(e.target.value)} />
+            </div>
+            <div>
+              <label style={lbl}>¿Cuántas veces? *</label>
+              <input required type="number" min="1" style={inp} value={veces} onChange={e => setVeces(e.target.value)} />
+            </div>
+          </div>
+          <div style={{ ...inp, background: '#0d0d0d', color: MU, marginBottom: 16, textAlign: 'center' }}>
+            Total: <span style={{ color: G, fontWeight: 700 }}>{usd(total)}</span>
+          </div>
+        </>
+      )}
+
       <button type="submit" disabled={loading} style={{ background: GR, color: '#000', border: 'none', padding: 14, borderRadius: 10, width: '100%', fontSize: 15, fontWeight: 700, cursor: 'pointer' }}>
         {loading ? 'Guardando...' : '✓ Confirmar Pago'}
       </button>
