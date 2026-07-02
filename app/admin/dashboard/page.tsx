@@ -43,6 +43,7 @@ interface Finanza {
 interface GastoFijo {
   id: number; nombre: string; monto: number; categoria: string
   dia_cobro: number | null; propiedad_id: number; ultimo_pago: string | null
+  ultimo_monto_pagado: number | null
 }
 interface ResumenAnual {
   year: number; meses_transcurridos: number
@@ -89,6 +90,7 @@ export default function Dashboard() {
   const [compras, setCompras] = useState<Compra[]>([])
   const [inventario, setInventario] = useState<InventarioItem[]>([])
   const [modal, setModal] = useState<string | null>(null)
+  const [pagandoGasto, setPagandoGasto] = useState<GastoFijo | null>(null)
   const [csvFile, setCsvFile] = useState<File | null>(null)
   const [csvLoading, setCsvLoading] = useState(false)
   const [csvResult, setCsvResult] = useState<string | null>(null)
@@ -155,7 +157,7 @@ export default function Dashboard() {
   }
 
   const ingresos = finanzas.filter(f => f.tipo === 'ingreso' && f.categoria !== 'Caja Chica')
-  const gastos = finanzas.filter(f => f.tipo === 'gasto' && f.categoria !== 'Caja Chica')
+  const gastos = finanzas.filter(f => f.tipo === 'gasto' && f.categoria !== 'Caja Chica' && f.fuente !== 'gasto_fijo')
   const cajaChicaMovs = finanzas.filter(f => f.categoria === 'Caja Chica').sort((a, b) => new Date(b.fecha).getTime() - new Date(a.fecha).getTime())
   const cajaChicaBalance = cajaChicaMovs.reduce((a, f) => a + (f.tipo === 'ingreso' ? f.monto : -f.monto), 0)
   const pendientes = mantenimientos.filter(m => m.estado !== 'completado')
@@ -381,12 +383,20 @@ export default function Dashboard() {
                             <div style={{ fontSize: 12, color: MU }}>{g.categoria}{g.dia_cobro ? ` · día ${g.dia_cobro}` : ''}</div>
                           </div>
                           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                            <div style={{ fontFamily: 'Georgia,serif', fontSize: 18, color: RD }}>{usd(g.monto)}</div>
+                            <div style={{ textAlign: 'right' }}>
+                              <div style={{ fontFamily: 'Georgia,serif', fontSize: 18, color: RD }}>{usd(pagado && g.ultimo_monto_pagado ? g.ultimo_monto_pagado : g.monto)}</div>
+                              {pagado && g.ultimo_monto_pagado != null && g.ultimo_monto_pagado !== g.monto && (
+                                <div style={{ fontSize: 11, color: MU }}>Est: {usd(g.monto)}</div>
+                              )}
+                            </div>
                             <button onClick={async () => { await api.delete(`/api/gastos-fijos/${g.id}`); loadAll() }}
                               style={{ background: 'none', border: 'none', color: RD + '80', cursor: 'pointer', fontSize: 18 }}>×</button>
                           </div>
                         </div>
-                        <button onClick={async () => { await api.patch(`/api/gastos-fijos/${g.id}/${pagado ? 'despagar' : 'pagar'}`); loadAll() }}
+                        <button onClick={async () => {
+                          if (pagado) { await api.patch(`/api/gastos-fijos/${g.id}/despagar`); loadAll() }
+                          else { setPagandoGasto(g); setModal('pagar_gasto_fijo') }
+                        }}
                           style={{ ...s.btnSm(pagado ? '#1a1a1a' : GR, pagado ? MU : '#000'), width: '100%', marginTop: 10 }}>
                           {pagado ? 'Marcar como pendiente' : '✓ Marcar como pagado'}
                         </button>
@@ -630,7 +640,7 @@ export default function Dashboard() {
 
       {/* ── MODALS ── */}
       {modal && (
-        <Modal onClose={() => { setModal(null); setCsvResult(null); setCsvFile(null) }}>
+        <Modal onClose={() => { setModal(null); setCsvResult(null); setCsvFile(null); setPagandoGasto(null) }}>
           {/* CSV Import */}
           {modal === 'csv' && (
             <div>
@@ -686,6 +696,11 @@ export default function Dashboard() {
           {/* Nuevo Artículo de Inventario */}
           {modal === 'inventario' && pid && (
             <FormInventario pid={pid} onSaved={() => { setModal(null); loadAll() }} />
+          )}
+
+          {/* Marcar Gasto Fijo como Pagado */}
+          {modal === 'pagar_gasto_fijo' && pagandoGasto && (
+            <FormPagarGastoFijo gasto={pagandoGasto} onSaved={() => { setModal(null); setPagandoGasto(null); loadAll() }} />
           )}
         </Modal>
       )}
@@ -1066,6 +1081,31 @@ function FormInventario({ pid, onSaved }: { pid: number; onSaved: () => void }) 
       <input style={inp} placeholder="Ej: Bodega, Cocina, Alberca" value={v.ubicacion} onChange={e => setV({ ...v, ubicacion: e.target.value })} />
       <button type="submit" disabled={loading} style={{ background: G, color: BG, border: 'none', padding: 14, borderRadius: 10, width: '100%', fontSize: 15, fontWeight: 700, cursor: 'pointer' }}>
         {loading ? 'Guardando...' : 'Guardar'}
+      </button>
+    </form>
+  )
+}
+
+function FormPagarGastoFijo({ gasto, onSaved }: { gasto: GastoFijo; onSaved: () => void }) {
+  const [monto, setMonto] = useState(String(gasto.monto))
+  const [loading, setLoading] = useState(false)
+  const inp: React.CSSProperties = { width: '100%', background: '#0f0f0f', border: `1px solid ${BD}`, color: TX, padding: '10px 12px', borderRadius: 8, fontSize: 14, boxSizing: 'border-box', marginBottom: 12 }
+  const lbl: React.CSSProperties = { fontSize: 11, color: MU, display: 'block', marginBottom: 4, letterSpacing: '0.1em', textTransform: 'uppercase' }
+  async function submit(e: React.FormEvent) {
+    e.preventDefault(); setLoading(true)
+    try {
+      await api.patch(`/api/gastos-fijos/${gasto.id}/pagar?monto_real=${parseFloat(monto)}`)
+      onSaved()
+    } finally { setLoading(false) }
+  }
+  return (
+    <form onSubmit={submit}>
+      <ModalTitle>Marcar como Pagado</ModalTitle>
+      <p style={{ fontSize: 13, color: MU, marginBottom: 16 }}>{gasto.nombre} — confirma cuánto llegó realmente (puede diferir del estimado, como agua o luz).</p>
+      <label style={lbl}>Monto pagado (MXN) *</label>
+      <input required autoFocus type="number" step="0.01" style={inp} value={monto} onChange={e => setMonto(e.target.value)} />
+      <button type="submit" disabled={loading} style={{ background: GR, color: '#000', border: 'none', padding: 14, borderRadius: 10, width: '100%', fontSize: 15, fontWeight: 700, cursor: 'pointer' }}>
+        {loading ? 'Guardando...' : '✓ Confirmar Pago'}
       </button>
     </form>
   )
