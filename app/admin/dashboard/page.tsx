@@ -42,7 +42,13 @@ interface Finanza {
 }
 interface GastoFijo {
   id: number; nombre: string; monto: number; categoria: string
-  dia_cobro: number | null; propiedad_id: number
+  dia_cobro: number | null; propiedad_id: number; ultimo_pago: string | null
+}
+interface ResumenAnual {
+  year: number; meses_transcurridos: number
+  ingresos_anual: number; gastos_variables_anual: number
+  gastos_fijos_anual: number; ganancia_neta_anual: number
+  noches_ocupadas_anual: number
 }
 interface Compra {
   id: number; articulo: string; descripcion: string | null; cantidad: string | null
@@ -60,6 +66,11 @@ const usd = (n: number) => '$' + Math.abs(n).toLocaleString('en-US', { minimumFr
 const fDate = (s: string) => s ? new Date(s).toLocaleDateString('es-MX', { day: '2-digit', month: 'short' }) : '—'
 const fDateLong = (s: string) => s ? new Date(s).toLocaleDateString('es-MX', { day: '2-digit', month: 'short', year: 'numeric' }) : '—'
 const isOverdue = (s: string | null) => s ? new Date(s) < new Date() : false
+const isPagadoEstePeriodo = (ultimoPago: string | null) => {
+  if (!ultimoPago) return false
+  const p = new Date(ultimoPago), n = new Date()
+  return p.getFullYear() === n.getFullYear() && p.getMonth() === n.getMonth()
+}
 
 // ── MAIN ──────────────────────────────────────────────────
 export default function Dashboard() {
@@ -70,6 +81,7 @@ export default function Dashboard() {
   const [propiedades, setPropiedades] = useState<Propiedad[]>([])
   const [pid, setPid] = useState<number | null>(null)
   const [resumen, setResumen] = useState<Resumen | null>(null)
+  const [resumenAnual, setResumenAnual] = useState<ResumenAnual | null>(null)
   const [reservaciones, setReservaciones] = useState<Reservacion[]>([])
   const [mantenimientos, setMantenimientos] = useState<Mantenimiento[]>([])
   const [finanzas, setFinanzas] = useState<Finanza[]>([])
@@ -87,7 +99,7 @@ export default function Dashboard() {
     const p = propId ?? pidRef.current
     try {
       const suffix = p ? `?propiedad_id=${p}` : ''
-      const [props, res, mant, fin, gf, sum, cmp, inv] = await Promise.all([
+      const [props, res, mant, fin, gf, sum, cmp, inv, sumAnual] = await Promise.all([
         api.get('/api/propiedades'),
         api.get(`/api/reservaciones${suffix}`),
         api.get(`/api/mantenimientos${suffix}`),
@@ -96,6 +108,7 @@ export default function Dashboard() {
         api.get(`/api/resumen${suffix}`),
         api.get(`/api/compras${suffix}`),
         api.get(`/api/inventario${suffix}`),
+        api.get(`/api/resumen-anual${suffix}`),
       ])
       setPropiedades(props)
       setReservaciones(res)
@@ -105,6 +118,7 @@ export default function Dashboard() {
       setResumen(sum)
       setCompras(cmp)
       setInventario(inv)
+      setResumenAnual(sumAnual)
       if (!pidRef.current && props.length) {
         pidRef.current = props[0].id
         setPid(props[0].id)
@@ -198,6 +212,19 @@ export default function Dashboard() {
                 {usd(resumen.ingresos_mes)} ingresos − {usd(resumen.gastos_mes)} gastos
               </div>
             </div>
+
+            {/* Ganancia neta anual (YTD) */}
+            {resumenAnual && (
+              <div style={{ ...s.card, textAlign: 'center', marginBottom: 16 }}>
+                <div style={s.lbl}>Ganancia Neta {resumenAnual.year} (acumulado)</div>
+                <div style={{ fontFamily: 'Georgia,serif', fontSize: 32, color: resumenAnual.ganancia_neta_anual >= 0 ? G : RD, lineHeight: 1.1 }}>
+                  {resumenAnual.ganancia_neta_anual < 0 ? '-' : ''}{usd(resumenAnual.ganancia_neta_anual)}
+                </div>
+                <div style={{ fontSize: 12, color: MU, marginTop: 6 }}>
+                  {usd(resumenAnual.ingresos_anual)} ingresos − {usd(resumenAnual.gastos_variables_anual + resumenAnual.gastos_fijos_anual)} gastos · {resumenAnual.meses_transcurridos} meses
+                </div>
+              </div>
+            )}
 
             {/* KPI grid */}
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 16 }}>
@@ -336,19 +363,36 @@ export default function Dashboard() {
                     </div>
                     <button onClick={() => setModal('gasto_fijo')} style={s.btn()}>+ Agregar</button>
                   </div>
-                  {gastosFijos.map(g => (
-                    <div key={g.id} style={{ ...s.card, marginBottom: 10, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <div>
-                        <div style={{ fontSize: 15, fontWeight: 600 }}>{g.nombre}</div>
-                        <div style={{ fontSize: 12, color: MU }}>{g.categoria}{g.dia_cobro ? ` · día ${g.dia_cobro}` : ''}</div>
-                      </div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                        <div style={{ fontFamily: 'Georgia,serif', fontSize: 18, color: RD }}>{usd(g.monto)}</div>
-                        <button onClick={async () => { await api.delete(`/api/gastos-fijos/${g.id}`); loadAll() }}
-                          style={{ background: 'none', border: 'none', color: RD + '80', cursor: 'pointer', fontSize: 18 }}>×</button>
-                      </div>
+                  {gastosFijos.filter(g => !isPagadoEstePeriodo(g.ultimo_pago)).length > 0 && (
+                    <div style={{ ...s.lbl, color: RD, marginBottom: 8 }}>
+                      {gastosFijos.filter(g => !isPagadoEstePeriodo(g.ultimo_pago)).length} pendientes de pago este mes
                     </div>
-                  ))}
+                  )}
+                  {[...gastosFijos].sort((a, b) => (a.dia_cobro ?? 99) - (b.dia_cobro ?? 99)).map(g => {
+                    const pagado = isPagadoEstePeriodo(g.ultimo_pago)
+                    return (
+                      <div key={g.id} style={{ ...s.card, marginBottom: 10, borderLeft: `3px solid ${pagado ? GR : G}` }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                              <span style={{ fontSize: 15, fontWeight: 600 }}>{g.nombre}</span>
+                              <span style={s.badge(pagado ? GR : G)}>{pagado ? 'Pagado' : 'Pendiente'}</span>
+                            </div>
+                            <div style={{ fontSize: 12, color: MU }}>{g.categoria}{g.dia_cobro ? ` · día ${g.dia_cobro}` : ''}</div>
+                          </div>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                            <div style={{ fontFamily: 'Georgia,serif', fontSize: 18, color: RD }}>{usd(g.monto)}</div>
+                            <button onClick={async () => { await api.delete(`/api/gastos-fijos/${g.id}`); loadAll() }}
+                              style={{ background: 'none', border: 'none', color: RD + '80', cursor: 'pointer', fontSize: 18 }}>×</button>
+                          </div>
+                        </div>
+                        <button onClick={async () => { await api.patch(`/api/gastos-fijos/${g.id}/${pagado ? 'despagar' : 'pagar'}`); loadAll() }}
+                          style={{ ...s.btnSm(pagado ? '#1a1a1a' : GR, pagado ? MU : '#000'), width: '100%', marginTop: 10 }}>
+                          {pagado ? 'Marcar como pendiente' : '✓ Marcar como pagado'}
+                        </button>
+                      </div>
+                    )
+                  })}
                   {gastosFijos.length === 0 && <Empty msg="Sin gastos fijos registrados" />}
                 </>
               )}
