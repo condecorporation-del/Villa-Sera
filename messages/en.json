@@ -63,10 +63,13 @@
     "subtitle": "Mexican colonial architecture with breathtaking views",
     "categories": {
       "all": "All",
-      "exterior": "Exteriors",
-      "interior": "Interiors",
-      "rooms": "Bedrooms",
-      "beach": "Beach"
+      "sala": "Living Room",
+      "cocina": "Kitchen",
+      "comedor": "Dining Room",
+      "cuartos": "Bedrooms",
+      "banos": "Bathrooms",
+      "exterior": "Exterior",
+      "alberca": "Pool"
     }
   },
   "experiences": {

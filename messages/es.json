@@ -63,10 +63,13 @@
     "subtitle": "Una arquitectura colonial mexicana con vistas inalcanzables",
     "categories": {
       "all": "Todo",
-      "exterior": "Exteriores",
-      "interior": "Interiores",
-      "rooms": "Recámaras",
-      "beach": "Playa"
+      "sala": "Sala",
+      "cocina": "Cocina",
+      "comedor": "Comedor",
+      "cuartos": "Cuartos",
+      "banos": "Baños",
+      "exterior": "Exterior",
+      "alberca": "Alberca"
     }
   },
   "experiences": {
