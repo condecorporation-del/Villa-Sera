@@ -16,7 +16,7 @@ const RD = '#ef4444'      // red
 
 // ── TYPES ─────────────────────────────────────────────────
 type Tab = 'dashboard' | 'reservas' | 'finanzas' | 'mantenimiento' | 'compras'
-type FinTab = 'ingresos' | 'fijos' | 'gastos'
+type FinTab = 'ingresos' | 'fijos' | 'gastos' | 'caja'
 
 interface Resumen {
   ganancia_neta: number; ingresos_mes: number; gastos_mes: number
@@ -132,8 +132,10 @@ export default function Dashboard() {
     } finally { setCsvLoading(false) }
   }
 
-  const ingresos = finanzas.filter(f => f.tipo === 'ingreso')
-  const gastos = finanzas.filter(f => f.tipo === 'gasto')
+  const ingresos = finanzas.filter(f => f.tipo === 'ingreso' && f.categoria !== 'Caja Chica')
+  const gastos = finanzas.filter(f => f.tipo === 'gasto' && f.categoria !== 'Caja Chica')
+  const cajaChicaMovs = finanzas.filter(f => f.categoria === 'Caja Chica').sort((a, b) => new Date(b.fecha).getTime() - new Date(a.fecha).getTime())
+  const cajaChicaBalance = cajaChicaMovs.reduce((a, f) => a + (f.tipo === 'ingreso' ? f.monto : -f.monto), 0)
   const pendientes = mantenimientos.filter(m => m.estado !== 'completado')
   const completados = mantenimientos.filter(m => m.estado === 'completado')
 
@@ -202,6 +204,16 @@ export default function Dashboard() {
                   <div style={{ fontSize: 22, color, fontFamily: 'Georgia,serif' }}>{val}</div>
                 </div>
               ))}
+            </div>
+
+            {/* Caja Chica quick view */}
+            <div onClick={() => { setTab('finanzas'); setFinTab('caja') }}
+              style={{ ...s.card, marginBottom: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }}>
+              <div>
+                <div style={s.lbl}>Caja Chica</div>
+                <div style={{ fontFamily: 'Georgia,serif', fontSize: 24, color: cajaChicaBalance >= 0 ? G : RD }}>{usd(cajaChicaBalance)}</div>
+              </div>
+              <span style={{ color: MU, fontSize: 20 }}>›</span>
             </div>
 
             {/* Upcoming maintenance alerts */}
@@ -282,7 +294,7 @@ export default function Dashboard() {
           <div>
             {/* Sub-tabs */}
             <div style={{ display: 'flex', borderBottom: `1px solid ${BD}`, marginBottom: 16, padding: '0 16px' }}>
-              {([['ingresos', 'Ingresos'], ['fijos', 'Gastos Fijos'], ['gastos', 'Variables']] as [FinTab, string][]).map(([key, lbl]) => (
+              {([['ingresos', 'Ingresos'], ['fijos', 'Gastos Fijos'], ['gastos', 'Variables'], ['caja', 'Caja Chica']] as [FinTab, string][]).map(([key, lbl]) => (
                 <button key={key} onClick={() => setFinTab(key)} style={{
                   flex: 1, padding: '11px 4px', background: 'none', border: 'none', cursor: 'pointer', fontSize: 13,
                   color: finTab === key ? G : MU, borderBottom: finTab === key ? `2px solid ${G}` : '2px solid transparent', fontWeight: finTab === key ? 600 : 400
@@ -342,6 +354,25 @@ export default function Dashboard() {
                   </div>
                   {gastos.map(f => <FinanzaRow key={f.id} f={f} onDelete={() => { api.delete(`/api/finanzas/${f.id}`).then(() => loadAll()) }} />)}
                   {gastos.length === 0 && <Empty msg="Sin gastos variables" />}
+                </>
+              )}
+
+              {/* CAJA CHICA */}
+              {finTab === 'caja' && (
+                <>
+                  <div style={{ ...s.card, textAlign: 'center', marginBottom: 16, background: 'linear-gradient(135deg,#111,#1a1400)' }}>
+                    <div style={s.lbl}>Saldo de Caja Chica</div>
+                    <div style={{ fontFamily: 'Georgia,serif', fontSize: 40, color: cajaChicaBalance >= 0 ? G : RD, lineHeight: 1.1 }}>
+                      {usd(cajaChicaBalance)}
+                    </div>
+                  </div>
+                  <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
+                    <button onClick={() => setModal('caja_ingreso')} style={{ ...s.btn(GR, '#000'), flex: 1 }}>+ Agregar fondos</button>
+                    <button onClick={() => setModal('caja_gasto')} style={{ ...s.btn('#f97316', '#000'), flex: 1 }}>− Registrar gasto</button>
+                  </div>
+                  <div style={s.lbl}>Movimientos</div>
+                  {cajaChicaMovs.map(f => <FinanzaRow key={f.id} f={f} onDelete={() => { api.delete(`/api/finanzas/${f.id}`).then(() => loadAll()) }} />)}
+                  {cajaChicaMovs.length === 0 && <Empty msg="Sin movimientos de caja chica" />}
                 </>
               )}
 
@@ -543,6 +574,14 @@ export default function Dashboard() {
             <FormFinanza pid={pid} tipo="gasto" onSaved={() => { setModal(null); loadAll() }} />
           )}
 
+          {/* Caja Chica */}
+          {modal === 'caja_ingreso' && pid && (
+            <FormFinanza pid={pid} tipo="ingreso" categoriaFija="Caja Chica" onSaved={() => { setModal(null); loadAll() }} />
+          )}
+          {modal === 'caja_gasto' && pid && (
+            <FormFinanza pid={pid} tipo="gasto" categoriaFija="Caja Chica" onSaved={() => { setModal(null); loadAll() }} />
+          )}
+
           {/* Nuevo Gasto Fijo */}
           {modal === 'gasto_fijo' && pid && (
             <FormGastoFijo pid={pid} onSaved={() => { setModal(null); loadAll() }} />
@@ -691,8 +730,8 @@ function FormMantenimiento({ pid, onSaved }: { pid: number; onSaved: () => void 
   )
 }
 
-function FormFinanza({ pid, tipo, onSaved }: { pid: number; tipo: string; onSaved: () => void }) {
-  const [v, setV] = useState({ descripcion: '', categoria: tipo === 'ingreso' ? 'Renta' : 'Mantenimiento', monto: '', fecha: new Date().toISOString().split('T')[0], notas: '' })
+function FormFinanza({ pid, tipo, categoriaFija, onSaved }: { pid: number; tipo: string; categoriaFija?: string; onSaved: () => void }) {
+  const [v, setV] = useState({ descripcion: '', categoria: categoriaFija ?? (tipo === 'ingreso' ? 'Renta' : 'Mantenimiento'), monto: '', fecha: new Date().toISOString().split('T')[0], notas: '' })
   const [file, setFile] = useState<File | null>(null)
   const [loading, setLoading] = useState(false)
   const inp: React.CSSProperties = { width: '100%', background: '#0f0f0f', border: `1px solid ${BD}`, color: TX, padding: '10px 12px', borderRadius: 8, fontSize: 14, boxSizing: 'border-box', marginBottom: 12 }
@@ -713,9 +752,9 @@ function FormFinanza({ pid, tipo, onSaved }: { pid: number; tipo: string; onSave
   }
   return (
     <form onSubmit={submit}>
-      <ModalTitle>{tipo === 'ingreso' ? 'Nuevo Ingreso' : 'Nuevo Gasto'}</ModalTitle>
+      <ModalTitle>{categoriaFija ? (tipo === 'ingreso' ? 'Agregar Fondos — Caja Chica' : 'Registrar Gasto — Caja Chica') : tipo === 'ingreso' ? 'Nuevo Ingreso' : 'Nuevo Gasto'}</ModalTitle>
       <label style={lbl}>Descripción *</label>
-      <input required style={inp} value={v.descripcion} onChange={e => setV({ ...v, descripcion: e.target.value })} />
+      <input required style={inp} placeholder={categoriaFija ? 'Ej: Reparación triturador de alimentos' : undefined} value={v.descripcion} onChange={e => setV({ ...v, descripcion: e.target.value })} />
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
         <div>
           <label style={lbl}>Monto (USD) *</label>
@@ -726,10 +765,14 @@ function FormFinanza({ pid, tipo, onSaved }: { pid: number; tipo: string; onSave
           <input required type="date" style={inp} value={v.fecha} onChange={e => setV({ ...v, fecha: e.target.value })} />
         </div>
       </div>
-      <label style={lbl}>Categoría</label>
-      <select style={inp} value={v.categoria} onChange={e => setV({ ...v, categoria: e.target.value })}>
-        {cats.map(c => <option key={c}>{c}</option>)}
-      </select>
+      {!categoriaFija && (
+        <>
+          <label style={lbl}>Categoría</label>
+          <select style={inp} value={v.categoria} onChange={e => setV({ ...v, categoria: e.target.value })}>
+            {cats.map(c => <option key={c}>{c}</option>)}
+          </select>
+        </>
+      )}
       <label style={lbl}>Comprobante (foto / PDF)</label>
       <input type="file" accept="image/*,.pdf" onChange={e => setFile(e.target.files?.[0] ?? null)}
         style={{ ...inp, padding: '8px', color: MU }} />
