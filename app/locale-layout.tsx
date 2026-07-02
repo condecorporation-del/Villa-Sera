@@ -18,7 +18,7 @@ const inter = Inter({
   weight: ['300', '400', '500', '600'],
 });
 
-const BASE_URL = 'https://www.villa-sera.com';
+const BASE_URL = 'https://villa-sera.com';
 const AIRBNB_URL = 'https://www.airbnb.mx/rooms/1583142544563137626';
 
 const META = {

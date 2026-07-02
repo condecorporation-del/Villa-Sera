@@ -21,7 +21,7 @@ const inter = Inter({
   weight: ['300', '400', '500', '600'],
 });
 
-const BASE_URL = 'https://www.villa-sera.com';
+const BASE_URL = 'https://villa-sera.com';
 const AIRBNB_URL = 'https://www.airbnb.mx/rooms/1583142544563137626';
 
 const META = {
@@ -161,6 +161,33 @@ const jsonLd = {
       sameAs: [
         AIRBNB_URL,
         `https://wa.me/526242175935`,
+      ],
+      aggregateRating: {
+        '@type': 'AggregateRating',
+        ratingValue: '5.0',
+        reviewCount: '3',
+        bestRating: '5',
+        worstRating: '1',
+      },
+      review: [
+        {
+          '@type': 'Review',
+          reviewRating: { '@type': 'Rating', ratingValue: '5', bestRating: '5' },
+          author: { '@type': 'Person', name: 'Sarah M.' },
+          reviewBody: 'An absolutely magical experience. The villa is stunning, the views are incredible and the staff made us feel like royalty. We will definitely be back.',
+        },
+        {
+          '@type': 'Review',
+          reviewRating: { '@type': 'Rating', ratingValue: '5', bestRating: '5' },
+          author: { '@type': 'Person', name: 'Carlos & Ana' },
+          reviewBody: 'The private chef was the highlight of our trip. Every meal was a work of art. The oceanfront location is simply unmatched anywhere in Los Cabos.',
+        },
+        {
+          '@type': 'Review',
+          reviewRating: { '@type': 'Rating', ratingValue: '5', bestRating: '5' },
+          author: { '@type': 'Person', name: 'James & Linda K.' },
+          reviewBody: 'We celebrated our anniversary here and it was perfect in every way. The sunset yacht tour to the Arch was something we will never forget.',
+        },
       ],
     },
     {

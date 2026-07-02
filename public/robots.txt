@@ -8,4 +8,4 @@ Disallow: /api/
 # Private admin dashboard - not for search engines
 Disallow: /admin
 
-Sitemap: https://www.villa-sera.com/sitemap.xml
+Sitemap: https://villa-sera.com/sitemap.xml
