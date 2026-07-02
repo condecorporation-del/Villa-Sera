@@ -16,8 +16,13 @@
 }
 
 @keyframes vs-pulse-dot {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(201, 168, 76, 0.35); }
-  50% { box-shadow: 0 0 0 5px rgba(201, 168, 76, 0); }
+  0%, 100% { box-shadow: 0 0 0 0 rgba(227, 189, 102, 0.4); }
+  50% { box-shadow: 0 0 0 6px rgba(227, 189, 102, 0); }
+}
+
+@keyframes vs-glow {
+  0%, 100% { opacity: 0.55; }
+  50% { opacity: 1; }
 }
 
 .vs-fade-item {
@@ -69,13 +74,17 @@
 }
 
 .vs-skeleton {
-  background: linear-gradient(90deg, #211C17 25%, #2A241D 37%, #211C17 63%);
+  background: linear-gradient(90deg, #211B15 25%, #2C251C 37%, #211B15 63%);
   background-size: 400% 100%;
   animation: vs-shimmer 1.4s ease infinite;
 }
 
+.vs-glow {
+  animation: vs-glow 3.2s ease-in-out infinite;
+}
+
 ::selection {
-  background: rgba(207, 162, 59, 0.28);
+  background: rgba(227, 189, 102, 0.32);
 }
 
 /* Legibility: Inter reads thin at small sizes on some displays -
@@ -121,11 +130,12 @@
   }
   .vs-hero-grid > * { margin-bottom: 0 !important; }
   .vs-card-hover {
-    transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.22s ease;
+    transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.22s ease, border-color 0.22s ease;
   }
   .vs-card-hover:hover {
     transform: translateY(-3px);
-    box-shadow: 0 4px 10px rgba(42, 33, 26, 0.07), 0 22px 44px -18px rgba(42, 33, 26, 0.28) !important;
+    border-color: rgba(227, 189, 102, 0.4) !important;
+    box-shadow: 0 0 0 1px rgba(227, 189, 102, 0.12), 0 22px 44px -16px rgba(0, 0, 0, 0.55) !important;
   }
   .vs-root { font-size: 15.5px; }
 }

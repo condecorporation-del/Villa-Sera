@@ -4,21 +4,23 @@ import { useRouter } from 'next/navigation'
 import { api, logout, checkHealth } from '@/lib/admin-api'
 
 // ── THEME ─────────────────────────────────────────────────
-// Villa Sera brand tokens — light, vivid console matching the public site's
-// actual cream canvas, with saturated accent colors instead of muted/dark ones
-const G = '#CFA23B'        // gold — brand accent, CTAs
-const GL = '#E8C874'       // gold light — hover/highlight/gradient top
-const BG = '#FAF6EE'       // cream canvas
-const C1 = '#FFFFFF'       // card surface (white, elevated via shadow not border)
-const C2 = '#F4ECDD'       // surface-2 — inputs / chips / recessed areas
-const BD = '#D9C9AA'       // hairline border — stronger so cards read as distinct objects
-const TX = '#211A14'       // espresso ink — primary text
-const MU = '#5B4D42'       // warm grey-brown — secondary text (darkened further for visibility)
-const GR = '#278049'       // vivid meadow green — positive figures (deepened to hold up at small sizes)
-const RD = '#D03F2C'       // vivid coral-terracotta — negative/expense
-const OC = '#0F8AA8'       // vivid turquoise-ocean — informational accent
-const AM = '#C97A0F'       // vivid amber — variable-expense distinction
-const SH = '0 1px 3px rgba(33,26,20,0.07), 0 14px 32px -14px rgba(33,26,20,0.26)'
+// Villa Sera brand tokens — warm dark console. Not neutral black: an espresso
+// ink so gold/terracotta accents feel warm, with brightened vivid accents
+// (they need more lift on dark than they did on the cream version) and a
+// cream-white primary text for strong, unambiguous contrast.
+const G = '#E3BD66'        // gold — brand accent, CTAs
+const GL = '#F0D28C'       // gold light — hover/highlight/gradient top
+const BG = '#15110D'       // espresso ink canvas
+const C1 = '#211B15'       // card surface
+const C2 = '#2C251C'       // surface-2 — inputs / chips / recessed areas
+const BD = '#4A4032'       // hairline border — lighter than surface so cards read as distinct objects
+const TX = '#F8F2E7'       // warm cream white — primary text
+const MU = '#B9AC9B'       // warm light grey — secondary text (bright enough to read on dark)
+const GR = '#4CC585'       // vivid meadow green — positive figures
+const RD = '#F16A52'       // vivid coral-terracotta — negative/expense
+const OC = '#3FCBEA'       // vivid turquoise-ocean — informational accent
+const AM = '#F0A93E'       // vivid amber — variable-expense distinction
+const SH = '0 1px 0 rgba(255,255,255,0.03) inset, 0 12px 32px -14px rgba(0,0,0,0.55)'
 const FONT_DISPLAY = "'Cormorant Garamond', Georgia, serif"
 
 // ── ICONS ─────────────────────────────────────────────────
@@ -422,7 +424,7 @@ export default function Dashboard() {
             <div className="vs-hero-grid">
             {/* Ganancia neta — headline */}
             <div className="vs-fade-item vs-card vs-card-hover" style={{ ...s.card, textAlign: 'center', marginBottom: 16, background: `radial-gradient(120% 100% at 50% 0%, ${C2} 0%, ${C1} 60%)`, position: 'relative', overflow: 'hidden' }}>
-              <div style={{ position: 'absolute', top: -1, left: '50%', transform: 'translateX(-50%)', width: '60%', height: 2, background: `linear-gradient(90deg, transparent, ${G}, transparent)` }} />
+              <div className="vs-glow" style={{ position: 'absolute', top: -1, left: '50%', transform: 'translateX(-50%)', width: '60%', height: 2, background: `linear-gradient(90deg, transparent, ${G}, transparent)` }} />
               <div style={s.lbl}>Ganancia Neta del Mes</div>
               <div style={{ fontFamily: FONT_DISPLAY, fontStyle: 'italic', fontWeight: 600, fontSize: 'clamp(34px, 8vw, 56px)', color: gananciaAnimada >= 0 ? G : RD, lineHeight: 1.1 }}>
                 {gananciaAnimada < 0 ? '-' : ''}{usd(gananciaAnimada)}
