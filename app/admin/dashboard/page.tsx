@@ -350,6 +350,10 @@ export default function Dashboard() {
   const gananciaAnualAnimada = useCountUp(resumenAnual?.ganancia_neta_anual ?? 0)
   const trendData = monthlyNetSeries(finanzas, 6)
   const reservasPorMes = groupByMonth(reservaciones)
+  const proximasReservas = reservaciones
+    .filter(r => new Date(r.check_in) > new Date() && r.estado !== 'cancelada')
+    .sort((a, b) => new Date(a.check_in).getTime() - new Date(b.check_in).getTime())
+    .slice(0, 3)
 
   // ── STYLES ──────────────────────────────────────────────
   const s = {
@@ -495,16 +499,36 @@ export default function Dashboard() {
             )}
 
             {/* Next check-ins */}
-            {reservaciones.filter(r => new Date(r.check_in) > new Date()).slice(0, 2).map(r => (
-              <div key={r.id} className="vs-card-hover" style={{ ...s.card, marginBottom: 8, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <div>
-                  <div style={{ fontSize: 13, color: MU, marginBottom: 2 }}>Próximo check-in</div>
-                  <div style={{ fontSize: 15, fontWeight: 600 }}>{r.huesped_nombre}</div>
-                  <div style={{ fontSize: 12, color: MU }}>{fDate(r.check_in)} · {r.noches} noches</div>
+            {proximasReservas.length > 0 && (
+              <div style={{ marginBottom: 16 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+                  <div style={{ ...s.lbl, marginBottom: 0 }}>Próximas Reservas</div>
+                  <button onClick={() => setTab('reservas')} className="vs-btn" style={{ background: 'none', border: 'none', color: G, fontSize: 12, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 2 }}>
+                    Ver todas <Icon name="chevron" size={13} color={G} />
+                  </button>
                 </div>
-                <div style={{ fontFamily: FONT_DISPLAY, fontSize: 20, color: GR }}>{r.monto_total ? usd(r.monto_total) : '—'}</div>
+                {proximasReservas.map((r, i) => {
+                  const diasFaltan = Math.ceil((new Date(r.check_in).getTime() - Date.now()) / 86400000)
+                  return (
+                    <div key={r.id} className="vs-fade-item vs-card-hover" style={{ ...s.card, marginBottom: 8, display: 'flex', justifyContent: 'space-between', alignItems: 'center', animationDelay: `${i * 60}ms` }}>
+                      <div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 2 }}>
+                          <span style={{ fontSize: 15, fontWeight: 700 }}>{r.huesped_nombre}</span>
+                          {r.fuente === 'airbnb' && <span style={s.badge('#ff5a5f')}>Airbnb</span>}
+                        </div>
+                        <div style={{ fontSize: 12.5, color: MU, fontWeight: 600 }}>
+                          {fDate(r.check_in)} → {fDate(r.check_out)} · {r.noches} noches
+                        </div>
+                        <div style={{ fontSize: 11.5, color: G, fontWeight: 700, marginTop: 2 }}>
+                          {diasFaltan <= 0 ? 'Llega hoy' : diasFaltan === 1 ? 'Llega mañana' : `En ${diasFaltan} días`}
+                        </div>
+                      </div>
+                      <div style={{ fontFamily: FONT_DISPLAY, fontSize: 20, fontWeight: 600, color: GR }}>{r.monto_total ? usd(r.monto_total) : '—'}</div>
+                    </div>
+                  )
+                })}
               </div>
-            ))}
+            )}
           </div>
         )}
 
