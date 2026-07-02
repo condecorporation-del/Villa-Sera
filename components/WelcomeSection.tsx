@@ -79,9 +79,19 @@ export default function WelcomeSection() {
               variants={fadeUp}
               initial="hidden"
               animate={inView ? 'visible' : 'hidden'}
-              className="text-[#0D0D0D]/70 text-base leading-relaxed font-sans font-light mb-12"
+              className="text-[#0D0D0D]/70 text-base leading-relaxed font-sans font-light mb-4"
             >
               {t('description')}
+            </motion.p>
+
+            <motion.p
+              custom={3.5}
+              variants={fadeUp}
+              initial="hidden"
+              animate={inView ? 'visible' : 'hidden'}
+              className="text-[#A0342A] text-base leading-relaxed font-sans font-medium mb-12"
+            >
+              {t('layout')}
             </motion.p>
 
             {/* Feature pills */}
