@@ -11,7 +11,7 @@ const AIRBNB_URL = 'https://www.airbnb.mx/rooms/1583142544563137626';
 
 const kb = {
   es: {
-    greeting: '¡Hola! Soy el concierge de Villa Sera.\nEstoy aquí para responder cualquier duda sobre la villa, los servicios y Los Cabos.',
+    greeting: 'Hola, soy el concierge de Villa Sera.\nPuedo darte información sobre la villa, los servicios, Los Cabos, y checar disponibilidad de fechas. ¿En qué te ayudo?',
     placeholder: 'Escribe tu pregunta...',
     faqLabel: 'Preguntas frecuentes',
     fallback: 'Para información personalizada, escríbenos directo por WhatsApp y te respondemos al momento. 👋',
@@ -56,7 +56,7 @@ const kb = {
     bookBtn: 'Reservar',
   },
   en: {
-    greeting: 'Hi! I\'m Villa Sera\'s concierge.\nI\'m here to answer any questions about the villa, services and Los Cabos.',
+    greeting: 'Hi, I\'m Villa Sera\'s concierge.\nI can give you information about the villa, our services, Los Cabos, and check date availability. How can I help?',
     placeholder: 'Type your question...',
     faqLabel: 'Frequently asked questions',
     fallback: 'For personalized information, message us on WhatsApp and we\'ll reply right away. 👋',
@@ -236,28 +236,36 @@ export default function ChatWidget() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 16, scale: 0.96 }}
             transition={{ duration: 0.22 }}
-            className="fixed bottom-24 right-6 z-50 w-[360px] max-w-[calc(100vw-24px)] flex flex-col shadow-2xl"
-            style={{ borderRadius: '20px', border: '1px solid rgba(201,168,76,0.15)', background: '#0f0f0f', maxHeight: '600px' }}
+            className="fixed bottom-24 right-6 z-50 w-[420px] max-w-[calc(100vw-24px)] flex flex-col shadow-2xl"
+            style={{ borderRadius: '22px', border: '1px solid rgba(201,168,76,0.18)', background: '#0f0f0f', maxHeight: '70vh', minHeight: '460px' }}
           >
             {/* Header */}
-            <div style={{ background: 'linear-gradient(135deg, #111 0%, #1a1408 100%)', borderRadius: '20px 20px 0 0' }} className="px-5 py-4 flex items-center gap-3 border-b border-[#C9A84C]/10 shrink-0">
-              <div className="w-9 h-9 shrink-0 flex items-center justify-center" style={{ borderRadius: '50%', background: 'linear-gradient(135deg, #C9A84C, #8B6914)' }}>
-                <span className="text-[#0D0D0D] text-sm font-medium" style={{ fontFamily: 'var(--font-cormorant)' }}>VS</span>
+            <div style={{ background: 'linear-gradient(135deg, #171310 0%, #1a1408 100%)', borderRadius: '22px 22px 0 0' }} className="px-6 py-5 flex items-center gap-3.5 border-b border-[#C9A84C]/12 shrink-0">
+              <div
+                className="w-11 h-11 shrink-0 flex items-center justify-center"
+                style={{
+                  borderRadius: '50%',
+                  background: 'linear-gradient(150deg, #E8C874 0%, #C9A84C 55%, #9C7C33 100%)',
+                  boxShadow: '0 1px 0 rgba(255,255,255,0.35) inset, 0 4px 14px -4px rgba(201,168,76,0.5)',
+                }}
+              >
+                <span className="text-[#171310] text-base font-medium" style={{ fontFamily: 'var(--font-cormorant)' }}>VS</span>
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-white text-sm font-sans font-medium tracking-wide">Villa Sera · Concierge</p>
-                <p className="text-[#C9A84C]/70 text-[10px] tracking-[0.2em] uppercase font-sans">
-                  {locale === 'es' ? '● Asistente inteligente' : '● Smart assistant'}
+                <p className="text-white text-[15px] font-sans font-semibold tracking-wide">Villa Sera Concierge</p>
+                <p className="text-[#C9A84C]/70 text-[10px] tracking-[0.2em] uppercase font-sans flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#C9A84C] inline-block" />
+                  {locale === 'es' ? 'Asistente inteligente' : 'Smart assistant'}
                 </p>
               </div>
             </div>
 
             {/* Messages */}
-            <div className="flex-1 overflow-y-auto px-4 pt-4 pb-2 space-y-3">
+            <div className="flex-1 overflow-y-auto px-5 pt-5 pb-2 space-y-3.5">
               {messages.map((msg, i) => (
                 <div key={i} className={`flex ${msg.from === 'user' ? 'justify-end' : 'justify-start'}`}>
                   <div
-                    className="px-4 py-2.5 text-sm font-sans leading-relaxed whitespace-pre-line max-w-[88%]"
+                    className="px-4 py-3 text-[15px] font-sans leading-relaxed whitespace-pre-line max-w-[88%]"
                     style={{
                       background: msg.from === 'bot' ? 'rgba(255,255,255,0.06)' : 'linear-gradient(135deg, #C9A84C, #DFC07A)',
                       color: msg.from === 'bot' ? 'rgba(255,255,255,0.9)' : '#0D0D0D',
@@ -322,7 +330,7 @@ export default function ChatWidget() {
                         <button
                           key={item.value}
                           onClick={() => openTopic(item.value)}
-                          className="flex items-center justify-between gap-2 text-white/75 hover:text-[#C9A84C] text-[11px] font-sans px-3 py-2 text-left transition-all duration-150 w-full"
+                          className="flex items-center justify-between gap-2 text-white/75 hover:text-[#C9A84C] text-[12.5px] font-sans px-3.5 py-2.5 text-left transition-all duration-150 w-full"
                           style={{
                             background: 'rgba(255,255,255,0.03)',
                             border: '1px solid rgba(255,255,255,0.06)',
@@ -364,7 +372,7 @@ export default function ChatWidget() {
                   onKeyDown={handleKey}
                   disabled={typing}
                   placeholder={lang.placeholder}
-                  className="flex-1 bg-transparent text-white/90 text-sm font-sans px-4 py-3 outline-none placeholder:text-white/25 disabled:opacity-50"
+                  className="flex-1 bg-transparent text-white/90 text-[15px] font-sans px-4 py-3.5 outline-none placeholder:text-white/25 disabled:opacity-50"
                 />
                 <button
                   onClick={() => sendMessage(input)}
