@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { useLocale } from 'next-intl';
-import { X, ChevronRight, ChevronDown, ExternalLink, Send, Phone, Calendar, ArrowLeft } from 'lucide-react';
+import { X, ChevronRight, ChevronDown, ExternalLink, Send, Phone, Calendar, ArrowLeft, MessageCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const WHATSAPP = '526242175935';
@@ -187,33 +187,45 @@ export default function ChatWidget() {
       {/* Floating button */}
       <motion.button
         onClick={() => (open ? handleClose() : setOpen(true))}
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.95 }}
-        className="fixed bottom-6 right-6 z-50 flex items-center gap-2.5 px-5 py-3.5 shadow-2xl"
+        whileHover={{ scale: 1.03, y: -1 }}
+        whileTap={{ scale: 0.97 }}
+        className="fixed bottom-6 right-6 z-50 flex items-center gap-3 pl-3.5 pr-5 py-3"
         style={{
           borderRadius: '50px',
-          background: 'linear-gradient(135deg, #1a1a1a 0%, #0D0D0D 100%)',
-          border: '1px solid rgba(201,168,76,0.4)',
+          background: 'linear-gradient(160deg, #171310 0%, #0a0806 100%)',
+          border: '1px solid rgba(201,168,76,0.35)',
+          boxShadow: '0 1px 0 rgba(255,255,255,0.05) inset, 0 10px 30px -8px rgba(0,0,0,0.55), 0 0 0 1px rgba(201,168,76,0.06)',
         }}
         aria-label="Concierge"
       >
-        <AnimatePresence mode="wait">
-          {open ? (
-            <motion.span key="close" initial={{ rotate: -90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: 90, opacity: 0 }} transition={{ duration: 0.2 }}>
-              <X size={18} className="text-[#C9A84C]" />
-            </motion.span>
-          ) : (
-            <motion.span key="open" initial={{ rotate: 90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: -90, opacity: 0 }} transition={{ duration: 0.2 }}>
-              <span className="text-[#C9A84C] text-base" style={{ fontFamily: 'var(--font-cormorant)' }}>✦</span>
-            </motion.span>
-          )}
-        </AnimatePresence>
-        <span className="text-[#C9A84C] text-xs tracking-[0.2em] uppercase font-sans font-medium hidden sm:inline">
-          Concierge
+        <span
+          className="flex items-center justify-center shrink-0"
+          style={{
+            width: 30, height: 30, borderRadius: '50%',
+            background: 'linear-gradient(150deg, #E8C874 0%, #C9A84C 55%, #9C7C33 100%)',
+            boxShadow: '0 1px 0 rgba(255,255,255,0.35) inset',
+          }}
+        >
+          <AnimatePresence mode="wait">
+            {open ? (
+              <motion.span key="close" initial={{ rotate: -90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: 90, opacity: 0 }} transition={{ duration: 0.2 }} className="flex">
+                <X size={15} className="text-[#171310]" strokeWidth={2.4} />
+              </motion.span>
+            ) : (
+              <motion.span key="open" initial={{ rotate: 90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: -90, opacity: 0 }} transition={{ duration: 0.2 }} className="flex">
+                <MessageCircle size={15} className="text-[#171310]" strokeWidth={2.4} />
+              </motion.span>
+            )}
+          </AnimatePresence>
         </span>
-        {!open && (
-          <span className="absolute inset-0 animate-ping opacity-10 pointer-events-none" style={{ borderRadius: '50px', background: '#C9A84C' }} />
-        )}
+        <span className="flex flex-col items-start leading-tight">
+          <span className="text-[#F0D28C] text-[13px] tracking-[0.06em] font-sans font-semibold">
+            Concierge
+          </span>
+          <span className="text-[#C9A84C]/60 text-[9px] tracking-[0.18em] uppercase font-sans hidden sm:inline">
+            Villa Sera
+          </span>
+        </span>
       </motion.button>
 
       {/* Chat window */}

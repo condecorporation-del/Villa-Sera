@@ -8,35 +8,39 @@ import { X, ChevronLeft, ChevronRight } from 'lucide-react';
 
 type Category = 'all' | 'exterior' | 'interior' | 'rooms' | 'beach';
 
+// Hotlinked directly from the Airbnb listing's own photo CDN instead of storing
+// copies in the repo - keeps the same photos guests already see on Airbnb and
+// keeps the git repo / deploy size light.
+const AIRBNB_HOST = 'https://a0.muscache.com/im/pictures/hosting/Hosting-1583142544563137626/original';
+const airbnbImg = (id: string) => `${AIRBNB_HOST}/${id}.jpeg?im_w=1200&width=1200&quality=75&auto=webp`;
+
 const galleryImages = [
-  { src: '/images/CasaSergio233.jpg', category: 'exterior', alt: 'Sunset terrace view' },
-  { src: '/images/CasaSergio238.jpg', category: 'exterior', alt: 'Outdoor dining at sunset' },
-  { src: '/images/exterior 1.jpg', category: 'exterior', alt: 'Villa exterior at night' },
-  { src: '/images/CasaSergio126.jpg', category: 'exterior', alt: 'Villa facade daytime' },
-  { src: '/images/CasaSergio121.jpg', category: 'exterior', alt: 'View from the sea' },
-  { src: '/images/CasaSergio139+.jpg', category: 'exterior', alt: 'Aerial view with Arch' },
-  { src: '/images/pool arch view.jpg', category: 'exterior', alt: 'Infinity pool with Arch view' },
-  { src: '/images/sunset pool.jpg', category: 'exterior', alt: 'Sunset over the pool and Arch' },
-  { src: '/images/sunset terrace lounge.jpg', category: 'exterior', alt: 'Sunset lounge terrace' },
-  { src: '/images/fitness terrace.jpg', category: 'exterior', alt: 'Ocean-view fitness terrace' },
-  { src: '/images/CasaSergio180.jpg', category: 'beach', alt: 'Private beach path' },
-  { src: '/images/CasaSergio181.jpg', category: 'beach', alt: 'Private cove with palms' },
-  { src: '/images/CasaSergio182.jpg', category: 'beach', alt: 'Aerial cove view' },
-  { src: '/images/beach path.jpg', category: 'beach', alt: 'Path down to the private beach' },
-  { src: '/images/livingroom villa serena.jpg', category: 'interior', alt: 'Living room' },
-  { src: '/images/diningroom1.jpg', category: 'interior', alt: 'Indoor dining room' },
-  { src: '/images/diningroom2.jpg', category: 'interior', alt: 'Terrace dining at sunset' },
-  { src: '/images/bathroom1.jpg', category: 'interior', alt: 'Master bathroom' },
-  { src: '/images/foyer.jpg', category: 'interior', alt: 'Entrance foyer' },
-  { src: '/images/kitchen.jpg', category: 'interior', alt: 'Gourmet kitchen' },
-  { src: '/images/bathroom talavera.jpg', category: 'interior', alt: 'Guest bathroom, talavera tile' },
-  { src: '/images/bathroom spa.jpg', category: 'interior', alt: 'Spa-style bathroom' },
-  { src: '/images/outdoor shower.jpg', category: 'interior', alt: 'Outdoor tropical shower' },
-  { src: '/images/master room 1.jpg', category: 'rooms', alt: 'Master suite ocean view' },
-  { src: '/images/masteroom2.jpg', category: 'rooms', alt: 'Master suite' },
-  { src: '/images/bedroom 2.jpg', category: 'rooms', alt: 'King bedroom with canopy' },
-  { src: '/images/bedroom queen.jpg', category: 'rooms', alt: 'Queen bedroom' },
-  { src: '/images/tv lounge.jpg', category: 'rooms', alt: 'TV lounge with sofa bed' },
+  // Exterior
+  { src: airbnbImg('c0678a33-9437-41df-9f96-e95d476a8717'), category: 'exterior', alt: 'Villa Sera from the sea' },
+  { src: airbnbImg('af421233-b67e-4a1b-939c-42bb164b7a34'), category: 'exterior', alt: 'Villa at twilight' },
+  { src: airbnbImg('f9415e2b-b50f-4071-8d4a-1a370d40873a'), category: 'exterior', alt: 'Villa facade' },
+  { src: airbnbImg('1186749e-7a43-4033-9f7a-e6597c57d0df'), category: 'exterior', alt: 'Exterior terrace' },
+  { src: airbnbImg('a0d715da-6b4b-4342-8163-6bdf3da61cff'), category: 'exterior', alt: 'Exterior terrace' },
+  { src: airbnbImg('cc54ff3e-fb99-47bd-bd75-8da2867e141c'), category: 'exterior', alt: 'Exterior view' },
+  { src: airbnbImg('eb5bae1a-5fc5-421a-a881-973d4559de7f'), category: 'exterior', alt: 'Infinity pool' },
+  // Beach
+  { src: airbnbImg('1c342fc1-989f-4b7d-9bb2-0db53b63bbeb'), category: 'beach', alt: 'Path down to the private beach' },
+  { src: airbnbImg('c57e248d-56e4-441b-98df-8a844a939ba4'), category: 'beach', alt: 'Private cove beach' },
+  // Interior
+  { src: airbnbImg('31d2e042-c704-462e-ba37-44f49f92e819'), category: 'interior', alt: 'Living room' },
+  { src: airbnbImg('759db471-3461-4960-820b-c0ceeaca3e9f'), category: 'interior', alt: 'Gourmet kitchen' },
+  { src: airbnbImg('906719f3-4034-44a7-ad1c-72d1a8710167'), category: 'interior', alt: 'Kitchen' },
+  { src: airbnbImg('dbceb58b-1065-447c-8a00-d1ff0d57eca4'), category: 'interior', alt: 'Poolside kitchenette and bar' },
+  { src: airbnbImg('5f36da75-fc2c-4c27-88e6-bb56ece6e320'), category: 'interior', alt: 'Dining room' },
+  { src: airbnbImg('3cbcdf61-9927-476a-9977-ea0f53999f54'), category: 'interior', alt: 'Terrace dining' },
+  { src: airbnbImg('fac0e2f2-f9d3-41a9-bb90-edc811546fec'), category: 'interior', alt: 'Bathroom' },
+  { src: airbnbImg('92f16c3f-1821-4922-9d67-cc65f4e3a6ea'), category: 'interior', alt: 'Bathroom' },
+  // Rooms
+  { src: airbnbImg('3d3de8d6-7a5d-40d6-a807-d74a7191dbf5'), category: 'rooms', alt: 'Bedroom 1' },
+  { src: airbnbImg('bfeccbcb-b388-494f-ab1a-6f0d67bf24c1'), category: 'rooms', alt: 'Master suite ocean-view terrace' },
+  { src: airbnbImg('86343df8-a0a3-47af-b547-c85038289c8a'), category: 'rooms', alt: 'Bedroom 2' },
+  { src: airbnbImg('d0cc8d86-b361-4314-9391-59d546c3a8a8'), category: 'rooms', alt: 'Bedroom 3' },
+  { src: airbnbImg('fdba7ace-0903-4e2c-9fe3-d4410956c29e'), category: 'rooms', alt: 'Bedroom 4' },
 ];
 
 export default function GallerySection() {

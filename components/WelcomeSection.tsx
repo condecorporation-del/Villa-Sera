@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { useInView } from 'framer-motion';
 import { useRef } from 'react';
-import { Waves, TreePalm, ShieldCheck, Users } from 'lucide-react';
+import { Waves, TreePalm, ShieldCheck, Users, BedDouble } from 'lucide-react';
 
 const fadeUp = {
   hidden: { opacity: 0, y: 40 },
@@ -22,10 +22,11 @@ export default function WelcomeSection() {
   const inView = useInView(ref, { once: true, margin: '-80px' });
 
   const features = [
-    { key: 'beach', icon: Waves },
-    { key: 'ocean', icon: TreePalm },
-    { key: 'privacy', icon: ShieldCheck },
-    { key: 'staff', icon: Users },
+    { key: 'layout', icon: BedDouble, full: true },
+    { key: 'beach', icon: Waves, full: false },
+    { key: 'ocean', icon: TreePalm, full: false },
+    { key: 'privacy', icon: ShieldCheck, full: false },
+    { key: 'staff', icon: Users, full: false },
   ] as const;
 
   return (
@@ -79,31 +80,21 @@ export default function WelcomeSection() {
               variants={fadeUp}
               initial="hidden"
               animate={inView ? 'visible' : 'hidden'}
-              className="text-[#0D0D0D]/70 text-base leading-relaxed font-sans font-light mb-4"
+              className="text-[#0D0D0D]/70 text-base leading-relaxed font-sans font-light mb-12"
             >
               {t('description')}
             </motion.p>
 
-            <motion.p
-              custom={3.5}
-              variants={fadeUp}
-              initial="hidden"
-              animate={inView ? 'visible' : 'hidden'}
-              className="text-[#A0342A] text-base leading-relaxed font-sans font-medium mb-12"
-            >
-              {t('layout')}
-            </motion.p>
-
             {/* Feature pills */}
             <div className="grid grid-cols-2 gap-4">
-              {features.map(({ key, icon: Icon }, i) => (
+              {features.map(({ key, icon: Icon, full }, i) => (
                 <motion.div
                   key={key}
                   custom={4 + i}
                   variants={fadeUp}
                   initial="hidden"
                   animate={inView ? 'visible' : 'hidden'}
-                  className="flex items-center gap-3 py-3 border-b border-[#E5DDD4]"
+                  className={`flex items-center gap-3 py-3 border-b border-[#E5DDD4] ${full ? 'col-span-2' : ''}`}
                 >
                   <Icon size={16} className="text-[#C9A84C] shrink-0" />
                   <span className="text-sm tracking-[0.08em] uppercase font-sans text-[#0D0D0D]/80">

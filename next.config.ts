@@ -7,6 +7,13 @@ const nextConfig: NextConfig = {
   images: {
     formats: ['image/webp'],
     qualities: [75, 90],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'a0.muscache.com',
+        pathname: '/im/pictures/**',
+      },
+    ],
   },
   // Ensure Vercel serverless bundle includes the HTML read by app/guest-guide/route.ts
   outputFileTracingIncludes: {
