@@ -15,7 +15,7 @@ const GR = '#22c55e'      // green
 const RD = '#ef4444'      // red
 
 // ── TYPES ─────────────────────────────────────────────────
-type Tab = 'dashboard' | 'reservas' | 'finanzas' | 'mantenimiento' | 'compras'
+type Tab = 'dashboard' | 'reservas' | 'finanzas' | 'mantenimiento' | 'compras' | 'inventario'
 type FinTab = 'ingresos' | 'fijos' | 'gastos' | 'caja'
 
 interface Resumen {
@@ -49,6 +49,11 @@ interface Compra {
   prioridad: string; estado: string; costo_estimado: number | null
   costo_real: number | null; categoria: string; propiedad_id: number
 }
+interface InventarioItem {
+  id: number; articulo: string; categoria: string; cantidad: number
+  estado: string; costo: number | null; ubicacion: string | null
+  notas: string | null; propiedad_id: number
+}
 
 // ── HELPERS ───────────────────────────────────────────────
 const usd = (n: number) => '$' + Math.abs(n).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })
@@ -70,6 +75,7 @@ export default function Dashboard() {
   const [finanzas, setFinanzas] = useState<Finanza[]>([])
   const [gastosFijos, setGastosFijos] = useState<GastoFijo[]>([])
   const [compras, setCompras] = useState<Compra[]>([])
+  const [inventario, setInventario] = useState<InventarioItem[]>([])
   const [modal, setModal] = useState<string | null>(null)
   const [csvFile, setCsvFile] = useState<File | null>(null)
   const [csvLoading, setCsvLoading] = useState(false)
@@ -81,7 +87,7 @@ export default function Dashboard() {
     const p = propId ?? pidRef.current
     try {
       const suffix = p ? `?propiedad_id=${p}` : ''
-      const [props, res, mant, fin, gf, sum, cmp] = await Promise.all([
+      const [props, res, mant, fin, gf, sum, cmp, inv] = await Promise.all([
         api.get('/api/propiedades'),
         api.get(`/api/reservaciones${suffix}`),
         api.get(`/api/mantenimientos${suffix}`),
@@ -89,6 +95,7 @@ export default function Dashboard() {
         api.get(`/api/gastos-fijos${suffix}`),
         api.get(`/api/resumen${suffix}`),
         api.get(`/api/compras${suffix}`),
+        api.get(`/api/inventario${suffix}`),
       ])
       setPropiedades(props)
       setReservaciones(res)
@@ -97,6 +104,7 @@ export default function Dashboard() {
       setGastosFijos(gf)
       setResumen(sum)
       setCompras(cmp)
+      setInventario(inv)
       if (!pidRef.current && props.length) {
         pidRef.current = props[0].id
         setPid(props[0].id)
@@ -512,6 +520,44 @@ export default function Dashboard() {
             {compras.length === 0 && <Empty msg="Sin artículos por comprar" />}
           </div>
         )}
+
+        {/* ── INVENTARIO TAB ── */}
+        {tab === 'inventario' && (
+          <div style={s.section}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+              <span style={{ ...s.lbl, marginBottom: 0 }}>{inventario.length} artículos</span>
+              <button onClick={() => setModal('inventario')} style={s.btn()}>+ Agregar</button>
+            </div>
+
+            {inventario.filter(i => i.estado === 'faltante').length > 0 && (
+              <div style={{ marginBottom: 20 }}>
+                <div style={{ ...s.lbl, color: RD }}>⚠ Faltantes</div>
+                {inventario.filter(i => i.estado === 'faltante').map(i => (
+                  <InventarioRow key={i.id} i={i}
+                    onEstado={async e => { await api.patch(`/api/inventario/${i.id}/estado?estado=${e}`); loadAll() }}
+                    onDelete={async () => { await api.delete(`/api/inventario/${i.id}`); loadAll() }} />
+                ))}
+              </div>
+            )}
+
+            {Object.entries(
+              inventario.filter(i => i.estado !== 'faltante').reduce((acc: Record<string, InventarioItem[]>, i) => {
+                (acc[i.categoria] ??= []).push(i); return acc
+              }, {})
+            ).sort(([a], [b]) => a.localeCompare(b)).map(([cat, items]) => (
+              <div key={cat} style={{ marginBottom: 20 }}>
+                <div style={s.lbl}>{cat} ({items.length})</div>
+                {items.map(i => (
+                  <InventarioRow key={i.id} i={i}
+                    onEstado={async e => { await api.patch(`/api/inventario/${i.id}/estado?estado=${e}`); loadAll() }}
+                    onDelete={async () => { await api.delete(`/api/inventario/${i.id}`); loadAll() }} />
+                ))}
+              </div>
+            ))}
+
+            {inventario.length === 0 && <Empty msg="Sin artículos en inventario" />}
+          </div>
+        )}
       </div>
 
       {/* ── BOTTOM NAV ── */}
@@ -526,6 +572,7 @@ export default function Dashboard() {
           ['finanzas', '$', 'Finanzas'],
           ['mantenimiento', '⚙', 'Manten.'],
           ['compras', '◎', 'Compras'],
+          ['inventario', '▤', 'Inventario'],
         ] as [Tab, string, string][]).map(([key, icon, lbl]) => (
           <button key={key} onClick={() => setTab(key)} style={{
             flex: 1, background: 'none', border: 'none', cursor: 'pointer',
@@ -590,6 +637,11 @@ export default function Dashboard() {
           {/* Nueva Compra */}
           {modal === 'compra' && pid && (
             <FormCompra pid={pid} onSaved={() => { setModal(null); loadAll() }} />
+          )}
+
+          {/* Nuevo Artículo de Inventario */}
+          {modal === 'inventario' && pid && (
+            <FormInventario pid={pid} onSaved={() => { setModal(null); loadAll() }} />
           )}
         </Modal>
       )}
@@ -877,6 +929,99 @@ function FormCompra({ pid, onSaved }: { pid: number; onSaved: () => void }) {
       </div>
       <button type="submit" disabled={loading} style={{ background: G, color: BG, border: 'none', padding: 14, borderRadius: 10, width: '100%', fontSize: 15, fontWeight: 700, cursor: 'pointer' }}>
         {loading ? 'Guardando...' : 'Agregar a lista'}
+      </button>
+    </form>
+  )
+}
+
+function InventarioRow({ i, onEstado, onDelete }: { i: InventarioItem; onEstado: (estado: string) => void; onDelete: () => void }) {
+  const color = i.estado === 'faltante' ? RD : i.estado === 'dañado' ? '#f97316' : GR
+  return (
+    <div style={{ background: C1, border: `1px solid ${BD}`, borderRadius: 10, padding: '12px 14px', marginBottom: 8, borderLeft: `3px solid ${color}` }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+        <div style={{ flex: 1, marginRight: 12 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 2, flexWrap: 'wrap' }}>
+            <span style={{ fontSize: 14, fontWeight: 600 }}>{i.articulo}</span>
+            {i.cantidad > 1 && <span style={{ fontSize: 12, color: MU }}>×{i.cantidad}</span>}
+          </div>
+          {i.notas && <div style={{ fontSize: 12, color: MU }}>{i.notas}</div>}
+          <div style={{ fontSize: 12, color: MU, marginTop: 2 }}>
+            {i.costo ? `$${i.costo.toLocaleString()}` : ''}
+            {i.ubicacion ? ` · ${i.ubicacion}` : ''}
+          </div>
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 6, alignItems: 'flex-end' }}>
+          <select value={i.estado} onChange={e => onEstado(e.target.value)}
+            style={{ background: color + '20', color, border: 'none', borderRadius: 6, padding: '4px 8px', fontSize: 11, fontWeight: 600 }}>
+            <option value="disponible">Disponible</option>
+            <option value="faltante">Faltante</option>
+            <option value="dañado">Dañado</option>
+          </select>
+          <button onClick={onDelete} style={{ background: 'none', border: 'none', color: RD + '60', cursor: 'pointer', fontSize: 16 }}>×</button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function FormInventario({ pid, onSaved }: { pid: number; onSaved: () => void }) {
+  const [v, setV] = useState({ articulo: '', categoria: 'Herramientas', cantidad: '1', estado: 'disponible', costo: '', ubicacion: '', notas: '' })
+  const [loading, setLoading] = useState(false)
+  const inp: React.CSSProperties = { width: '100%', background: '#0f0f0f', border: `1px solid ${BD}`, color: TX, padding: '10px 12px', borderRadius: 8, fontSize: 14, boxSizing: 'border-box', marginBottom: 12 }
+  const lbl: React.CSSProperties = { fontSize: 11, color: MU, display: 'block', marginBottom: 4, letterSpacing: '0.1em', textTransform: 'uppercase' }
+  async function submit(e: React.FormEvent) {
+    e.preventDefault(); setLoading(true)
+    try {
+      await api.post('/api/inventario', {
+        propiedad_id: pid,
+        articulo: v.articulo,
+        categoria: v.categoria,
+        cantidad: parseInt(v.cantidad) || 1,
+        estado: v.estado,
+        costo: v.costo ? parseFloat(v.costo) : null,
+        ubicacion: v.ubicacion || null,
+        notas: v.notas || null,
+      })
+      onSaved()
+    } finally { setLoading(false) }
+  }
+  return (
+    <form onSubmit={submit}>
+      <ModalTitle>Nuevo Artículo de Inventario</ModalTitle>
+      <label style={lbl}>Artículo *</label>
+      <input required style={inp} placeholder="Ej: Llave Trox" value={v.articulo} onChange={e => setV({ ...v, articulo: e.target.value })} />
+      <label style={lbl}>Notas</label>
+      <input style={inp} placeholder="Para qué sirve, detalles..." value={v.notas} onChange={e => setV({ ...v, notas: e.target.value })} />
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+        <div>
+          <label style={lbl}>Cantidad</label>
+          <input type="number" min="1" style={inp} value={v.cantidad} onChange={e => setV({ ...v, cantidad: e.target.value })} />
+        </div>
+        <div>
+          <label style={lbl}>Costo (opcional)</label>
+          <input type="number" step="0.01" style={inp} placeholder="0.00" value={v.costo} onChange={e => setV({ ...v, costo: e.target.value })} />
+        </div>
+      </div>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+        <div>
+          <label style={lbl}>Categoría</label>
+          <select style={inp} value={v.categoria} onChange={e => setV({ ...v, categoria: e.target.value })}>
+            {['Herramientas', 'Cocina', 'Blancos', 'Alberca', 'Limpieza', 'Electrónica', 'Mobiliario', 'Jardín', 'Otro'].map(c => <option key={c}>{c}</option>)}
+          </select>
+        </div>
+        <div>
+          <label style={lbl}>Estado</label>
+          <select style={inp} value={v.estado} onChange={e => setV({ ...v, estado: e.target.value })}>
+            <option value="disponible">Disponible</option>
+            <option value="faltante">Faltante</option>
+            <option value="dañado">Dañado</option>
+          </select>
+        </div>
+      </div>
+      <label style={lbl}>Ubicación (opcional)</label>
+      <input style={inp} placeholder="Ej: Bodega, Cocina, Alberca" value={v.ubicacion} onChange={e => setV({ ...v, ubicacion: e.target.value })} />
+      <button type="submit" disabled={loading} style={{ background: G, color: BG, border: 'none', padding: 14, borderRadius: 10, width: '100%', fontSize: 15, fontWeight: 700, cursor: 'pointer' }}>
+        {loading ? 'Guardando...' : 'Guardar'}
       </button>
     </form>
   )
