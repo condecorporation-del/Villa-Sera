@@ -19,7 +19,7 @@ const experiences = [
   },
   {
     key: 'wellness',
-    image: '/images/CasaSergio181.jpg',
+    image: '/images/wellness-terrace.jpg',
     alt: 'In-villa wellness',
   },
 ] as const;
