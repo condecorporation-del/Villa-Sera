@@ -191,43 +191,90 @@ function smoothPath(pts: { x: number; y: number }[]) {
   }
   return d
 }
+const compactUsd = (n: number) => {
+  const abs = Math.abs(n)
+  if (abs >= 1000) return `$${(n / 1000).toFixed(abs >= 10000 ? 0 : 1)}k`
+  return `$${Math.round(n)}`
+}
+
+// Grouped bars (ingresos / gastos) with a net-profit line overlay, gridlines
+// and axis labels - reads like a real finance dashboard chart rather than a
+// single sparkline.
 function TrendChart({ data, positiveColor, negativeColor, mutedColor }: { data: { key: string; label: string; ingresos: number; gastos: number }[]; positiveColor: string; negativeColor: string; mutedColor: string }) {
   const nets = data.map(d => d.ingresos - d.gastos)
-  const max = Math.max(1, ...nets.map(n => Math.abs(n)))
-  const W = 300, H = 74, PADX = 6, PADY = 14
-  const stepX = data.length > 1 ? (W - PADX * 2) / (data.length - 1) : 0
-  const pts = nets.map((n, i) => ({
-    x: PADX + i * stepX,
-    y: PADY + (1 - (n / max + 1) / 2) * (H - PADY * 2),
+  const maxBar = Math.max(1, ...data.map(d => Math.max(d.ingresos, d.gastos)))
+  const maxNet = Math.max(1, ...nets.map(n => Math.abs(n)))
+  const W = 320, H = 150, PADX = 4, PADT = 10, PADB = 20
+  const plotH = H - PADT - PADB
+  const stepX = data.length > 0 ? (W - PADX * 2) / data.length : 0
+  const barGroupW = stepX * 0.58
+  const barW = barGroupW / 2 - 1.5
+  const gridLines = [0, 0.25, 0.5, 0.75, 1]
+  const netColor = nets[nets.length - 1] >= 0 ? positiveColor : negativeColor
+  const netPts = nets.map((n, i) => ({
+    x: PADX + i * stepX + stepX / 2,
+    y: PADT + (1 - (n / maxNet + 1) / 2) * plotH,
   }))
-  const lineColor = nets[nets.length - 1] >= 0 ? positiveColor : negativeColor
-  const gid = 'vsGrad'
-  const linePath = smoothPath(pts)
-  const areaPath = `${linePath} L ${pts[pts.length - 1].x},${H} L ${pts[0].x},${H} Z`
+  const netPath = smoothPath(netPts)
+
   return (
-    <div style={{ marginTop: 14 }}>
-      <svg viewBox={`0 0 ${W} ${H}`} width="100%" height={84} preserveAspectRatio="none" style={{ overflow: 'visible' }}>
-        <defs>
-          <linearGradient id={gid} x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor={lineColor} stopOpacity="0.32" />
-            <stop offset="100%" stopColor={lineColor} stopOpacity="0" />
-          </linearGradient>
-        </defs>
-        <line x1={PADX} y1={H / 2} x2={W - PADX} y2={H / 2} stroke={mutedColor} strokeOpacity="0.25" strokeDasharray="3 4" />
-        <path d={areaPath} fill={`url(#${gid})`} className="vs-fade-item" style={{ animationDelay: '120ms' }} />
-        <path d={linePath} fill="none" stroke={lineColor} strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" className="vs-fade-item" style={{ animationDelay: '60ms' }} />
-        {pts.map((p, i) => {
-          const isLast = i === pts.length - 1
-          return (
-            <circle key={data[i].key} cx={p.x} cy={p.y} r={isLast ? 4 : 2.5}
-              fill={isLast ? lineColor : C1} stroke={lineColor} strokeWidth={isLast ? 0 : 1.6}
-              className={isLast ? 'vs-live-dot' : ''} />
-          )
-        })}
-      </svg>
+    <div style={{ marginTop: 16 }}>
+      <div style={{ position: 'relative' }}>
+        {/* $ gridline labels — plain HTML so they never get skewed by the SVG's non-uniform scaling */}
+        <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}>
+          {gridLines.map(g => (
+            <span key={g} style={{ position: 'absolute', left: 0, top: `${((PADT + g * plotH) / H) * 100}%`, transform: 'translateY(-100%)', fontSize: 8.5, color: mutedColor, opacity: 0.55, fontWeight: 600 }}>
+              {compactUsd(maxBar * (1 - g))}
+            </span>
+          ))}
+        </div>
+        <svg viewBox={`0 0 ${W} ${H}`} width="100%" height={150} preserveAspectRatio="none" style={{ overflow: 'visible' }}>
+          {/* Gridlines */}
+          {gridLines.map(g => (
+            <line key={g} x1={PADX} y1={PADT + g * plotH} x2={W - PADX} y2={PADT + g * plotH} stroke={mutedColor} strokeOpacity="0.14" strokeDasharray="2 4" />
+          ))}
+
+          {/* Grouped bars */}
+          {data.map((d, i) => {
+            const x0 = PADX + i * stepX + (stepX - barGroupW) / 2
+            const hIn = (d.ingresos / maxBar) * plotH
+            const hGa = (d.gastos / maxBar) * plotH
+            return (
+              <g key={d.key} className="vs-fade-item" style={{ animationDelay: `${i * 40}ms` }}>
+                <rect x={x0} y={PADT + plotH - hIn} width={barW} height={hIn} rx="1.5" fill={positiveColor} opacity="0.85" />
+                <rect x={x0 + barW + 3} y={PADT + plotH - hGa} width={barW} height={hGa} rx="1.5" fill={negativeColor} opacity="0.75" />
+              </g>
+            )
+          })}
+
+          {/* Net profit line overlay */}
+          <path d={netPath} fill="none" stroke={netColor} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+            strokeDasharray="4 3" opacity="0.9" className="vs-fade-item" style={{ animationDelay: '160ms' }} />
+          {netPts.map((p, i) => {
+            const isLast = i === netPts.length - 1
+            return (
+              <circle key={data[i].key} cx={p.x} cy={p.y} r={isLast ? 3.5 : 2}
+                fill={isLast ? netColor : C1} stroke={netColor} strokeWidth={isLast ? 0 : 1.4}
+                className={isLast ? 'vs-live-dot' : ''} />
+            )
+          })}
+        </svg>
+      </div>
+
+      {/* X-axis month labels */}
       <div style={{ display: 'flex', marginTop: 4 }}>
         {data.map((d, i) => (
           <span key={d.key} style={{ flex: 1, textAlign: 'center', fontSize: 9, color: mutedColor, textTransform: 'capitalize', opacity: i === data.length - 1 ? 1 : 0.65, fontWeight: i === data.length - 1 ? 700 : 500 }}>{d.label}</span>
+        ))}
+      </div>
+
+      {/* Legend */}
+      <div style={{ display: 'flex', justifyContent: 'center', gap: 16, marginTop: 6 }}>
+        {[['Ingresos', positiveColor], ['Gastos', negativeColor], ['Neto', netColor]].map(([lbl, color]) => (
+          <div key={lbl} style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+            <span style={{ width: 7, height: 7, borderRadius: lbl === 'Neto' ? '50%' : 2, background: color, display: 'inline-block' }} />
+            <span style={{ fontSize: 10, color: mutedColor, fontWeight: 600 }}>{lbl}</span>
+          </div>
         ))}
       </div>
     </div>
@@ -464,6 +511,7 @@ export default function Dashboard() {
               <div className="vs-fade-item vs-card" style={{ ...s.card, textAlign: 'center', animationDelay: '180ms', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
                 <div style={s.lbl}>Ocupación</div>
                 <OccupancyRing pct={resumen.ocupacion_porcentaje} color={OC} trackColor={BD} />
+                <div style={{ fontSize: 11, color: MU, marginTop: 4, fontWeight: 600 }}>{resumen.noches_ocupadas} noches este mes</div>
               </div>
             </div>
 
