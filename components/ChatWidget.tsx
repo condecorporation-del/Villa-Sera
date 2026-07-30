@@ -444,27 +444,52 @@ export default function ChatWidget() {
               <div ref={bottomRef} />
             </div>
 
-            {/* Quick topics — always visible so the questions are the invitation */}
-            <div className="relative shrink-0 border-t border-[#EFE7DA]/8">
-              {/* Fade at the right edge signals there is more to scroll */}
-              <div
-                className="pointer-events-none absolute right-0 top-0 bottom-0 w-10 z-10"
-                style={{ background: 'linear-gradient(90deg, rgba(4,20,28,0) 0%, #04141C 85%)' }}
-              />
-              <div className="flex gap-2 overflow-x-auto no-scrollbar px-5 py-3">
-                {lang.menu.map((item) => (
-                  <button
-                    key={item.value}
-                    onClick={() => openTopic(item.value)}
-                    className="shrink-0 flex items-center gap-1.5 text-[#EFE7DA]/80 hover:text-[#04141C] text-[13px] font-sans whitespace-nowrap px-3.5 py-2 transition-colors duration-150 border border-[#EFE7DA]/12 hover:bg-[#C9A84C] hover:border-[#C9A84C]"
-                    style={{ borderRadius: '999px' }}
-                  >
-                    <span>{item.label}</span>
-                    {'external' in item && item.external && (
-                      <ExternalLink size={11} className="shrink-0 opacity-50" />
-                    )}
-                  </button>
-                ))}
+            {/* Quick topics — a grid so every question is visible at once,
+                not a scrolling row that hides most of them */}
+            <div className="shrink-0 border-t border-[#EFE7DA]/8 px-5 py-3.5">
+              <div className="grid grid-cols-2 gap-2">
+                {lang.menu.map((item) => {
+                  const [emoji, ...rest] = item.label.split(' ');
+                  const text = rest.join(' ');
+                  return (
+                    <button
+                      key={item.value}
+                      onClick={() => openTopic(item.value)}
+                      className="group flex items-center gap-2.5 text-left px-3 py-2.5 transition-colors duration-150"
+                      style={{
+                        borderRadius: '14px',
+                        background: 'rgba(239,231,218,0.04)',
+                        border: '1px solid rgba(239,231,218,0.1)',
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.background = 'rgba(201,168,76,0.12)';
+                        e.currentTarget.style.borderColor = 'rgba(201,168,76,0.4)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.background = 'rgba(239,231,218,0.04)';
+                        e.currentTarget.style.borderColor = 'rgba(239,231,218,0.1)';
+                      }}
+                    >
+                      <span
+                        className="shrink-0 flex items-center justify-center text-[15px]"
+                        style={{
+                          width: 30,
+                          height: 30,
+                          borderRadius: '50%',
+                          background: 'rgba(201,168,76,0.14)',
+                        }}
+                      >
+                        {emoji}
+                      </span>
+                      <span className="flex-1 min-w-0 text-[#EFE7DA]/85 group-hover:text-[#EFE7DA] text-[12.5px] leading-tight font-sans">
+                        {text}
+                      </span>
+                      {'external' in item && item.external && (
+                        <ExternalLink size={11} className="shrink-0 opacity-40" />
+                      )}
+                    </button>
+                  );
+                })}
               </div>
             </div>
 
