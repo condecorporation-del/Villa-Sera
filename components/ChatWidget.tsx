@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { useLocale } from 'next-intl';
-import { X, ChevronRight, ChevronDown, ExternalLink, Send, Phone, Calendar, ArrowLeft, MessageCircle } from 'lucide-react';
+import { X, ExternalLink, Send, Phone, Calendar, MessageCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const WHATSAPP = '526242175935';
@@ -127,7 +127,7 @@ export default function ChatWidget() {
   const lang = kb[locale] ?? kb.es;
 
   const [open, setOpen] = useState(false);
-  const [faqOpen, setFaqOpen] = useState(false);
+  const [, setFaqOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [bookingOpen, setBookingOpen] = useState(false);
@@ -325,52 +325,61 @@ export default function ChatWidget() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 8, scale: 0.98 }}
             transition={{ duration: 0.14, ease: [0.16, 1, 0.3, 1] }}
-            className="fixed bottom-24 right-6 z-50 w-[420px] max-w-[calc(100vw-24px)] flex flex-col shadow-2xl overflow-hidden"
-            style={{ borderRadius: '22px', border: '1px solid rgba(201,168,76,0.2)', background: '#04141C', maxHeight: '70vh', minHeight: '460px', boxShadow: '0 24px 60px -12px rgba(0,0,0,0.65), 0 0 0 1px rgba(201,168,76,0.06)' }}
+            className="fixed z-50 inset-x-3 bottom-24 sm:inset-x-auto sm:right-6 sm:w-[480px] flex flex-col overflow-hidden"
+            style={{
+              borderRadius: '24px',
+              border: '1px solid rgba(201,168,76,0.22)',
+              background: '#04141C',
+              maxHeight: 'min(760px, 78vh)',
+              minHeight: '560px',
+              boxShadow: '0 32px 80px -16px rgba(0,0,0,0.75), 0 0 0 1px rgba(201,168,76,0.06)',
+            }}
           >
             {/* Thin gold accent line */}
             <div className="h-[3px] shrink-0" style={{ background: 'linear-gradient(90deg, #9C7C33, #F0D28C 50%, #9C7C33)' }} />
 
             {/* Header */}
-            <div style={{ background: 'linear-gradient(135deg, #0A2430 0%, #12384A 100%)' }} className="px-6 py-5 flex items-center gap-3.5 border-b border-[#C9A84C]/12 shrink-0">
+            <div style={{ background: 'linear-gradient(135deg, #0A2430 0%, #12384A 100%)' }} className="px-6 py-5 flex items-center gap-4 border-b border-[#C9A84C]/12 shrink-0">
               <div
-                className="w-11 h-11 shrink-0 flex items-center justify-center"
+                className="w-12 h-12 shrink-0 flex items-center justify-center"
                 style={{
                   borderRadius: '50%',
                   background: 'linear-gradient(150deg, #F0D28C 0%, #C9A84C 55%, #9C7C33 100%)',
                   boxShadow: '0 1px 0 rgba(255,255,255,0.4) inset, 0 4px 16px -4px rgba(201,168,76,0.55)',
                 }}
               >
-                <span className="text-[#04141C] text-base font-medium" style={{ fontFamily: 'var(--font-display)' }}>VS</span>
+                <span className="text-[#04141C] text-lg font-medium" style={{ fontFamily: 'var(--font-display)' }}>VS</span>
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-white text-[15px] font-sans font-semibold tracking-wide">Villa Sera Concierge</p>
-                <p className="text-[#3DDC84] text-[10px] tracking-[0.2em] uppercase font-sans flex items-center gap-1.5">
+                <p className="text-[#EFE7DA] text-[17px] font-sans font-semibold tracking-wide leading-tight">
+                  Villa Sera Concierge
+                </p>
+                <p className="text-[#3DDC84] text-[11px] font-sans flex items-center gap-1.5 mt-1">
                   <span className="w-1.5 h-1.5 rounded-full bg-[#3DDC84] inline-block" />
-                  {locale === 'es' ? 'En línea ahora' : 'Online now'}
+                  {locale === 'es' ? 'En línea · responde al momento' : 'Online · replies right away'}
                 </p>
               </div>
               <button
                 onClick={handleClose}
-                className="text-white/30 hover:text-white/70 transition-colors p-1 -mr-1"
+                className="text-[#EFE7DA]/35 hover:text-[#EFE7DA]/80 transition-colors p-1.5 -mr-1.5"
                 aria-label={locale === 'es' ? 'Cerrar' : 'Close'}
               >
-                <X size={18} />
+                <X size={20} />
               </button>
             </div>
 
             {/* Messages */}
-            <div className="flex-1 overflow-y-auto px-5 pt-5 pb-2 space-y-3.5">
+            <div className="flex-1 overflow-y-auto px-5 pt-6 pb-3 space-y-4">
               {messages.map((msg, i) => (
                 <div key={i} className={`flex ${msg.from === 'user' ? 'justify-end' : 'justify-start'}`}>
                   <div
-                    className="px-4 py-3 text-[15px] font-sans leading-relaxed whitespace-pre-line max-w-[88%]"
+                    className="px-5 py-3.5 text-[15.5px] font-sans leading-[1.6] whitespace-pre-line max-w-[86%]"
                     style={{
                       background: msg.from === 'bot' ? '#0A2430' : 'linear-gradient(135deg, #C9A84C, #DFC07A)',
                       color: msg.from === 'bot' ? 'rgba(239,231,218,0.92)' : '#04141C',
-                      borderRadius: msg.from === 'bot' ? '4px 16px 16px 16px' : '16px 4px 16px 16px',
+                      borderRadius: msg.from === 'bot' ? '6px 20px 20px 20px' : '20px 6px 20px 20px',
                       border: msg.from === 'bot' ? '1px solid rgba(239,231,218,0.08)' : 'none',
-                      boxShadow: msg.from === 'bot' ? '0 2px 8px -2px rgba(0,0,0,0.3)' : '0 2px 10px -3px rgba(201,168,76,0.5)',
+                      boxShadow: msg.from === 'bot' ? '0 2px 8px -2px rgba(0,0,0,0.3)' : '0 2px 12px -3px rgba(201,168,76,0.45)',
                     }}
                   >
                     {msg.text}
@@ -380,14 +389,14 @@ export default function ChatWidget() {
               {typing && (
                 <div className="flex justify-start">
                   <div
-                    className="px-4 py-2.5 text-sm font-sans flex items-center gap-1"
-                    style={{ background: '#0A2430', borderRadius: '4px 16px 16px 16px' }}
+                    className="px-5 py-3.5 flex items-center gap-1.5"
+                    style={{ background: '#0A2430', borderRadius: '6px 20px 20px 20px' }}
                   >
                     {[0, 1, 2].map((i) => (
                       <motion.span
                         key={i}
                         className="w-1.5 h-1.5 rounded-full inline-block"
-                        style={{ background: 'rgba(255,255,255,0.5)' }}
+                        style={{ background: 'rgba(239,231,218,0.55)' }}
                         animate={{ opacity: [0.3, 1, 0.3] }}
                         transition={{ duration: 1, repeat: Infinity, delay: i * 0.15 }}
                       />
@@ -398,72 +407,39 @@ export default function ChatWidget() {
               <div ref={bottomRef} />
             </div>
 
-            {/* FAQ toggle */}
-            <div className="px-4 pb-2 shrink-0">
-              <button
-                onClick={() => setFaqOpen((v) => !v)}
-                className="w-full flex items-center justify-between gap-2 px-4 py-2.5 text-left transition-all duration-200"
-                style={{
-                  background: faqOpen ? 'rgba(201,168,76,0.08)' : 'rgba(255,255,255,0.03)',
-                  border: `1px solid ${faqOpen ? 'rgba(201,168,76,0.3)' : 'rgba(255,255,255,0.08)'}`,
-                  borderRadius: '10px',
-                }}
-              >
-                <span className="text-[#C9A84C]/80 text-[10px] font-sans tracking-[0.15em] uppercase">
-                  {lang.faqLabel}
-                </span>
-                <motion.span animate={{ rotate: faqOpen ? 180 : 0 }} transition={{ duration: 0.2 }}>
-                  <ChevronDown size={13} className="text-[#C9A84C]/60" />
-                </motion.span>
-              </button>
-
-              <AnimatePresence>
-                {faqOpen && (
-                  <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: 'auto' }}
-                    exit={{ opacity: 0, height: 0 }}
-                    transition={{ duration: 0.22 }}
-                    className="overflow-hidden"
+            {/* Quick topics — always visible so the questions are the invitation */}
+            <div className="relative shrink-0 border-t border-[#EFE7DA]/8">
+              {/* Fade at the right edge signals there is more to scroll */}
+              <div
+                className="pointer-events-none absolute right-0 top-0 bottom-0 w-10 z-10"
+                style={{ background: 'linear-gradient(90deg, rgba(4,20,28,0) 0%, #04141C 85%)' }}
+              />
+              <div className="flex gap-2 overflow-x-auto no-scrollbar px-5 py-3">
+                {lang.menu.map((item) => (
+                  <button
+                    key={item.value}
+                    onClick={() => openTopic(item.value)}
+                    className="shrink-0 flex items-center gap-1.5 text-[#EFE7DA]/80 hover:text-[#04141C] text-[13px] font-sans whitespace-nowrap px-3.5 py-2 transition-colors duration-150 border border-[#EFE7DA]/12 hover:bg-[#C9A84C] hover:border-[#C9A84C]"
+                    style={{ borderRadius: '999px' }}
                   >
-                    <div className="flex flex-col gap-1 pt-1.5">
-                      {lang.menu.map((item) => (
-                        <button
-                          key={item.value}
-                          onClick={() => openTopic(item.value)}
-                          className="flex items-center justify-between gap-2 text-white/75 hover:text-[#C9A84C] text-[12.5px] font-sans px-3.5 py-2.5 text-left transition-all duration-150 w-full"
-                          style={{
-                            background: 'rgba(255,255,255,0.03)',
-                            border: '1px solid rgba(255,255,255,0.06)',
-                            borderRadius: '8px',
-                          }}
-                          onMouseEnter={(e) => {
-                            e.currentTarget.style.borderColor = 'rgba(201,168,76,0.3)';
-                            e.currentTarget.style.background = 'rgba(201,168,76,0.05)';
-                          }}
-                          onMouseLeave={(e) => {
-                            e.currentTarget.style.borderColor = 'rgba(255,255,255,0.06)';
-                            e.currentTarget.style.background = 'rgba(255,255,255,0.03)';
-                          }}
-                        >
-                          <span>{item.label}</span>
-                          {'external' in item && item.external
-                            ? <ExternalLink size={10} className="shrink-0 opacity-40" />
-                            : <ChevronRight size={10} className="shrink-0 opacity-40" />
-                          }
-                        </button>
-                      ))}
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
+                    <span>{item.label}</span>
+                    {'external' in item && item.external && (
+                      <ExternalLink size={11} className="shrink-0 opacity-50" />
+                    )}
+                  </button>
+                ))}
+              </div>
             </div>
 
             {/* Text input */}
-            <div className="px-4 pb-3 shrink-0">
+            <div className="px-5 pb-4 pt-1 shrink-0">
               <div
-                className="flex items-center gap-2"
-                style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px' }}
+                className="flex items-center gap-2 pl-5 pr-2 py-1.5"
+                style={{
+                  background: '#0A2430',
+                  border: '1px solid rgba(239,231,218,0.12)',
+                  borderRadius: '999px',
+                }}
               >
                 <input
                   ref={inputRef}
@@ -473,21 +449,25 @@ export default function ChatWidget() {
                   onKeyDown={handleKey}
                   disabled={typing}
                   placeholder={lang.placeholder}
-                  className="flex-1 bg-transparent text-white/90 text-[15px] font-sans px-4 py-3.5 outline-none placeholder:text-white/25 disabled:opacity-50"
+                  className="flex-1 min-w-0 bg-transparent text-[#EFE7DA] text-[15.5px] font-sans py-2.5 outline-none placeholder:text-[#EFE7DA]/30 disabled:opacity-50"
                 />
                 <button
                   onClick={() => sendMessage(input)}
                   disabled={!input.trim() || typing}
-                  className="mr-2 p-1.5 transition-all duration-150 disabled:opacity-20"
-                  style={{ color: '#C9A84C' }}
+                  className="shrink-0 w-10 h-10 flex items-center justify-center text-[#04141C] transition-opacity duration-150 disabled:opacity-25"
+                  style={{
+                    borderRadius: '50%',
+                    background: 'linear-gradient(135deg, #C9A84C, #DFC07A)',
+                  }}
+                  aria-label={locale === 'es' ? 'Enviar' : 'Send'}
                 >
-                  <Send size={15} />
+                  <Send size={16} />
                 </button>
               </div>
             </div>
 
             {/* Bottom — Book button */}
-            <div style={{ background: '#111', borderTop: '1px solid rgba(201,168,76,0.12)', borderRadius: '0 0 20px 20px' }} className="px-4 py-3 shrink-0">
+            <div style={{ background: '#020C12', borderTop: '1px solid rgba(201,168,76,0.12)' }} className="px-5 py-4 shrink-0">
               <AnimatePresence mode="wait">
                 {bookingOpen ? (
                   <motion.div
@@ -497,7 +477,7 @@ export default function ChatWidget() {
                     exit={{ opacity: 0, y: 8 }}
                     className="flex flex-col gap-2"
                   >
-                    <p className="text-white/40 text-[10px] tracking-[0.15em] uppercase font-sans mb-0.5">{lang.book.prompt}</p>
+                    <p className="text-[#EFE7DA]/40 text-[10px] tracking-[0.15em] uppercase font-sans mb-0.5">{lang.book.prompt}</p>
                     <a
                       href={`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(lang.book.whatsappMsg)}`}
                       target="_blank"
@@ -510,8 +490,8 @@ export default function ChatWidget() {
                     </a>
                     <a
                       href={`mailto:${EMAIL}?subject=${encodeURIComponent(lang.book.emailSubject)}&body=${encodeURIComponent(lang.book.emailBody)}`}
-                      className="flex items-center justify-center gap-2 py-2.5 text-white text-xs font-sans tracking-wide transition-opacity hover:opacity-90"
-                      style={{ borderRadius: '10px', background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.12)' }}
+                      className="flex items-center justify-center gap-2 py-2.5 text-[#EFE7DA] text-xs font-sans tracking-wide transition-opacity hover:opacity-90"
+                      style={{ borderRadius: '10px', background: '#0A2430', border: '1px solid rgba(239,231,218,0.14)' }}
                     >
                       <Send size={12} />
                       Email
@@ -520,14 +500,14 @@ export default function ChatWidget() {
                       href={AIRBNB_URL}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center justify-center gap-1.5 py-2 text-white/40 hover:text-white/70 text-[10px] font-sans tracking-wide transition-colors"
+                      className="flex items-center justify-center gap-1.5 py-2 text-[#EFE7DA]/40 hover:text-[#EFE7DA]/70 text-[10px] font-sans tracking-wide transition-colors"
                     >
                       <ExternalLink size={11} />
                       Airbnb
                     </a>
                     <button
                       onClick={() => setBookingOpen(false)}
-                      className="text-white/30 hover:text-white/60 text-[10px] font-sans tracking-wide transition-colors py-1"
+                      className="text-[#EFE7DA]/30 hover:text-[#EFE7DA]/60 text-[10px] font-sans tracking-wide transition-colors py-1"
                     >
                       ← {locale === 'es' ? 'Cancelar' : 'Cancel'}
                     </button>
