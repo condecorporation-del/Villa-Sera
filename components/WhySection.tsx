@@ -21,12 +21,15 @@ export default function WhySection() {
 
   return (
     <section id="porque" ref={ref} className="relative py-24 lg:py-32 overflow-hidden">
-      {/* Background image */}
+      {/* Background image — sits under a ~90% opaque gradient, so it is
+          decorative texture rather than something anyone reads detail from.
+          Low quality here is invisible and saves ~250KB. */}
       <Image
         src="/images/CasaSergio139+.jpg"
-        alt="Villa Sera aerial Los Cabos"
+        alt=""
+        aria-hidden
         fill
-        quality={75}
+        quality={45}
         className="object-cover"
         sizes="100vw"
       />

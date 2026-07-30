@@ -70,7 +70,8 @@
       "banos": "Bathrooms",
       "exterior": "Exterior",
       "alberca": "Pool"
-    }
+    },
+    "play_video": "Play the villa film"
   },
   "experiences": {
     "label": "Experiences",

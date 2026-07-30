@@ -4,8 +4,11 @@ import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 import { useState, useRef } from 'react';
 import { motion, useInView, AnimatePresence } from 'framer-motion';
-import { X, ChevronLeft, ChevronRight } from 'lucide-react';
+import { X, ChevronLeft, ChevronRight, Play } from 'lucide-react';
 import SectionHeader from './SectionHeader';
+
+const VIDEO_SRC =
+  'https://res.cloudinary.com/dt9iyiorn/video/upload/v1782976236/Some_places_dont_just_take_your_breath_away_they_give_it_back_to_you._Villa_Sera_is_a_priva_xy0u9m.mp4';
 
 type Category = 'all' | 'sala' | 'cocina' | 'comedor' | 'cuartos' | 'banos' | 'exterior' | 'alberca';
 
@@ -59,6 +62,7 @@ export default function GallerySection() {
   const inView = useInView(ref, { once: true, margin: '-80px' });
   const [active, setActive] = useState<Category>('all');
   const [lightbox, setLightbox] = useState<number | null>(null);
+  const [videoOn, setVideoOn] = useState(false);
 
   const filtered = active === 'all'
     ? galleryImages.filter((img) => img.featured)
@@ -111,15 +115,54 @@ export default function GallerySection() {
             className="relative overflow-hidden mx-auto max-w-5xl shadow-[0_30px_80px_-20px_rgba(0,0,0,0.7)] ring-1 ring-[#EFE7DA]/12 bg-black"
             style={{ aspectRatio: '16/9' }}
           >
-            <video
-              controls
-              playsInline
-              preload="metadata"
-              poster="/images/CasaSergio233.jpg"
-              className="absolute inset-0 w-full h-full object-cover"
-            >
-              <source src="https://res.cloudinary.com/dt9iyiorn/video/upload/v1782976236/Some_places_dont_just_take_your_breath_away_they_give_it_back_to_you._Villa_Sera_is_a_priva_xy0u9m.mp4" type="video/mp4" />
-            </video>
+            {/* The film is ~9MB. It stays unrequested until someone asks for
+                it: until then this is just the optimised poster. */}
+            {videoOn ? (
+              <video
+                autoPlay
+                controls
+                playsInline
+                preload="auto"
+                poster="/images/CasaSergio233.jpg"
+                // autoPlay alone can be refused by the browser's autoplay
+                // policy; asking again once it can play covers that. If the
+                // browser still says no, the controls are right there.
+                onCanPlay={(e) => {
+                  void e.currentTarget.play().catch(() => {});
+                }}
+                className="absolute inset-0 w-full h-full object-cover"
+              >
+                <source src={VIDEO_SRC} type="video/mp4" />
+              </video>
+            ) : (
+              <button
+                onClick={() => setVideoOn(true)}
+                className="group absolute inset-0 w-full h-full"
+                aria-label={t('play_video')}
+              >
+                <Image
+                  src="/images/CasaSergio233.jpg"
+                  alt=""
+                  fill
+                  quality={70}
+                  className="object-cover"
+                  sizes="(max-width: 1024px) 100vw, 1024px"
+                />
+                <span className="absolute inset-0 bg-[#04141C]/25 group-hover:bg-[#04141C]/10 transition-colors duration-300" />
+                <span
+                  className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center transition-transform duration-300 group-hover:scale-105"
+                  style={{
+                    width: 76,
+                    height: 76,
+                    borderRadius: '50%',
+                    background: 'linear-gradient(140deg, #F0D28C 0%, #C9A84C 55%, #B08F3A 100%)',
+                    boxShadow: '0 12px 40px -8px rgba(0,0,0,0.6), 0 0 0 1px rgba(240,210,140,0.5)',
+                  }}
+                >
+                  <Play size={26} className="text-[#04141C] ml-1" fill="#04141C" />
+                </span>
+              </button>
+            )}
           </motion.div>
         ) : (
           <motion.div layout className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">

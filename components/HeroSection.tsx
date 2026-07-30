@@ -25,7 +25,7 @@ export default function HeroSection() {
           alt="Villa Sera — Los Cabos sunset"
           fill
           priority
-          quality={90}
+          quality={80}
           className="object-cover object-center"
           sizes="100vw"
         />
@@ -36,19 +36,22 @@ export default function HeroSection() {
 
       {/* Content */}
       <div className="relative z-20 text-center px-6 max-w-4xl mx-auto">
+        {/* Timings are deliberately tight: the h1 is this page's LCP element,
+            so every millisecond of delay/duration here is a millisecond of
+            Largest Contentful Paint. The sequence still reads as a reveal. */}
         <motion.p
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.9, delay: 0.3, ease }}
+          transition={{ duration: 0.5, delay: 0.05, ease }}
           className="text-[#C9A84C] text-[10px] tracking-[0.32em] uppercase font-sans mb-8"
         >
           {t('location')}
         </motion.p>
 
         <motion.h1
-          initial={{ opacity: 0, y: 28 }}
+          initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1.1, delay: 0.45, ease }}
+          transition={{ duration: 0.55, delay: 0.1, ease }}
           className="text-[#EFE7DA] text-6xl sm:text-7xl md:text-[7.5rem] font-light leading-[0.92] tracking-[-0.035em] mb-7"
           style={{ fontFamily: 'var(--font-display)' }}
         >
@@ -58,7 +61,7 @@ export default function HeroSection() {
         <motion.p
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.9, delay: 0.75, ease }}
+          transition={{ duration: 0.6, delay: 0.32, ease }}
           className="text-[#EFE7DA]/70 text-base sm:text-lg font-light leading-relaxed mb-11 font-sans max-w-xl mx-auto"
         >
           {t('tagline')}
@@ -67,7 +70,7 @@ export default function HeroSection() {
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.9, delay: 0.95, ease }}
+          transition={{ duration: 0.6, delay: 0.45, ease }}
           className="flex justify-center"
         >
           <a
@@ -86,7 +89,7 @@ export default function HeroSection() {
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ delay: 1.6, duration: 1.2 }}
+        transition={{ delay: 0.8, duration: 0.8 }}
         className="absolute bottom-0 left-0 right-0 z-20 border-t border-[#EFE7DA]/10 bg-[#04141C]/40 backdrop-blur-sm py-4 px-6"
       >
         <VillaConditions />

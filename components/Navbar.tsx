@@ -60,8 +60,8 @@ export default function Navbar() {
             <Image
               src="/logo.png"
               alt="Villa Sera"
-              width={480}
-              height={192}
+              width={768}
+              height={512}
               className="object-contain h-24 lg:h-32 w-auto"
               priority
             />

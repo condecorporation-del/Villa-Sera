@@ -70,7 +70,8 @@
       "banos": "Baños",
       "exterior": "Exterior",
       "alberca": "Alberca"
-    }
+    },
+    "play_video": "Reproducir el video de la villa"
   },
   "experiences": {
     "label": "Experiencias",
