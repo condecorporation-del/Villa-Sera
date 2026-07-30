@@ -54,7 +54,7 @@ export default function Navbar() {
       }`}
     >
       <div className="max-w-7xl mx-auto px-6 lg:px-12">
-        <div className="flex items-center justify-between h-28 md:h-40">
+        <div className="flex items-center justify-between h-24 lg:h-32">
           {/* Logo */}
           <a href="/" className="flex items-center -ml-3">
             <Image
@@ -62,13 +62,13 @@ export default function Navbar() {
               alt="Villa Sera"
               width={480}
               height={192}
-              className="object-contain h-28 md:h-40 w-auto"
+              className="object-contain h-24 lg:h-32 w-auto"
               priority
             />
           </a>
 
           {/* Desktop nav */}
-          <nav className="hidden md:flex items-center gap-8">
+          <nav className="hidden lg:flex items-center gap-8">
             {navLinks.map((link) => (
               <button
                 key={link.href}
@@ -81,7 +81,7 @@ export default function Navbar() {
           </nav>
 
           {/* Right side: lang switcher + CTA */}
-          <div className="hidden md:flex items-center gap-5">
+          <div className="hidden lg:flex items-center gap-5">
             {/* Professional Language Toggle */}
             <div className="flex items-center bg-[#EFE7DA]/5 rounded-full p-1 border border-[#EFE7DA]/10">
               <button
@@ -123,7 +123,7 @@ export default function Navbar() {
           </div>
 
           {/* Mobile menu toggle */}
-          <div className="flex md:hidden items-center gap-4">
+          <div className="flex lg:hidden items-center gap-4">
             {/* Mobile Language Toggle */}
             <button
               onClick={() => switchLocale(currentLocale === 'es' ? 'en' : 'es')}
@@ -147,7 +147,7 @@ export default function Navbar() {
 
       {/* Mobile menu */}
       {menuOpen && (
-        <div className="md:hidden bg-[#04141C] border-t border-[#EFE7DA]/10">
+        <div className="lg:hidden bg-[#04141C] border-t border-[#EFE7DA]/10">
           <nav className="max-w-7xl mx-auto px-6 py-6 flex flex-col gap-5">
             {/* Mobile Language Switcher in Menu */}
             <div className="flex items-center justify-center gap-4 pb-4 border-b border-[#EFE7DA]/10">

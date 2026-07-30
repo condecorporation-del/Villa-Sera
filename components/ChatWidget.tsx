@@ -132,14 +132,33 @@ export default function ChatWidget() {
   const [input, setInput] = useState('');
   const [bookingOpen, setBookingOpen] = useState(false);
   const [typing, setTyping] = useState(false);
+  const [teaser, setTeaser] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
+  // Seed the greeting on mount so the panel already has content the instant it
+  // opens, instead of populating after the open animation.
   useEffect(() => {
-    if (open && messages.length === 0) {
-      setMessages([{ from: 'bot', text: lang.greeting }]);
+    setMessages((prev) => (prev.length === 0 ? [{ from: 'bot', text: lang.greeting }] : prev));
+  }, [lang.greeting]);
+
+  // Invite the first question once, a few seconds in. Dismissed for the session
+  // as soon as it is closed or the chat is opened.
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    if (sessionStorage.getItem('vs-teaser-seen')) return;
+    const id = setTimeout(() => setTeaser(true), 4500);
+    return () => clearTimeout(id);
+  }, []);
+
+  const dismissTeaser = () => {
+    setTeaser(false);
+    try {
+      sessionStorage.setItem('vs-teaser-seen', '1');
+    } catch {
+      /* private mode — the teaser simply shows again next load */
     }
-  }, [open]);
+  };
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -149,6 +168,11 @@ export default function ChatWidget() {
     setOpen(false);
     setFaqOpen(false);
     setBookingOpen(false);
+  };
+
+  const handleOpen = () => {
+    dismissTeaser();
+    setOpen(true);
   };
 
   const sendMessage = async (text: string) => {
@@ -185,29 +209,79 @@ export default function ChatWidget() {
   return (
     <>
       {/* Floating button */}
-      <div className="fixed bottom-6 right-6 z-50">
-        {/* Breathing glow behind the button — draws the eye without feeling gimmicky */}
-        {!open && (
-          <motion.div
-            className="absolute inset-0 pointer-events-none"
-            style={{ borderRadius: '50px', background: 'radial-gradient(circle, rgba(201,168,76,0.55) 0%, rgba(201,168,76,0) 70%)' }}
-            animate={{ opacity: [0.5, 1, 0.5], scale: [1, 1.12, 1] }}
-            transition={{ duration: 2.6, repeat: Infinity, ease: 'easeInOut' }}
-          />
-        )}
-        <motion.button
-          onClick={() => (open ? handleClose() : setOpen(true))}
-          whileHover={{ scale: 1.04, y: -1 }}
-          whileTap={{ scale: 0.97 }}
-          className="relative flex items-center gap-3 pl-3.5 pr-5 py-3"
-          style={{
-            borderRadius: '50px',
-            background: 'linear-gradient(160deg, #1c1712 0%, #0a0806 100%)',
-            border: '1px solid rgba(201,168,76,0.45)',
-            boxShadow: '0 1px 0 rgba(255,255,255,0.06) inset, 0 12px 34px -8px rgba(0,0,0,0.6), 0 0 22px -4px rgba(201,168,76,0.35)',
-          }}
-          aria-label="Concierge"
-        >
+      <div className="fixed bottom-6 right-6 z-50 flex items-center gap-3">
+        {/* Teaser: invites the first question, once per session */}
+        <AnimatePresence>
+          {teaser && !open && (
+            <motion.div
+              initial={{ opacity: 0, x: 12, scale: 0.94 }}
+              animate={{ opacity: 1, x: 0, scale: 1 }}
+              exit={{ opacity: 0, x: 12, scale: 0.94 }}
+              transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
+              className="hidden sm:flex items-center gap-2 max-w-[15rem]"
+            >
+              <button
+                onClick={handleOpen}
+                className="text-left px-4 py-2.5 text-[13px] font-sans leading-snug text-[#EFE7DA] hover:text-white transition-colors"
+                style={{
+                  borderRadius: '14px 14px 4px 14px',
+                  background: 'linear-gradient(150deg, #12384A 0%, #0A2430 100%)',
+                  border: '1px solid rgba(201,168,76,0.35)',
+                  boxShadow: '0 12px 30px -10px rgba(0,0,0,0.6)',
+                }}
+              >
+                {locale === 'es'
+                  ? '¿Dudas sobre la villa o fechas? Pregúntame aquí.'
+                  : 'Questions about the villa or dates? Ask me here.'}
+              </button>
+              <button
+                onClick={dismissTeaser}
+                className="text-[#EFE7DA]/40 hover:text-[#EFE7DA]/80 transition-colors p-1"
+                aria-label={locale === 'es' ? 'Cerrar aviso' : 'Dismiss'}
+              >
+                <X size={13} />
+              </button>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        <div className="relative">
+          {/* Pulsing ring — draws the eye without covering content */}
+          {!open && (
+            <>
+              <motion.span
+                className="absolute inset-0 pointer-events-none"
+                style={{ borderRadius: '50px', border: '1.5px solid rgba(201,168,76,0.65)' }}
+                animate={{ opacity: [0.7, 0, 0.7], scale: [1, 1.22, 1] }}
+                transition={{ duration: 2.2, repeat: Infinity, ease: 'easeOut' }}
+              />
+              <motion.span
+                className="absolute inset-0 pointer-events-none"
+                style={{
+                  borderRadius: '50px',
+                  background:
+                    'radial-gradient(circle, rgba(201,168,76,0.5) 0%, rgba(201,168,76,0) 70%)',
+                }}
+                animate={{ opacity: [0.5, 1, 0.5], scale: [1, 1.1, 1] }}
+                transition={{ duration: 2.6, repeat: Infinity, ease: 'easeInOut' }}
+              />
+            </>
+          )}
+          <motion.button
+            onClick={() => (open ? handleClose() : handleOpen())}
+            whileHover={{ scale: 1.05, y: -1 }}
+            whileTap={{ scale: 0.97 }}
+            transition={{ duration: 0.12 }}
+            className="relative flex items-center gap-3 pl-3.5 pr-5 py-3"
+            style={{
+              borderRadius: '50px',
+              background: 'linear-gradient(160deg, #12384A 0%, #04141C 100%)',
+              border: '1px solid rgba(201,168,76,0.55)',
+              boxShadow:
+                '0 1px 0 rgba(255,255,255,0.08) inset, 0 12px 34px -8px rgba(0,0,0,0.65), 0 0 28px -4px rgba(201,168,76,0.45)',
+            }}
+            aria-label="Concierge"
+          >
           <span
             className="relative flex items-center justify-center shrink-0"
             style={{
@@ -219,16 +293,16 @@ export default function ChatWidget() {
             <AnimatePresence mode="wait">
               {open ? (
                 <motion.span key="close" initial={{ rotate: -90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: 90, opacity: 0 }} transition={{ duration: 0.2 }} className="flex">
-                  <X size={15} className="text-[#171310]" strokeWidth={2.4} />
+                  <X size={15} className="text-[#04141C]" strokeWidth={2.4} />
                 </motion.span>
               ) : (
                 <motion.span key="open" initial={{ rotate: 90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: -90, opacity: 0 }} transition={{ duration: 0.2 }} className="flex">
-                  <MessageCircle size={15} className="text-[#171310]" strokeWidth={2.4} />
+                  <MessageCircle size={15} className="text-[#04141C]" strokeWidth={2.4} />
                 </motion.span>
               )}
             </AnimatePresence>
             {!open && (
-              <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-[#3DDC84] ring-2 ring-[#0a0806]" />
+              <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-[#3DDC84] ring-2 ring-[#04141C]" />
             )}
           </span>
           <span className="flex flex-col items-start leading-tight">
@@ -239,25 +313,26 @@ export default function ChatWidget() {
               Villa Sera
             </span>
           </span>
-        </motion.button>
+          </motion.button>
+        </div>
       </div>
 
       {/* Chat window */}
       <AnimatePresence>
         {open && (
           <motion.div
-            initial={{ opacity: 0, y: 16, scale: 0.96 }}
+            initial={{ opacity: 0, y: 10, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 16, scale: 0.96 }}
-            transition={{ duration: 0.22 }}
+            exit={{ opacity: 0, y: 8, scale: 0.98 }}
+            transition={{ duration: 0.14, ease: [0.16, 1, 0.3, 1] }}
             className="fixed bottom-24 right-6 z-50 w-[420px] max-w-[calc(100vw-24px)] flex flex-col shadow-2xl overflow-hidden"
-            style={{ borderRadius: '22px', border: '1px solid rgba(201,168,76,0.2)', background: '#0f0f0f', maxHeight: '70vh', minHeight: '460px', boxShadow: '0 24px 60px -12px rgba(0,0,0,0.65), 0 0 0 1px rgba(201,168,76,0.06)' }}
+            style={{ borderRadius: '22px', border: '1px solid rgba(201,168,76,0.2)', background: '#04141C', maxHeight: '70vh', minHeight: '460px', boxShadow: '0 24px 60px -12px rgba(0,0,0,0.65), 0 0 0 1px rgba(201,168,76,0.06)' }}
           >
             {/* Thin gold accent line */}
             <div className="h-[3px] shrink-0" style={{ background: 'linear-gradient(90deg, #9C7C33, #F0D28C 50%, #9C7C33)' }} />
 
             {/* Header */}
-            <div style={{ background: 'linear-gradient(135deg, #171310 0%, #1a1408 100%)' }} className="px-6 py-5 flex items-center gap-3.5 border-b border-[#C9A84C]/12 shrink-0">
+            <div style={{ background: 'linear-gradient(135deg, #0A2430 0%, #12384A 100%)' }} className="px-6 py-5 flex items-center gap-3.5 border-b border-[#C9A84C]/12 shrink-0">
               <div
                 className="w-11 h-11 shrink-0 flex items-center justify-center"
                 style={{
@@ -266,7 +341,7 @@ export default function ChatWidget() {
                   boxShadow: '0 1px 0 rgba(255,255,255,0.4) inset, 0 4px 16px -4px rgba(201,168,76,0.55)',
                 }}
               >
-                <span className="text-[#171310] text-base font-medium" style={{ fontFamily: 'var(--font-display)' }}>VS</span>
+                <span className="text-[#04141C] text-base font-medium" style={{ fontFamily: 'var(--font-display)' }}>VS</span>
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-white text-[15px] font-sans font-semibold tracking-wide">Villa Sera Concierge</p>
@@ -291,10 +366,10 @@ export default function ChatWidget() {
                   <div
                     className="px-4 py-3 text-[15px] font-sans leading-relaxed whitespace-pre-line max-w-[88%]"
                     style={{
-                      background: msg.from === 'bot' ? 'rgba(255,255,255,0.06)' : 'linear-gradient(135deg, #C9A84C, #DFC07A)',
-                      color: msg.from === 'bot' ? 'rgba(255,255,255,0.9)' : '#0D0D0D',
+                      background: msg.from === 'bot' ? '#0A2430' : 'linear-gradient(135deg, #C9A84C, #DFC07A)',
+                      color: msg.from === 'bot' ? 'rgba(239,231,218,0.92)' : '#04141C',
                       borderRadius: msg.from === 'bot' ? '4px 16px 16px 16px' : '16px 4px 16px 16px',
-                      border: msg.from === 'bot' ? '1px solid rgba(255,255,255,0.06)' : 'none',
+                      border: msg.from === 'bot' ? '1px solid rgba(239,231,218,0.08)' : 'none',
                       boxShadow: msg.from === 'bot' ? '0 2px 8px -2px rgba(0,0,0,0.3)' : '0 2px 10px -3px rgba(201,168,76,0.5)',
                     }}
                   >
@@ -306,7 +381,7 @@ export default function ChatWidget() {
                 <div className="flex justify-start">
                   <div
                     className="px-4 py-2.5 text-sm font-sans flex items-center gap-1"
-                    style={{ background: 'rgba(255,255,255,0.06)', borderRadius: '4px 16px 16px 16px' }}
+                    style={{ background: '#0A2430', borderRadius: '4px 16px 16px 16px' }}
                   >
                     {[0, 1, 2].map((i) => (
                       <motion.span
@@ -427,7 +502,7 @@ export default function ChatWidget() {
                       href={`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(lang.book.whatsappMsg)}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center justify-center gap-2 py-3 text-[#0D0D0D] text-xs font-sans font-semibold tracking-wide transition-opacity hover:opacity-90"
+                      className="flex items-center justify-center gap-2 py-3 text-[#04141C] text-xs font-sans font-semibold tracking-wide transition-opacity hover:opacity-90"
                       style={{ borderRadius: '10px', background: 'linear-gradient(135deg, #C9A84C, #DFC07A)' }}
                     >
                       <Phone size={13} />
@@ -464,7 +539,7 @@ export default function ChatWidget() {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: 8 }}
                     onClick={() => setBookingOpen(true)}
-                    className="w-full flex items-center justify-center gap-2 py-3 text-[#0D0D0D] text-xs font-sans font-semibold tracking-[0.1em] uppercase transition-opacity hover:opacity-90"
+                    className="w-full flex items-center justify-center gap-2 py-3 text-[#04141C] text-xs font-sans font-semibold tracking-[0.1em] uppercase transition-opacity hover:opacity-90"
                     style={{ borderRadius: '10px', background: 'linear-gradient(135deg, #C9A84C, #DFC07A)' }}
                   >
                     <Calendar size={13} />

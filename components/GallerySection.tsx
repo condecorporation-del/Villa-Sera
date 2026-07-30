@@ -77,6 +77,7 @@ export default function GallerySection() {
           title={t('title')}
           subtitle={t('subtitle')}
           inView={inView}
+          align="center"
         />
 
         {/* Category filters */}
@@ -84,7 +85,7 @@ export default function GallerySection() {
           initial={{ opacity: 0 }}
           animate={inView ? { opacity: 1 } : {}}
           transition={{ duration: 0.6, delay: 0.3 }}
-          className="flex flex-wrap gap-2.5 mb-10"
+          className="flex flex-wrap justify-center gap-2.5 mb-10"
         >
           {categories.map((cat) => (
             <button
