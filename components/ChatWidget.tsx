@@ -264,23 +264,32 @@ export default function ChatWidget() {
         </AnimatePresence>
 
         <div className="relative">
-          {/* Pulsing ring — draws the eye without covering content */}
+          {/* Expanding rings — the button is the brightest thing on a dark page,
+              and these keep pushing the eye back to it until it is used. */}
           {!open && (
             <>
+              {[0, 1].map((i) => (
+                <motion.span
+                  key={i}
+                  className="absolute inset-0 pointer-events-none"
+                  style={{ borderRadius: '999px', border: '2px solid rgba(201,168,76,0.7)' }}
+                  animate={{ opacity: [0.75, 0], scale: [1, 1.18] }}
+                  transition={{
+                    duration: 2.4,
+                    repeat: Infinity,
+                    ease: 'easeOut',
+                    delay: i * 1.2,
+                  }}
+                />
+              ))}
               <motion.span
-                className="absolute inset-0 pointer-events-none"
-                style={{ borderRadius: '50px', border: '1.5px solid rgba(201,168,76,0.65)' }}
-                animate={{ opacity: [0.7, 0, 0.7], scale: [1, 1.22, 1] }}
-                transition={{ duration: 2.2, repeat: Infinity, ease: 'easeOut' }}
-              />
-              <motion.span
-                className="absolute inset-0 pointer-events-none"
+                className="absolute -inset-1 pointer-events-none"
                 style={{
-                  borderRadius: '50px',
+                  borderRadius: '999px',
                   background:
-                    'radial-gradient(circle, rgba(201,168,76,0.5) 0%, rgba(201,168,76,0) 70%)',
+                    'radial-gradient(circle, rgba(201,168,76,0.55) 0%, rgba(201,168,76,0) 70%)',
                 }}
-                animate={{ opacity: [0.5, 1, 0.5], scale: [1, 1.1, 1] }}
+                animate={{ opacity: [0.45, 0.95, 0.45], scale: [1, 1.06, 1] }}
                 transition={{ duration: 2.6, repeat: Infinity, ease: 'easeInOut' }}
               />
             </>
@@ -290,45 +299,55 @@ export default function ChatWidget() {
             whileHover={{ scale: 1.05, y: -1 }}
             whileTap={{ scale: 0.97 }}
             transition={{ duration: 0.12 }}
-            className="relative flex items-center gap-3 pl-3.5 pr-5 py-3"
+            className="relative flex items-center gap-3 pl-3 pr-6 py-3"
             style={{
-              borderRadius: '50px',
-              background: 'linear-gradient(160deg, #12384A 0%, #04141C 100%)',
-              border: '1px solid rgba(201,168,76,0.55)',
-              boxShadow:
-                '0 1px 0 rgba(255,255,255,0.08) inset, 0 12px 34px -8px rgba(0,0,0,0.65), 0 0 28px -4px rgba(201,168,76,0.45)',
+              borderRadius: '999px',
+              background: open
+                ? 'linear-gradient(160deg, #12384A 0%, #04141C 100%)'
+                : 'linear-gradient(140deg, #F0D28C 0%, #C9A84C 52%, #B08F3A 100%)',
+              border: open ? '1px solid rgba(201,168,76,0.55)' : '1px solid rgba(240,210,140,0.9)',
+              boxShadow: open
+                ? '0 12px 34px -8px rgba(0,0,0,0.65)'
+                : '0 1px 0 rgba(255,255,255,0.45) inset, 0 14px 38px -10px rgba(0,0,0,0.7), 0 0 34px -6px rgba(201,168,76,0.75)',
             }}
             aria-label="Concierge"
           >
           <span
             className="relative flex items-center justify-center shrink-0"
             style={{
-              width: 32, height: 32, borderRadius: '50%',
-              background: 'linear-gradient(150deg, #F0D28C 0%, #C9A84C 55%, #9C7C33 100%)',
-              boxShadow: '0 1px 0 rgba(255,255,255,0.4) inset, 0 0 12px -2px rgba(201,168,76,0.6)',
+              width: 36, height: 36, borderRadius: '50%',
+              background: open ? 'linear-gradient(150deg, #F0D28C 0%, #C9A84C 55%, #9C7C33 100%)' : '#04141C',
             }}
           >
             <AnimatePresence mode="wait">
               {open ? (
                 <motion.span key="close" initial={{ rotate: -90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: 90, opacity: 0 }} transition={{ duration: 0.2 }} className="flex">
-                  <X size={15} className="text-[#04141C]" strokeWidth={2.4} />
+                  <X size={17} className="text-[#04141C]" strokeWidth={2.4} />
                 </motion.span>
               ) : (
                 <motion.span key="open" initial={{ rotate: 90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: -90, opacity: 0 }} transition={{ duration: 0.2 }} className="flex">
-                  <MessageCircle size={15} className="text-[#04141C]" strokeWidth={2.4} />
+                  <MessageCircle size={17} className="text-[#F0D28C]" strokeWidth={2.4} />
                 </motion.span>
               )}
             </AnimatePresence>
             {!open && (
-              <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-[#3DDC84] ring-2 ring-[#04141C]" />
+              <span className="absolute -top-0.5 -right-0.5 w-3 h-3 rounded-full bg-[#3DDC84] ring-2 ring-[#C9A84C]" />
             )}
           </span>
           <span className="flex flex-col items-start leading-tight">
-            <span className="text-[#F5DBA0] text-[13.5px] tracking-[0.06em] font-sans font-semibold">
+            <span
+              className={`text-[15px] tracking-[0.02em] font-sans font-bold ${
+                open ? 'text-[#F5DBA0]' : 'text-[#04141C]'
+              }`}
+            >
               Concierge
             </span>
-            <span className="text-[#C9A84C]/65 text-[9px] tracking-[0.2em] uppercase font-sans hidden sm:inline">
-              Villa Sera
+            <span
+              className={`text-[10.5px] font-sans ${
+                open ? 'text-[#C9A84C]/65' : 'text-[#04141C]/70'
+              }`}
+            >
+              {locale === 'es' ? '¿Cómo te ayudo?' : 'How can I help?'}
             </span>
           </span>
           </motion.button>
