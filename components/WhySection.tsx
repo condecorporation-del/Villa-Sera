@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { motion, useInView } from 'framer-motion';
 import { useRef } from 'react';
 import { Lock, Gem, Clock, MapPin } from 'lucide-react';
+import SectionHeader from './SectionHeader';
 
 const pillars = [
   { key: 'privacy', icon: Lock },
@@ -29,52 +30,29 @@ export default function WhySection() {
         className="object-cover"
         sizes="100vw"
       />
-      <div className="absolute inset-0 bg-[#0D0D0D]/80" />
+      <div className="absolute inset-0 bg-gradient-to-b from-[#04141C]/92 via-[#04141C]/80 to-[#04141C]/95" />
 
       <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-12">
-        {/* Header */}
-        <div className="text-center mb-16">
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={inView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.6 }}
-            className="text-[#C9A84C] text-xs tracking-[0.35em] uppercase font-sans mb-4"
-          >
-            {t('label')}
-          </motion.p>
-          <motion.h2
-            initial={{ opacity: 0, y: 20 }}
-            animate={inView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.7, delay: 0.1 }}
-            className="text-white text-4xl lg:text-5xl font-light tracking-wide"
-            style={{ fontFamily: 'var(--font-cormorant)' }}
-          >
-            {t('title')}
-          </motion.h2>
-        </div>
+        <SectionHeader label={t('label')} title={t('title')} inView={inView} />
 
         {/* Pillars */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-px bg-white/10">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-px bg-[#EFE7DA]/10">
           {pillars.map(({ key, icon: Icon }, i) => (
             <motion.div
               key={key}
-              initial={{ opacity: 0, y: 30 }}
+              initial={{ opacity: 0, y: 24 }}
               animate={inView ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.6, delay: i * 0.12 }}
-              className="bg-transparent hover:bg-white/5 transition-colors duration-300 p-10 text-center"
+              transition={{ duration: 0.7, delay: i * 0.1, ease: [0.16, 1, 0.3, 1] }}
+              className="bg-[#04141C]/40 hover:bg-[#12384A]/50 backdrop-blur-[2px] transition-colors duration-500 p-9 lg:p-10"
             >
-              <Icon
-                size={28}
-                className="text-[#C9A84C] mx-auto mb-5"
-                strokeWidth={1.5}
-              />
+              <Icon size={22} className="text-[#C9A84C] mb-6" strokeWidth={1.5} />
               <h3
-                className="text-white text-2xl font-light tracking-wide mb-2"
-                style={{ fontFamily: 'var(--font-cormorant)' }}
+                className="text-[#EFE7DA] text-2xl font-light tracking-[-0.01em] mb-3"
+                style={{ fontFamily: 'var(--font-display)' }}
               >
                 {t(`items.${key}.title`)}
               </h3>
-              <p className="text-white/50 text-sm font-sans font-light">
+              <p className="text-[#EFE7DA]/55 text-sm leading-relaxed font-sans font-light">
                 {t(`items.${key}.description`)}
               </p>
             </motion.div>

@@ -266,7 +266,7 @@ export default function ChatWidget() {
                   boxShadow: '0 1px 0 rgba(255,255,255,0.4) inset, 0 4px 16px -4px rgba(201,168,76,0.55)',
                 }}
               >
-                <span className="text-[#171310] text-base font-medium" style={{ fontFamily: 'var(--font-cormorant)' }}>VS</span>
+                <span className="text-[#171310] text-base font-medium" style={{ fontFamily: 'var(--font-display)' }}>VS</span>
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-white text-[15px] font-sans font-semibold tracking-wide">Villa Sera Concierge</p>

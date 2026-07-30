@@ -1,21 +1,21 @@
 import type { Metadata } from 'next';
-import { Cormorant_Garamond, Inter } from 'next/font/google';
+import { Fraunces, Manrope } from 'next/font/google';
 import { NextIntlClientProvider } from 'next-intl';
 import { cookies } from 'next/headers';
 import { Analytics } from '@vercel/analytics/next';
 import './globals.css';
 
-const cormorant = Cormorant_Garamond({
-  variable: '--font-cormorant',
+// Fraunces: variable optical serif — high contrast at display sizes, real
+// character. Manrope: modern semi-geometric grotesk for body and UI.
+const fraunces = Fraunces({
+  variable: '--font-display',
   subsets: ['latin'],
-  weight: ['300', '400', '500', '600', '700'],
   style: ['normal', 'italic'],
 });
 
-const inter = Inter({
-  variable: '--font-inter',
+const manrope = Manrope({
+  variable: '--font-body',
   subsets: ['latin'],
-  weight: ['300', '400', '500', '600'],
 });
 
 const BASE_URL = 'https://villa-sera.com';
@@ -233,7 +233,7 @@ export async function LocaleLayout({
   const messages = (await import(`@/messages/${locale}.json`)).default;
 
   return (
-    <html lang={locale} className={`${cormorant.variable} ${inter.variable}`}>
+    <html lang={locale} className={`${fraunces.variable} ${manrope.variable}`}>
       <head>
         <script
           type="application/ld+json"

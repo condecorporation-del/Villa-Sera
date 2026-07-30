@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { motion, useInView } from 'framer-motion';
 import { useRef } from 'react';
 import { ArrowRight } from 'lucide-react';
+import SectionHeader from './SectionHeader';
 
 const experiences = [
   {
@@ -30,44 +31,23 @@ export default function ExperiencesSection() {
   const inView = useInView(ref, { once: true, margin: '-80px' });
 
   return (
-    <section id="experiencias" ref={ref} className="py-24 lg:py-32 bg-[#F8F4EF]">
+    <section id="experiencias" ref={ref} className="py-24 lg:py-36 bg-[#04141C]">
       <div className="max-w-7xl mx-auto px-6 lg:px-12">
-        {/* Header */}
-        <div className="text-center mb-16">
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={inView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.6 }}
-            className="text-[#C9A84C] text-xs tracking-[0.35em] uppercase font-sans mb-4"
-          >
-            {t('label')}
-          </motion.p>
-          <motion.h2
-            initial={{ opacity: 0, y: 20 }}
-            animate={inView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.7, delay: 0.1 }}
-            className="text-[#0D0D0D] text-4xl lg:text-5xl font-light tracking-wide"
-            style={{ fontFamily: 'var(--font-cormorant)' }}
-          >
-            {t('title')}
-          </motion.h2>
-        </div>
+        <SectionHeader label={t('label')} title={t('title')} inView={inView} />
 
         {/* Experience cards */}
-        <div className="space-y-16">
+        <div className="space-y-4 lg:space-y-6">
           {experiences.map(({ key, image, alt }, i) => (
             <motion.div
               key={key}
               initial={{ opacity: 0, y: 50 }}
               animate={inView ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.8, delay: i * 0.2 }}
-              className={`grid grid-cols-1 lg:grid-cols-2 gap-0 items-stretch ${
-                i % 2 === 1 ? 'lg:flex-row-reverse' : ''
-              }`}
+              transition={{ duration: 0.9, delay: i * 0.12, ease: [0.16, 1, 0.3, 1] }}
+              className="group grid grid-cols-1 lg:grid-cols-12 gap-0 items-stretch"
             >
               {/* Image */}
               <div
-                className={`relative h-72 lg:h-96 overflow-hidden ${
+                className={`relative h-72 lg:h-[26rem] overflow-hidden lg:col-span-7 ${
                   i % 2 === 1 ? 'lg:order-2' : ''
                 }`}
               >
@@ -76,38 +56,35 @@ export default function ExperiencesSection() {
                   alt={alt}
                   fill
                   quality={75}
-                  className="object-cover hover:scale-105 transition-transform duration-700"
-                  sizes="(max-width: 1024px) 100vw, 50vw"
+                  className="object-cover group-hover:scale-[1.04] transition-transform duration-[1400ms] ease-out"
+                  sizes="(max-width: 1024px) 100vw, 58vw"
                 />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#04141C]/40 to-transparent" />
               </div>
 
               {/* Text */}
               <div
-                className={`bg-[#0D0D0D] p-10 lg:p-14 flex flex-col justify-center ${
+                className={`bg-[#0A2430] p-10 lg:p-14 flex flex-col justify-center lg:col-span-5 ${
                   i % 2 === 1 ? 'lg:order-1' : ''
                 }`}
               >
-                <p className="text-[#C9A84C] text-xs tracking-[0.3em] uppercase font-sans mb-4">
-                  0{i + 1}
-                </p>
                 <h3
-                  className="text-white text-3xl lg:text-4xl font-light tracking-wide mb-4"
-                  style={{ fontFamily: 'var(--font-cormorant)' }}
+                  className="text-[#EFE7DA] text-3xl lg:text-[2.5rem] font-light leading-[1.1] tracking-[-0.02em] mb-5"
+                  style={{ fontFamily: 'var(--font-display)' }}
                 >
                   {t(`items.${key}.title`)}
                 </h3>
-                <div className="w-12 h-px bg-[#C9A84C] mb-6" />
-                <p className="text-white/60 text-base leading-relaxed font-sans font-light mb-8">
+                <p className="text-[#EFE7DA]/55 text-base leading-[1.75] font-sans font-light mb-9">
                   {t(`items.${key}.description`)}
                 </p>
                 <a
                   href="https://wa.me/526242175935"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-2 text-[#C9A84C] text-sm tracking-[0.15em] uppercase font-sans hover:gap-4 transition-all duration-300 group"
+                  className="inline-flex items-center gap-2.5 self-start text-[#C9A84C] hover:text-[#E4703A] text-[11px] tracking-[0.18em] uppercase font-sans border-b border-[#C9A84C]/30 hover:border-[#E4703A] pb-1.5 transition-colors duration-300"
                 >
                   {t(`items.${key}.cta`)}
-                  <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
+                  <ArrowRight size={13} />
                 </a>
               </div>
             </motion.div>

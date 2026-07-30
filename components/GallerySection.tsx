@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { useState, useRef } from 'react';
 import { motion, useInView, AnimatePresence } from 'framer-motion';
 import { X, ChevronLeft, ChevronRight } from 'lucide-react';
+import SectionHeader from './SectionHeader';
 
 type Category = 'all' | 'sala' | 'cocina' | 'comedor' | 'cuartos' | 'banos' | 'exterior' | 'alberca';
 
@@ -69,52 +70,30 @@ export default function GallerySection() {
   const categories: Category[] = ['all', 'sala', 'cocina', 'comedor', 'cuartos', 'banos', 'exterior', 'alberca'];
 
   return (
-    <section id="galeria" ref={ref} className="py-24 lg:py-32 bg-[#F8F4EF] border-t border-[#0D0D0D]/10">
+    <section id="galeria" ref={ref} className="py-24 lg:py-36 bg-[#0A2430]">
       <div className="max-w-7xl mx-auto px-6 lg:px-12">
-        {/* Header */}
-        <div className="text-center mb-12">
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={inView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.6 }}
-            className="text-[#C9A84C] text-xs tracking-[0.35em] uppercase font-sans mb-4"
-          >
-            {t('label')}
-          </motion.p>
-          <motion.h2
-            initial={{ opacity: 0, y: 20 }}
-            animate={inView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.7, delay: 0.1 }}
-            className="text-[#0D0D0D] text-4xl lg:text-5xl font-light tracking-wide mb-4"
-            style={{ fontFamily: 'var(--font-cormorant)' }}
-          >
-            {t('title')}
-          </motion.h2>
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={inView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.7, delay: 0.2 }}
-            className="text-[#0D0D0D]/50 text-base font-sans font-light"
-          >
-            {t('subtitle')}
-          </motion.p>
-        </div>
+        <SectionHeader
+          label={t('label')}
+          title={t('title')}
+          subtitle={t('subtitle')}
+          inView={inView}
+        />
 
         {/* Category filters */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={inView ? { opacity: 1 } : {}}
           transition={{ duration: 0.6, delay: 0.3 }}
-          className="flex flex-wrap justify-center gap-3 mb-10"
+          className="flex flex-wrap gap-2.5 mb-10"
         >
           {categories.map((cat) => (
             <button
               key={cat}
               onClick={() => setActive(cat)}
-              className={`text-xs tracking-[0.2em] uppercase font-sans px-5 py-2 border transition-all duration-200 ${
+              className={`text-[10px] tracking-[0.18em] uppercase font-sans px-4 py-2.5 border transition-colors duration-200 ${
                 active === cat
-                  ? 'bg-[#0D0D0D] text-white border-[#0D0D0D]'
-                  : 'text-[#0D0D0D]/60 border-[#0D0D0D]/20 hover:border-[#0D0D0D]/60'
+                  ? 'bg-[#C9A84C] text-[#04141C] border-[#C9A84C]'
+                  : 'text-[#EFE7DA]/55 border-[#EFE7DA]/15 hover:border-[#EFE7DA]/50 hover:text-[#EFE7DA]'
               }`}
             >
               {t(`categories.${cat}`)}
@@ -128,7 +107,7 @@ export default function GallerySection() {
             initial={{ opacity: 0, scale: 0.97 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.4 }}
-            className="relative rounded-sm overflow-hidden mx-auto max-w-4xl"
+            className="relative overflow-hidden mx-auto max-w-5xl shadow-[0_30px_80px_-20px_rgba(0,0,0,0.7)] ring-1 ring-[#EFE7DA]/12 bg-black"
             style={{ aspectRatio: '16/9' }}
           >
             <video
@@ -181,7 +160,7 @@ export default function GallerySection() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/95 z-[100] flex items-center justify-center"
+            className="fixed inset-0 bg-[#04141C]/97 backdrop-blur-sm z-[100] flex items-center justify-center"
             onClick={() => setLightbox(null)}
           >
             <button

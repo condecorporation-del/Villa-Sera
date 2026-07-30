@@ -49,7 +49,7 @@ export default function Navbar() {
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
         scrolled || menuOpen
-          ? 'bg-[#0D0D0D]/95 backdrop-blur-md shadow-lg'
+          ? 'bg-[#04141C]/95 backdrop-blur-md shadow-lg'
           : 'bg-gradient-to-b from-black/50 to-transparent'
       }`}
     >
@@ -73,7 +73,7 @@ export default function Navbar() {
               <button
                 key={link.href}
                 onClick={() => handleAnchor(link.href)}
-                className="text-white/80 hover:text-[#C9A84C] text-sm tracking-[0.12em] uppercase font-sans font-light transition-colors duration-200 bg-transparent border-none cursor-pointer"
+                className="text-[#EFE7DA]/80 hover:text-[#C9A84C] text-sm tracking-[0.12em] uppercase font-sans font-light transition-colors duration-200 bg-transparent border-none cursor-pointer"
               >
                 {link.label}
               </button>
@@ -83,14 +83,14 @@ export default function Navbar() {
           {/* Right side: lang switcher + CTA */}
           <div className="hidden md:flex items-center gap-5">
             {/* Professional Language Toggle */}
-            <div className="flex items-center bg-white/5 rounded-full p-1 border border-white/10">
+            <div className="flex items-center bg-[#EFE7DA]/5 rounded-full p-1 border border-[#EFE7DA]/10">
               <button
                 onClick={() => switchLocale('en')}
                 disabled={isPending}
                 className={`px-4 py-2 rounded-full text-xs font-sans font-medium transition-all duration-200 ${
                   currentLocale === 'en'
-                    ? 'bg-[#C9A84C] text-[#0D0D0D]'
-                    : 'text-white/60 hover:text-white'
+                    ? 'bg-[#C9A84C] text-[#04141C]'
+                    : 'text-[#EFE7DA]/60 hover:text-[#EFE7DA]'
                 } ${isPending ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
               >
                 <span className="flex items-center gap-2">
@@ -103,8 +103,8 @@ export default function Navbar() {
                 disabled={isPending}
                 className={`px-4 py-2 rounded-full text-xs font-sans font-medium transition-all duration-200 ${
                   currentLocale === 'es'
-                    ? 'bg-[#C9A84C] text-[#0D0D0D]'
-                    : 'text-white/60 hover:text-white'
+                    ? 'bg-[#C9A84C] text-[#04141C]'
+                    : 'text-[#EFE7DA]/60 hover:text-[#EFE7DA]'
                 } ${isPending ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
               >
                 <span className="flex items-center gap-2">
@@ -116,7 +116,7 @@ export default function Navbar() {
 
             <button
               onClick={() => handleAnchor('#contacto')}
-              className="border border-[#C9A84C] text-[#C9A84C] hover:bg-[#C9A84C] hover:text-[#0D0D0D] text-xs tracking-[0.2em] uppercase font-sans px-5 py-2.5 transition-all duration-300 cursor-pointer"
+              className="border border-[#C9A84C] text-[#C9A84C] hover:bg-[#C9A84C] hover:text-[#04141C] text-xs tracking-[0.2em] uppercase font-sans px-5 py-2.5 transition-all duration-300 cursor-pointer"
             >
               {t('book')}
             </button>
@@ -128,7 +128,7 @@ export default function Navbar() {
             <button
               onClick={() => switchLocale(currentLocale === 'es' ? 'en' : 'es')}
               disabled={isPending}
-              className="flex items-center gap-1.5 text-white/60 hover:text-white text-xs font-sans font-medium transition-colors"
+              className="flex items-center gap-1.5 text-[#EFE7DA]/60 hover:text-[#EFE7DA] text-xs font-sans font-medium transition-colors"
             >
               <Globe size={16} />
               <span>{currentLocale === 'es' ? '🇲🇽 ES' : '🇺🇸 EN'}</span>
@@ -136,7 +136,7 @@ export default function Navbar() {
 
             <button
               onClick={() => setMenuOpen(!menuOpen)}
-              className="text-white p-1"
+              className="text-[#EFE7DA] p-1"
               aria-label="Toggle menu"
             >
               {menuOpen ? <X size={22} /> : <Menu size={22} />}
@@ -147,17 +147,17 @@ export default function Navbar() {
 
       {/* Mobile menu */}
       {menuOpen && (
-        <div className="md:hidden bg-[#0D0D0D] border-t border-white/10">
+        <div className="md:hidden bg-[#04141C] border-t border-[#EFE7DA]/10">
           <nav className="max-w-7xl mx-auto px-6 py-6 flex flex-col gap-5">
             {/* Mobile Language Switcher in Menu */}
-            <div className="flex items-center justify-center gap-4 pb-4 border-b border-white/10">
+            <div className="flex items-center justify-center gap-4 pb-4 border-b border-[#EFE7DA]/10">
               <button
                 onClick={() => switchLocale('en')}
                 disabled={isPending}
                 className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-sans font-medium transition-all ${
                   currentLocale === 'en'
-                    ? 'bg-[#C9A84C] text-[#0D0D0D]'
-                    : 'text-white/60 border border-white/20'
+                    ? 'bg-[#C9A84C] text-[#04141C]'
+                    : 'text-[#EFE7DA]/60 border border-[#EFE7DA]/20'
                 } ${isPending ? 'opacity-50' : ''}`}
               >
                 <span className="text-lg">🇺🇸</span>
@@ -168,8 +168,8 @@ export default function Navbar() {
                 disabled={isPending}
                 className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-sans font-medium transition-all ${
                   currentLocale === 'es'
-                    ? 'bg-[#C9A84C] text-[#0D0D0D]'
-                    : 'text-white/60 border border-white/20'
+                    ? 'bg-[#C9A84C] text-[#04141C]'
+                    : 'text-[#EFE7DA]/60 border border-[#EFE7DA]/20'
                 } ${isPending ? 'opacity-50' : ''}`}
               >
                 <span className="text-lg">🇲🇽</span>
@@ -181,7 +181,7 @@ export default function Navbar() {
               <button
                 key={link.href}
                 onClick={() => handleAnchor(link.href)}
-                className="text-white/80 hover:text-[#C9A84C] text-base tracking-[0.12em] uppercase font-sans font-light transition-colors text-left bg-transparent border-none cursor-pointer"
+                className="text-[#EFE7DA]/80 hover:text-[#C9A84C] text-base tracking-[0.12em] uppercase font-sans font-light transition-colors text-left bg-transparent border-none cursor-pointer"
               >
                 {link.label}
               </button>
