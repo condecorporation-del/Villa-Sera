@@ -69,7 +69,7 @@ export default function GallerySection() {
   const categories: Category[] = ['all', 'sala', 'cocina', 'comedor', 'cuartos', 'banos', 'exterior', 'alberca'];
 
   return (
-    <section id="galeria" ref={ref} className="py-24 lg:py-32 bg-[#F8F4EF]">
+    <section id="galeria" ref={ref} className="py-24 lg:py-32 bg-[#F8F4EF] border-t border-[#0D0D0D]/10">
       <div className="max-w-7xl mx-auto px-6 lg:px-12">
         {/* Header */}
         <div className="text-center mb-12">
