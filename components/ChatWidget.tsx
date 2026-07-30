@@ -142,22 +142,39 @@ export default function ChatWidget() {
     setMessages((prev) => (prev.length === 0 ? [{ from: 'bot', text: lang.greeting }] : prev));
   }, [lang.greeting]);
 
-  // Invite the first question once, a few seconds in. Dismissed for the session
-  // as soon as it is closed or the chat is opened.
+  const markSeen = () => {
+    try {
+      sessionStorage.setItem('vs-concierge-seen', '1');
+    } catch {
+      /* private mode — the greeting simply shows again next load */
+    }
+  };
+
+  // Show the concierge on its own so visitors can see help is here, once per
+  // session. On a phone the panel would cover the whole screen, so there it
+  // announces itself with the teaser bubble instead of opening.
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    if (sessionStorage.getItem('vs-teaser-seen')) return;
-    const id = setTimeout(() => setTeaser(true), 4500);
+    if (sessionStorage.getItem('vs-concierge-seen')) return;
+
+    const id = setTimeout(() => {
+      const roomForPanel = window.matchMedia('(min-width: 640px)').matches;
+      const stillReading = !document.hidden;
+      if (!stillReading) return;
+      if (roomForPanel) {
+        setOpen(true);
+      } else {
+        setTeaser(true);
+      }
+      markSeen();
+    }, 5000);
+
     return () => clearTimeout(id);
   }, []);
 
   const dismissTeaser = () => {
     setTeaser(false);
-    try {
-      sessionStorage.setItem('vs-teaser-seen', '1');
-    } catch {
-      /* private mode — the teaser simply shows again next load */
-    }
+    markSeen();
   };
 
   useEffect(() => {
@@ -168,6 +185,7 @@ export default function ChatWidget() {
     setOpen(false);
     setFaqOpen(false);
     setBookingOpen(false);
+    markSeen();
   };
 
   const handleOpen = () => {
@@ -209,7 +227,7 @@ export default function ChatWidget() {
   return (
     <>
       {/* Floating button */}
-      <div className="fixed bottom-6 right-6 z-50 flex items-center gap-3">
+      <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-2.5 sm:flex-row sm:items-center sm:gap-3">
         {/* Teaser: invites the first question, once per session */}
         <AnimatePresence>
           {teaser && !open && (
@@ -218,7 +236,7 @@ export default function ChatWidget() {
               animate={{ opacity: 1, x: 0, scale: 1 }}
               exit={{ opacity: 0, x: 12, scale: 0.94 }}
               transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
-              className="hidden sm:flex items-center gap-2 max-w-[15rem]"
+              className="flex items-center gap-2 max-w-[15rem]"
             >
               <button
                 onClick={handleOpen}
