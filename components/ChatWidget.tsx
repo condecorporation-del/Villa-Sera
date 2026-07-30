@@ -367,8 +367,11 @@ export default function ChatWidget() {
               borderRadius: '24px',
               border: '1px solid rgba(201,168,76,0.22)',
               background: '#04141C',
-              maxHeight: 'min(760px, 78vh)',
-              minHeight: '560px',
+              // A fixed height (not just a max) so the flex-1 messages area
+              // actually fills the space left over instead of shrinking to
+              // its own content — that was what let the topics grid look
+              // like it was taking over the whole panel.
+              height: 'min(760px, 84vh)',
               boxShadow: '0 32px 80px -16px rgba(0,0,0,0.75), 0 0 0 1px rgba(201,168,76,0.06)',
             }}
           >
@@ -406,7 +409,7 @@ export default function ChatWidget() {
             </div>
 
             {/* Messages */}
-            <div className="flex-1 overflow-y-auto px-5 pt-6 pb-3 space-y-4">
+            <div className="flex-1 min-h-[120px] overflow-y-auto px-5 pt-6 pb-3 space-y-4">
               {messages.map((msg, i) => (
                 <div key={i} className={`flex ${msg.from === 'user' ? 'justify-end' : 'justify-start'}`}>
                   <div
@@ -447,7 +450,7 @@ export default function ChatWidget() {
             {/* Quick topics — a grid so every question is visible at once,
                 not a scrolling row that hides most of them */}
             <div className="shrink-0 border-t border-[#EFE7DA]/8 px-5 py-3.5">
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid grid-cols-2 gap-2 max-h-[310px] overflow-y-auto pr-0.5">
                 {lang.menu.map((item) => {
                   const [emoji, ...rest] = item.label.split(' ');
                   const text = rest.join(' ');
