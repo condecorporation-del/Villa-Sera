@@ -96,7 +96,7 @@ const jsonLd = {
         'Villa privada de ultra-lujo en Los Cabos con 4 recámaras, 4 baños completos, playa privada nadable exclusiva y vistas directas al Mar de Cortés y al Arco de Cabo San Lucas. Servicios opcionales: chef privado, mayordomo 24/7, yate, spa y concierge.',
       url: BASE_URL,
       telephone: '+526242175935',
-      email: 'villasera@seraholding.com',
+      email: 'villasera@villa-sera.com',
       priceRange: '$$$$$',
       currenciesAccepted: 'USD, MXN',
       paymentAccepted: 'Cash, Credit Card, Bank Transfer',

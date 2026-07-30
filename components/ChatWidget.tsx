@@ -6,7 +6,7 @@ import { X, ChevronDown, ExternalLink, Send, Phone, Calendar, MessageCircle } fr
 import { motion, AnimatePresence } from 'framer-motion';
 
 const WHATSAPP = '526242175935';
-const EMAIL = 'villasera@seraholding.com';
+const EMAIL = 'villasera@villa-sera.com';
 const AIRBNB_URL = 'https://www.airbnb.mx/rooms/1583142544563137626';
 
 const kb = {

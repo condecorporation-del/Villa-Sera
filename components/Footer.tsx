@@ -80,11 +80,11 @@ export default function Footer() {
                 +52 624 217 5935
               </a>
               <a
-                href="mailto:villasera@seraholding.com"
+                href="mailto:villasera@villa-sera.com"
                 className="flex items-center gap-3 text-[#EFE7DA]/65 hover:text-[#C9A84C] text-sm font-sans font-light transition-colors"
               >
                 <Mail size={14} className="text-[#C9A84C]" />
-                villasera@seraholding.com
+                villasera@villa-sera.com
               </a>
               <a
                 href="https://www.airbnb.mx/rooms/1583142544563137626"

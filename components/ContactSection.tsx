@@ -65,11 +65,11 @@ export default function ContactSection() {
                   <span>{t('direct.whatsapp')} — +52 624 217 5935</span>
                 </a>
                 <a
-                  href="mailto:villasera@seraholding.com"
+                  href="mailto:villasera@villa-sera.com"
                   className="flex items-center gap-4 border border-[#EFE7DA]/15 hover:border-[#C9A84C] text-[#EFE7DA]/70 hover:text-[#EFE7DA] text-sm font-sans tracking-wide px-6 py-4 transition-colors duration-300"
                 >
                   <Mail size={18} className="text-[#C9A84C]" />
-                  <span>{t('direct.email')} — villasera@seraholding.com</span>
+                  <span>{t('direct.email')} — villasera@villa-sera.com</span>
                 </a>
               </div>
             </div>

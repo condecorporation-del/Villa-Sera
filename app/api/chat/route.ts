@@ -71,7 +71,7 @@ function buildSystemPrompt(bookedRanges: { start: string; end: string }[], local
 PROPERTY MANAGER / CONTACT:
 - Property manager: Marlon Alexis Herrera Flores
 - WhatsApp / phone: +52 624 217 5935 (this is the direct line for booking, questions, and coordinating add-on services)
-- Email: villasera@seraholding.com
+- Email: villasera@villa-sera.com
 - Airbnb listing: ${AIRBNB_URL}
 
 VILLA FACTS:
