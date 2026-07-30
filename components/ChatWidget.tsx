@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { useLocale } from 'next-intl';
-import { X, ExternalLink, Send, Phone, Calendar, MessageCircle } from 'lucide-react';
+import { X, ChevronDown, ExternalLink, Send, Phone, Calendar, MessageCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const WHATSAPP = '526242175935';
@@ -127,7 +127,7 @@ export default function ChatWidget() {
   const lang = kb[locale] ?? kb.es;
 
   const [open, setOpen] = useState(false);
-  const [, setFaqOpen] = useState(false);
+  const [faqOpen, setFaqOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [bookingOpen, setBookingOpen] = useState(false);
@@ -420,7 +420,7 @@ export default function ChatWidget() {
             </div>
 
             {/* Messages */}
-            <div className="flex-1 min-h-[280px] overflow-y-auto px-5 pt-6 pb-3 space-y-4">
+            <div className="flex-1 min-h-[90px] overflow-y-auto px-5 pt-6 pb-3 space-y-4">
               {messages.map((msg, i) => (
                 <motion.div
                   key={i}
@@ -464,41 +464,78 @@ export default function ChatWidget() {
               <div ref={bottomRef} />
             </div>
 
-            {/* Quick topics — a slim single-row strip. The conversation is the
-                point of a chat; this is a shortcut into it, not a second
-                competing panel, so it stays compact and scrolls sideways. */}
-            <div className="relative shrink-0 border-t border-[#EFE7DA]/8">
-              <div
-                className="pointer-events-none absolute right-0 top-0 bottom-0 w-8 z-10"
-                style={{ background: 'linear-gradient(90deg, rgba(4,20,28,0) 0%, #04141C 80%)' }}
-              />
-              <div className="flex gap-2 overflow-x-auto no-scrollbar px-5 py-3">
-                {lang.menu.map((item) => (
-                  <button
-                    key={item.value}
-                    onClick={() => openTopic(item.value)}
-                    className="shrink-0 flex items-center gap-1.5 text-[#EFE7DA]/75 hover:text-[#04141C] text-[12.5px] font-sans whitespace-nowrap px-3.5 py-2 transition-colors duration-150"
-                    style={{
-                      borderRadius: '999px',
-                      background: 'rgba(239,231,218,0.05)',
-                      border: '1px solid rgba(239,231,218,0.12)',
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.background = '#C9A84C';
-                      e.currentTarget.style.borderColor = '#C9A84C';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.background = 'rgba(239,231,218,0.05)';
-                      e.currentTarget.style.borderColor = 'rgba(239,231,218,0.12)';
-                    }}
+            {/* Quick topics — collapsed by default so the conversation is
+                what the panel shows; tap to reveal all 9 at once in a grid,
+                instead of a strip where most are hidden off-screen. */}
+            <div className="shrink-0 border-t border-[#EFE7DA]/8">
+              <button
+                onClick={() => setFaqOpen((v) => !v)}
+                className="w-full flex items-center justify-between gap-2 px-5 py-3 text-left"
+              >
+                <span className="text-[#C9A84C] text-[11px] font-sans tracking-[0.14em] uppercase">
+                  {lang.faqLabel}
+                </span>
+                <motion.span animate={{ rotate: faqOpen ? 180 : 0 }} transition={{ duration: 0.2 }}>
+                  <ChevronDown size={15} className="text-[#C9A84C]/70" />
+                </motion.span>
+              </button>
+
+              <AnimatePresence>
+                {faqOpen && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: 'auto', opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+                    className="overflow-hidden"
                   >
-                    <span>{item.label}</span>
-                    {'external' in item && item.external && (
-                      <ExternalLink size={10} className="shrink-0 opacity-50" />
-                    )}
-                  </button>
-                ))}
-              </div>
+                    <div className="grid grid-cols-2 gap-2 px-5 pb-3.5 max-h-[280px] overflow-y-auto">
+                      {lang.menu.map((item) => {
+                        const [emoji, ...rest] = item.label.split(' ');
+                        const text = rest.join(' ');
+                        return (
+                          <button
+                            key={item.value}
+                            onClick={() => openTopic(item.value)}
+                            className="group flex items-center gap-2.5 text-left px-3 py-2.5 transition-colors duration-150"
+                            style={{
+                              borderRadius: '14px',
+                              background: 'rgba(239,231,218,0.04)',
+                              border: '1px solid rgba(239,231,218,0.1)',
+                            }}
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.background = 'rgba(201,168,76,0.12)';
+                              e.currentTarget.style.borderColor = 'rgba(201,168,76,0.4)';
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.background = 'rgba(239,231,218,0.04)';
+                              e.currentTarget.style.borderColor = 'rgba(239,231,218,0.1)';
+                            }}
+                          >
+                            <span
+                              className="shrink-0 flex items-center justify-center text-[15px]"
+                              style={{
+                                width: 30,
+                                height: 30,
+                                borderRadius: '50%',
+                                background: 'rgba(201,168,76,0.14)',
+                              }}
+                            >
+                              {emoji}
+                            </span>
+                            <span className="flex-1 min-w-0 text-[#EFE7DA]/85 group-hover:text-[#EFE7DA] text-[12.5px] leading-tight font-sans">
+                              {text}
+                            </span>
+                            {'external' in item && item.external && (
+                              <ExternalLink size={11} className="shrink-0 opacity-40" />
+                            )}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
 
             {/* Text input */}
