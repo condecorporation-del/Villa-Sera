@@ -380,15 +380,26 @@ export default function ChatWidget() {
 
             {/* Header */}
             <div style={{ background: 'linear-gradient(135deg, #0A2430 0%, #12384A 100%)' }} className="px-6 py-5 flex items-center gap-4 border-b border-[#C9A84C]/12 shrink-0">
-              <div
-                className="w-12 h-12 shrink-0 flex items-center justify-center"
-                style={{
-                  borderRadius: '50%',
-                  background: 'linear-gradient(150deg, #F0D28C 0%, #C9A84C 55%, #9C7C33 100%)',
-                  boxShadow: '0 1px 0 rgba(255,255,255,0.4) inset, 0 4px 16px -4px rgba(201,168,76,0.55)',
-                }}
-              >
-                <span className="text-[#04141C] text-lg font-medium" style={{ fontFamily: 'var(--font-display)' }}>VS</span>
+              <div className="relative shrink-0">
+                <motion.span
+                  className="absolute -inset-1.5 pointer-events-none"
+                  style={{
+                    borderRadius: '50%',
+                    background: 'radial-gradient(circle, rgba(201,168,76,0.45) 0%, rgba(201,168,76,0) 72%)',
+                  }}
+                  animate={{ opacity: [0.5, 1, 0.5], scale: [1, 1.08, 1] }}
+                  transition={{ duration: 2.4, repeat: Infinity, ease: 'easeInOut' }}
+                />
+                <div
+                  className="relative w-12 h-12 flex items-center justify-center"
+                  style={{
+                    borderRadius: '50%',
+                    background: 'linear-gradient(150deg, #F0D28C 0%, #C9A84C 55%, #9C7C33 100%)',
+                    boxShadow: '0 1px 0 rgba(255,255,255,0.4) inset, 0 4px 16px -4px rgba(201,168,76,0.55)',
+                  }}
+                >
+                  <span className="text-[#04141C] text-lg font-medium" style={{ fontFamily: 'var(--font-display)' }}>VS</span>
+                </div>
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-[#EFE7DA] text-[17px] font-sans font-semibold tracking-wide leading-tight">
@@ -409,9 +420,15 @@ export default function ChatWidget() {
             </div>
 
             {/* Messages */}
-            <div className="flex-1 min-h-[120px] overflow-y-auto px-5 pt-6 pb-3 space-y-4">
+            <div className="flex-1 min-h-[280px] overflow-y-auto px-5 pt-6 pb-3 space-y-4">
               {messages.map((msg, i) => (
-                <div key={i} className={`flex ${msg.from === 'user' ? 'justify-end' : 'justify-start'}`}>
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+                  className={`flex ${msg.from === 'user' ? 'justify-end' : 'justify-start'}`}
+                >
                   <div
                     className="px-5 py-3.5 text-[15.5px] font-sans leading-[1.6] whitespace-pre-line max-w-[86%]"
                     style={{
@@ -424,7 +441,7 @@ export default function ChatWidget() {
                   >
                     {msg.text}
                   </div>
-                </div>
+                </motion.div>
               ))}
               {typing && (
                 <div className="flex justify-start">
@@ -447,52 +464,40 @@ export default function ChatWidget() {
               <div ref={bottomRef} />
             </div>
 
-            {/* Quick topics — a grid so every question is visible at once,
-                not a scrolling row that hides most of them */}
-            <div className="shrink-0 border-t border-[#EFE7DA]/8 px-5 py-3.5">
-              <div className="grid grid-cols-2 gap-2 max-h-[310px] overflow-y-auto pr-0.5">
-                {lang.menu.map((item) => {
-                  const [emoji, ...rest] = item.label.split(' ');
-                  const text = rest.join(' ');
-                  return (
-                    <button
-                      key={item.value}
-                      onClick={() => openTopic(item.value)}
-                      className="group flex items-center gap-2.5 text-left px-3 py-2.5 transition-colors duration-150"
-                      style={{
-                        borderRadius: '14px',
-                        background: 'rgba(239,231,218,0.04)',
-                        border: '1px solid rgba(239,231,218,0.1)',
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.background = 'rgba(201,168,76,0.12)';
-                        e.currentTarget.style.borderColor = 'rgba(201,168,76,0.4)';
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.background = 'rgba(239,231,218,0.04)';
-                        e.currentTarget.style.borderColor = 'rgba(239,231,218,0.1)';
-                      }}
-                    >
-                      <span
-                        className="shrink-0 flex items-center justify-center text-[15px]"
-                        style={{
-                          width: 30,
-                          height: 30,
-                          borderRadius: '50%',
-                          background: 'rgba(201,168,76,0.14)',
-                        }}
-                      >
-                        {emoji}
-                      </span>
-                      <span className="flex-1 min-w-0 text-[#EFE7DA]/85 group-hover:text-[#EFE7DA] text-[12.5px] leading-tight font-sans">
-                        {text}
-                      </span>
-                      {'external' in item && item.external && (
-                        <ExternalLink size={11} className="shrink-0 opacity-40" />
-                      )}
-                    </button>
-                  );
-                })}
+            {/* Quick topics — a slim single-row strip. The conversation is the
+                point of a chat; this is a shortcut into it, not a second
+                competing panel, so it stays compact and scrolls sideways. */}
+            <div className="relative shrink-0 border-t border-[#EFE7DA]/8">
+              <div
+                className="pointer-events-none absolute right-0 top-0 bottom-0 w-8 z-10"
+                style={{ background: 'linear-gradient(90deg, rgba(4,20,28,0) 0%, #04141C 80%)' }}
+              />
+              <div className="flex gap-2 overflow-x-auto no-scrollbar px-5 py-3">
+                {lang.menu.map((item) => (
+                  <button
+                    key={item.value}
+                    onClick={() => openTopic(item.value)}
+                    className="shrink-0 flex items-center gap-1.5 text-[#EFE7DA]/75 hover:text-[#04141C] text-[12.5px] font-sans whitespace-nowrap px-3.5 py-2 transition-colors duration-150"
+                    style={{
+                      borderRadius: '999px',
+                      background: 'rgba(239,231,218,0.05)',
+                      border: '1px solid rgba(239,231,218,0.12)',
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = '#C9A84C';
+                      e.currentTarget.style.borderColor = '#C9A84C';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = 'rgba(239,231,218,0.05)';
+                      e.currentTarget.style.borderColor = 'rgba(239,231,218,0.12)';
+                    }}
+                  >
+                    <span>{item.label}</span>
+                    {'external' in item && item.external && (
+                      <ExternalLink size={10} className="shrink-0 opacity-50" />
+                    )}
+                  </button>
+                ))}
               </div>
             </div>
 
